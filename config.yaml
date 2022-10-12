@@ -1,0 +1,64 @@
+path:
+  #路径配置
+
+  #密码表路径
+  passwords_path: ./passwords.txt
+
+  #pack 待解压压缩包路径
+  pack_path: ./pack
+
+  #unpack 压缩包解压完成存放路径
+  unpack_path: ./unpack
+
+base:
+  #基础配置
+
+  #是否将压缩包解压的文件放进新文件夹中 [true/false]
+  #开启过后压缩包的文件就不会爆开了
+  parcel_unpack_file: true
+
+  #解压成功后是否删除压缩包 [true/false]
+  unpack_success_del: false
+
+  #解压是否保持文件的层级关系 [true/false]
+  #true: 保持原有目录层级关系
+  #false: 提取全部文件到指定目录
+  #       注意不同层级的相同名字的文件,可以搭配 unpack_over_write_model=t
+  keep_dir: true
+
+  #自动解压是否包含子文件夹 [true/false]
+  deep_pack_file: true
+
+  #提取文件覆写模式 [a/s/t/u]
+  #提取文件与现有文件冲突时使用
+  #a: 覆盖所有现有文件
+  #s: 跳过提取现有文件
+  #t: 自动重命名提取文件
+  #u: 自动重命名现有文件
+  unpack_over_write_model: t
+
+  #并发解压的数量上限[>=1]
+  unpack_thread_pool_max: 10
+
+  #并发测试压缩包的数量上限[>=1]
+  test_pack_thread_pool_max: 20
+
+pack_filter:
+  #压缩包文件过滤配置
+
+  #过滤模式 [true/false]
+  #true 包含模式: filter_re 命中则尝试解压此文件
+  #false 排除模式: filter_re 未命中则尝试解压此文件
+  filter_include_model: true
+
+  #压缩包过滤筛选正则
+  #匹配文件的名称(包含后缀名 例如: logo.png)
+  #   示例:
+  #   1. 解压全部非jpg后缀的文件
+  #        filter_model: false
+  #        filter_re: jpg$
+  #   2. 解压全部7z后缀的文件
+  #        filter_model: true
+  #        filter_re: 7z$
+  filter_re: .*
+

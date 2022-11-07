@@ -53,3 +53,18 @@ def time_format(time: datetime, format_str: str = '%Y-%m-%d %H:%M:%S.%f') -> str
 
 def time_diff(start_time: datetime, end_time: datetime) -> int:
     return (end_time - start_time).seconds
+
+
+def del_empty_folder(clear_path: str) -> bool:
+    has_file = False
+    for item in os.listdir(clear_path):
+        really_path = os.path.join(clear_path, item)
+        if os.path.isfile(really_path):
+            has_file = True
+        elif os.path.isdir(really_path):
+            item_has_file = del_empty_folder(really_path)
+            if not item_has_file:
+                os.rmdir(really_path)
+            else:
+                has_file = True
+    return has_file

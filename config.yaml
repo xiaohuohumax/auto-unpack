@@ -20,6 +20,9 @@ base:
   #解压成功后是否删除压缩包 [true/false]
   unpack_success_del: false
 
+  #是否删除解压完成后pack中的空文件夹 [true/false]
+  unpack_after_empty_folder_del: false
+
   #解压是否保持文件的层级关系 [true/false]
   #true: 保持原有目录层级关系
   #false: 提取全部文件到指定目录

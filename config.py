@@ -10,6 +10,7 @@ from utils import abs_path, title_format, exists_file, read_file
 @dataclass
 class ConfigBase:
     unpack_success_del: bool = False
+    unpack_after_empty_folder_del: bool = False
     unpack_thread_pool_max: int = 10
     test_pack_thread_pool_max: int = 20
     unpack_over_write_model: str = 't'
@@ -25,6 +26,7 @@ class ConfigBase:
     def __str__(self):
         return '\n'.join([
             f'解压成功后是否删除压缩包:{self.unpack_success_del}',
+            f'是否删除解压完成后pack中的空文件夹:{self.unpack_success_del}',
             f'并发解压的数量上限:{self.unpack_thread_pool_max}',
             f'并发测试压缩包的数量上限:{self.test_pack_thread_pool_max}',
             f'提取文件覆写模式:{self.unpack_over_write_model}',

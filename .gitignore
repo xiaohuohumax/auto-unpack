@@ -1,2 +1,6 @@
 .idea
 unpack.log
+
+unpack
+pack
+__pycache__

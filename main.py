@@ -13,7 +13,7 @@ from exception import UnpackException
 from log import only_logger, logger
 from util7zip.util_7z import Util7z
 from utils import abs_path, read_file, path_join, dict_format_str, write_file, title_format, time_diff, str_rep, \
-    remove_file
+    remove_file, del_empty_folder
 
 
 class PackFileStatus(Enum):
@@ -236,6 +236,14 @@ class AutoUnpack(object):
         logger.info(f'详细统计信息见:{cls._unpack_report_path}')
 
     @classmethod
+    def _clear(cls):
+        # 解压完成后pack中的空文件夹
+        if cls._config.base.unpack_after_empty_folder_del:
+            logger.info('开始清理空文件夹')
+            del_empty_folder(cls._config.path.pack_path)
+            logger.info('清理空文件夹完成')
+
+    @classmethod
     def _run_auto_unpack(cls):
         # 显示 banner
         cls._show_banner()
@@ -249,6 +257,8 @@ class AutoUnpack(object):
         cls._test_pack()
         # 解压压缩包
         cls._unpack()
+        # 清理
+        cls._clear()
         # 生成解压报告
         cls._create_unpack_report()
 

@@ -1,4 +1,4 @@
-<p align="center"><img src="img/logo.png"></p>
+<p style="text-align:center;"><img src="./img/logo.png" alt="auto-unpack"></p>
 
 ## 功能作用
 
@@ -18,45 +18,102 @@
 
 ## 实现说明
 
-通过调用 7zip.exe 实现批量解压压缩包
+通过调用 7z.exe 实现批量解压压缩包
 
 ## 执行流程
 
-1. 从待解压文件夹中筛选符合要求的待解压文件
-2. 测试待解压文件的完整性,顺便匹配密码,文件不完整或者没匹配中密码的则视为测试失败
-3. 解压测试成功的待解压文件
+**流程说明**: 流程[2-7]可开启/关闭,可以灵活配置
+
+1. 压缩包扫描: 扫描待解压文件夹下全部文件(是否包含子文件夹)
+2. 压缩包改名: 批量将异常分卷压缩包改回正确后缀 例如: .part01删除.rar -> .part01.rar
+3. 压缩包过滤: 筛选压缩包文件,排除不想解压的文件
+4. 压缩包识别: 识别压缩包的信息,是否分卷压缩,压缩类型,大小等等
+5. 压缩包测试: 测试压缩包完整性,并尝试匹配密码表的密码
+6. 压缩包解压: 解压压缩包
+7. 压缩包清理: 清理空文件夹
+8. 生成执行报告
+
+## 状态说明
+
+```text
+# 此文件已被收录准备执行后续操作
+SCAN = '扫描收录'
+
+RENAME = '修改名字'
+RENAME_FAIL = '改名失败'
+UN_RENAME = '未改名字'
+
+# 可以进行后续识别,测试,解压操作
+FILTER_INCLUDE = '过滤包含'
+
+FILTER_EXCLUDE = '过滤排除'
+
+# 压缩包信息识别成功
+ANALYSIS_SUCCESS = '识别成功'
+
+# 压缩信息识别失败 (注意: 某些类型压缩包需要输入密码才可识别,若密码错误也会识别失败)
+ANALYSIS_FAIL = '识别失败'
+
+# 识别成功 且被识别为分卷压缩的子卷 (注意: 某些类型子卷无法识别 例如:7z.002 则会被设置为 识别失败 'ANALYSIS_FAIL')
+ANALYSIS_SUCCESS_SPLIT = '识别成功(分卷子卷)'
+
+# 测试 (只会测试 识别成功的压缩包,子卷排除)
+# 测试成功(压缩包完整)
+TEST_SUCCESS = '测试成功'
+
+TEST_FAIL = '测试失败'
+
+# 解压操作
+UNPACK_SUCCESS = '解压成功'
+
+UNPACK_FAIL = '解压失败'
+```
 
 ## 目录说明
 
 ```text
 auto-unpack
  ├── banner
- ├── config.py
- ├── config.yaml            / 配置
- ├── exception.py
+ ├── clear.bat
+ ├── config.py              // 配置类
+ ├── config.yaml            // *全局配置
+ ├── core.py
  ├── img
  │   └── logo.png
- ├── log.py
- ├── main.bat               / 命令行启动脚本
- ├── main.py                / 程序入口
- ├── pack                   / 待解压文件存放文件夹
- ├── passwords.txt          / 密码表
+ ├── LICENSE
+ ├── log.py                 // 日志配置类
+ ├── main.bat               // *cmd快捷运行
+ ├── main.py                // *项目入口
+ ├── pack                   // *压缩包存放文件夹
+ │   └── hello world 7z     // 测试压缩包 7z 类型 密码:auto-unpack
+ ├── passwords.txt          // *密码表
  ├── readme.md
- ├── unpack                 / 解压完成存放文件夹
+ ├── report.txt             // 执行后的统计报告
+ ├── unpack                 // *压缩包解压后存放文件夹
  ├── unpack.log
- ├── unpack_report.txt      / 自动解压完成结果统计
- ├── util7zip               / 7-zip 依赖
+ ├── util7zip               // 7-zip 命令行调用库
  │   ├── lib7zip
- │   │   ├── 7-zip.chm      / command chm
+ │   │   ├── 7-zip.chm      // 7z.exe 命令手册
  │   │   ├── 7-zip.chw
  │   │   ├── 7z.dll
- │   │   ├── 7z.exe         / 7-zip
+ │   │   ├── 7z.exe
  │   │   ├── History.txt
  │   │   ├── License.txt
  │   │   └── readme.txt
- │   └── util_7z.py         / 7-zip 简单包装
+ │   ├── result.py
+ │   ├── utils.py
+ │   ├── util7z.py          // 库主文件
+ │   └── __init__.py
  └── utils.py
 ```
+
+## 7-zip支持格式
+
++ **压缩/解压缩**:
+  7z、XZ、BZIP2、GZIP、TAR、ZIP 以及 WIM
++ **仅解压缩**:
+  AR、ARJ、CAB、CHM、CPIO、CramFS、DMG、EXT、FAT、GPT、HFS、IHEX、ISO、LZH、LZMA、MBR、MSI、NSIS、NTFS、QCOW2、RAR、RPM、SquashFS、UDF、UEFI、VDI、VHD、VMDK、WIM、XAR
+  以及 Z
 
 ## 其他
 

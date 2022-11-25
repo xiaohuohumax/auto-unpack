@@ -1,98 +1,329 @@
-from dataclasses import dataclass, asdict, field
+import logging
+from dataclasses import dataclass, field
+from typing import List
 
 from dacite import from_dict
 from ruamel import yaml
 
-from exception import UnpackException
-from utils import abs_path, title_format, exists_file, read_file
+import utils
+from core import PackFileStatusEnum, KeysValuesEnum, UnpackException
 
 
 @dataclass
-class ConfigBase:
-    unpack_success_del: bool = False
-    unpack_after_empty_folder_del: bool = False
-    unpack_thread_pool_max: int = 10
-    test_pack_thread_pool_max: int = 20
-    unpack_over_write_model: str = 't'
-    parcel_unpack_file: bool = True
-    keep_dir: bool = True
-    deep_pack_file: bool = True
+class ConfigPackPath:
+    passwords: str = './passwords.txt'
+    pack: str = './pack'
+    unpack: str = './unpack'
+    report: str = './report.txt'
 
     def __post_init__(self):
-        unpack_over_write_model_allow = ['a', 's', 't', 'u']
-        if self.unpack_over_write_model not in unpack_over_write_model_allow:
-            raise UnpackException(f'提取文件覆写模式只能选择{unpack_over_write_model_allow}')
+        self.passwords = utils.abs_path(self.passwords)
+        self.pack = utils.abs_path(self.pack)
+        self.unpack = utils.abs_path(self.unpack)
+        self.report = utils.abs_path(self.report)
+
+        if not utils.is_exists_file(self.passwords):
+            raise UnpackException(f'路径配置-密码表不存在:{self.passwords}')
+        if not utils.is_exists_file(self.pack):
+            raise UnpackException(f'路径配置-压缩包存放路径不存在:{self.pack}')
 
     def __str__(self):
         return '\n'.join([
-            f'解压成功后是否删除压缩包:{self.unpack_success_del}',
-            f'是否删除解压完成后pack中的空文件夹:{self.unpack_success_del}',
-            f'并发解压的数量上限:{self.unpack_thread_pool_max}',
-            f'并发测试压缩包的数量上限:{self.test_pack_thread_pool_max}',
-            f'提取文件覆写模式:{self.unpack_over_write_model}',
-            f'是否将压缩包解压的文件放进新文件夹中:{self.parcel_unpack_file}',
-            f'解压是否保持文件的层级关系:{self.keep_dir}',
-            f'自动解压是否包含子文件夹:{self.deep_pack_file}',
+            f'密码表路径:{self.passwords}',
+            f'压缩包存放路径:{self.pack}',
+            f'压缩包解压存放路径:{self.unpack}',
+            f'解压报告存放路径:{self.report}',
+        ])
+
+
+class LogLevelEnum(KeysValuesEnum):
+    INFO = logging.INFO
+    DEBUG = logging.DEBUG
+    CRITICAL = logging.CRITICAL
+    ERROR = logging.ERROR
+    WARNING = logging.WARNING
+
+
+@dataclass
+class ConfigPackGlobal:
+    log_level: str = LogLevelEnum.INFO.name
+    log_level_obj: LogLevelEnum = field(init=False)
+
+    def __post_init__(self):
+        self.log_level = self.log_level.lower()
+        self.log_level_obj = LogLevelEnum.init_by_key(self.log_level)
+
+        if self.log_level_obj is None:
+            raise UnpackException(f'全局配置-日志等级异常:{self.log_level}')
+
+    def __str__(self):
+        return '\n'.join([
+            f'日志等级:{self.log_level}',
         ])
 
 
 @dataclass
-class ConfigPath:
-    passwords_path: str = './passwords.txt'
-    pack_path: str = './pack'
-    unpack_path: str = './unpack'
-
-    def __post_init__(self):
-        self.passwords_path = abs_path(self.passwords_path)
-        self.pack_path = abs_path(self.pack_path)
-        self.unpack_path = abs_path(self.unpack_path)
-
-        if not exists_file(self.passwords_path):
-            raise UnpackException(f'密码表路径不存在:{self.passwords_path}')
-        if not exists_file(self.pack_path):
-            raise UnpackException(f'待解压压缩包路径:{self.pack_path}')
+class ConfigPackScan:
+    is_deep_scan: bool = True
 
     def __str__(self):
         return '\n'.join([
-            f'密码表路径:{self.passwords_path}',
-            f'待解压压缩包路径:{self.pack_path}',
-            f'压缩包解压完成存放路径:{self.unpack_path}',
+            f'是否扫描子文件夹:{utils.bool_map(self.is_deep_scan)}',
         ])
+
+
+class PackRenameEnum(KeysValuesEnum):
+    REPLACE = 'replace'
+    GROUP = 'group'
+
+
+@dataclass(init=False)
+class PackRenameRuleChain:
+    module: PackRenameEnum = None
+
+    # REPLACE
+    replace_old: str = ''
+    replace_new: str = ''
+
+    # GROUP
+    group_pattern: str = ''
+    group_repl: str = ''
+
+    def __init__(self, rule: str):
+        try:
+            rule_command_list = rule.split(':')
+            self.module = PackRenameEnum.init_by_key(rule_command_list[0])
+
+            if self.module is None:
+                raise
+
+            if self.module == PackRenameEnum.REPLACE:
+                # 替换模式
+                self.replace_old = rule_command_list[1]
+                self.replace_new = rule_command_list[2]
+            elif self.module == PackRenameEnum.GROUP:
+                # 捕获组模式
+                self.group_pattern = rule_command_list[1]
+                self.group_repl = rule_command_list[2]
+
+        except Exception as _:
+            raise UnpackException(f'压缩包改名配置-规则链格式异常:{rule}')
+
+
+@dataclass
+class ConfigPackRename:
+    is_open: bool = False
+    rule_chain: List[str] = field(default_factory=list)
+    rule_chain_obj: List[PackRenameRuleChain] = field(init=False)
+
+    def __post_init__(self):
+        self.rule_chain_obj = [PackRenameRuleChain(rule) for rule in self.rule_chain]
+
+    def __str__(self):
+        return '\n'.join([
+            f'是否执行改名操作:{utils.bool_map(self.is_open)}',
+            f'规则链:{self.rule_chain}',
+        ])
+
+
+class PackFilterEnum(KeysValuesEnum):
+    INCLUDE = 'include'
+    EXCLUDE = 'exclude'
+
+
+@dataclass(init=False)
+class PackFilterRuleChain:
+    module: PackFilterEnum = None
+
+    # INCLUDE
+    include_re: str = ''
+
+    # EXCLUDE
+    exclude_re: str = ''
+
+    def __init__(self, rule: str):
+        try:
+            rule_command_list = rule.split(':')
+            self.module = PackFilterEnum.init_by_key(rule_command_list[0])
+
+            if self.module is None:
+                raise
+
+            if self.module == PackFilterEnum.INCLUDE:
+                # 包含模式
+                self.include_re = rule_command_list[1]
+            elif self.module == PackFilterEnum.EXCLUDE:
+                # 排除模式
+                self.exclude_re = rule_command_list[1]
+
+        except Exception as _:
+            raise UnpackException(f'压缩包过滤配置-规则链格式异常:{rule}')
 
 
 @dataclass
 class ConfigPackFilter:
-    filter_include_model: bool = True
-    filter_re: str = '.*'
+    is_open: bool = False
+    rule_chain: List[str] = field(default_factory=list)
+    rule_chain_obj: List[PackFilterRuleChain] = field(init=False)
+
+    def __post_init__(self):
+        self.rule_chain_obj = [PackFilterRuleChain(rule) for rule in self.rule_chain]
 
     def __str__(self):
         return '\n'.join([
-            f'过滤模式:{self.filter_include_model}',
-            f'压缩包过滤筛选正则:{self.filter_re}',
+            f'是否执行过滤操作:{utils.bool_map(self.is_open)}',
+            f'规则链:{self.rule_chain}',
+        ])
+
+
+@dataclass
+class ConfigPackAnalysis:
+    is_open: bool = True
+    thread_pool_max: int = 20
+
+    def __post_init__(self):
+        if self.thread_pool_max < 1:
+            raise UnpackException(f'压缩包识别配置-并发识别数量上限异常:{self.thread_pool_max}')
+
+    def __str__(self):
+        return '\n'.join([
+            f'是否执行识别操作:{utils.bool_map(self.is_open)}',
+            f'并发识别数量上限:{self.thread_pool_max}',
+        ])
+
+
+@dataclass
+class ConfigPackTest:
+    is_open: bool = True
+    thread_pool_max: int = 10
+
+    def __post_init__(self):
+        if self.thread_pool_max < 1:
+            raise UnpackException(f'压缩包测试配置-并发测试数量上限异常:{self.thread_pool_max}')
+
+    def __str__(self):
+        return '\n'.join([
+            f'是否执行测试操作:{utils.bool_map(self.is_open)}',
+            f'并发测试数量上限:{self.thread_pool_max}',
+        ])
+
+
+class PackOverwriteModelEnum(KeysValuesEnum):
+    A = 'a'
+    S = 's'
+    T = 't'
+    U = 'u'
+
+
+@dataclass
+class ConfigPackUnpack:
+    is_open: bool = True
+    is_parcel_unpack_file: bool = True
+    is_keep_dir: bool = True
+    overwrite_model: str = PackOverwriteModelEnum.U.name
+    overwrite_model_obj: PackOverwriteModelEnum = field(init=False)
+    is_success_del: bool = False
+    thread_pool_max: int = 5
+
+    def __post_init__(self):
+        self.overwrite_model = self.overwrite_model.lower()
+        self.overwrite_model_obj = PackOverwriteModelEnum.init_by_key(self.overwrite_model)
+
+        if self.overwrite_model_obj is None:
+            raise UnpackException(f'压缩包清理配置-提取文件覆写模式异常:{self.overwrite_model}')
+
+        if self.thread_pool_max < 1:
+            raise UnpackException(f'压缩包测试配置-并发测试数量上限异常:{self.thread_pool_max}')
+
+    def __str__(self):
+        return '\n'.join([
+            f'是否执行解压操作:{utils.bool_map(self.is_open)}',
+            f'是否将为解压文件创建包裹文件夹:{utils.bool_map(self.is_parcel_unpack_file)}',
+            f'是否保持压缩包解压文件的层级关系:{utils.bool_map(self.is_keep_dir)}',
+            f'解压文件覆写模式:{self.overwrite_model}',
+            f'是否删除解压成功的压缩包:{utils.bool_map(self.is_success_del)}',
+            f'并发解压数量上限:{self.thread_pool_max}',
+        ])
+
+
+@dataclass
+class ConfigPackClear:
+    is_open: bool = False
+    is_del_pack_empty_folder: bool = False
+    is_del_unpack_empty_folder: bool = False
+
+    def __str__(self):
+        return '\n'.join([
+            f'是否执行清理操作:{utils.bool_map(self.is_open)}',
+            f'是否删除压缩包存放文件夹中的空文件夹:{utils.bool_map(self.is_del_pack_empty_folder)}',
+            f'是否删除压缩包解压存放文件夹中的空文件夹:{utils.bool_map(self.is_del_unpack_empty_folder)}',
+        ])
+
+
+@dataclass
+class ConfigPackReport:
+    is_show_config: bool = True
+    is_show_status: bool = True
+    is_show_pack_info: bool = True
+    show_pack_status: List[str] = field(default_factory=lambda: ['all'])
+
+    def __post_init__(self):
+        self.show_pack_status = [item.lower() for item in self.show_pack_status]
+
+        if 'all' in self.show_pack_status:
+            self.show_pack_status = [item.lower() for item in PackFileStatusEnum.keys()]
+        else:
+            for status in self.show_pack_status:
+                if status not in PackFileStatusEnum.keys():
+                    raise UnpackException(f'解压报告配置-显示压缩包解压状态类型异常:{status.lower()}')
+
+    def __str__(self):
+        return '\n'.join([
+            f'是否显示配置信息:{utils.bool_map(self.is_show_config)}',
+            f'是否显示统计信息:{utils.bool_map(self.is_show_status)}',
+            f'是否显示压缩包解压信息:{utils.bool_map(self.is_show_pack_info)}',
+            f'显示压缩包解压状态类型:{self.show_pack_status}',
         ])
 
 
 @dataclass
 class Config:
-    path: ConfigPath = field(default_factory=lambda: ConfigPath())
-    base: ConfigBase = field(default_factory=lambda: ConfigBase())
+    pack_path: ConfigPackPath = field(default_factory=lambda: ConfigPackPath())
+    pack_global: ConfigPackGlobal = field(default_factory=lambda: ConfigPackGlobal())
+    pack_scan: ConfigPackScan = field(default_factory=lambda: ConfigPackScan())
+    pack_rename: ConfigPackRename = field(default_factory=lambda: ConfigPackRename())
     pack_filter: ConfigPackFilter = field(default_factory=lambda: ConfigPackFilter())
-
-    def as_dict(self):
-        return asdict(self)
+    pack_analysis: ConfigPackAnalysis = field(default_factory=lambda: ConfigPackAnalysis())
+    pack_test: ConfigPackTest = field(default_factory=lambda: ConfigPackTest())
+    pack_unpack: ConfigPackUnpack = field(default_factory=lambda: ConfigPackUnpack())
+    pack_clear: ConfigPackClear = field(default_factory=lambda: ConfigPackClear())
+    pack_report: ConfigPackReport = field(default_factory=lambda: ConfigPackReport())
 
     def __str__(self):
         return '\n'.join([
-            title_format('[基础配置]', 100, '-', f'{self.base}'),
-            title_format('[路径配置]', 100, '-', f'{self.path}'),
-            title_format('[压缩包文件过滤配置]', 100, '-', f'{self.pack_filter}'),
+            utils.title_format('[路径配置]', 100, '-', f'{self.pack_path}'),
+            utils.title_format('[全局配置]', 100, '-', f'{self.pack_global}'),
+            utils.title_format('[压缩包扫描配置]', 100, '-', f'{self.pack_scan}'),
+            utils.title_format('[压缩包改名配置]', 100, '-', f'{self.pack_rename}'),
+            utils.title_format('[压缩包过滤配置]', 100, '-', f'{self.pack_filter}'),
+            utils.title_format('[压缩包识别配置]', 100, '-', f'{self.pack_analysis}'),
+            utils.title_format('[压缩包测试配置]', 100, '-', f'{self.pack_test}'),
+            utils.title_format('[压缩包解压配置]', 100, '-', f'{self.pack_unpack}'),
+            utils.title_format('[压缩包清理配置]', 100, '-', f'{self.pack_clear}'),
+            utils.title_format('[解压报告配置]', 100, '-', f'{self.pack_report}'),
+            utils.str_rep('-', 100),
         ])
 
 
 def init_config(config_path: str) -> Config:
-    config_yaml_data = read_file(config_path)
+    # 初始化配置
+    if config_path is None:
+        # 采用默认配置
+        return Config()
+    config_yaml_data = utils.read_file(config_path)
+    # 替换默认配置
     return from_dict(data_class=Config, data=yaml.safe_load(config_yaml_data))
 
 
 if __name__ == '__main__':
-    print(init_config('./config.yaml').__str__())
+    print(init_config('./config.yaml'))

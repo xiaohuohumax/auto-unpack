@@ -1,48 +1,27 @@
+import logging
 import logging.config
+from logging import Formatter, StreamHandler
+from logging.handlers import RotatingFileHandler
 
-config = {
-    'version': 1,
-    'disable_existing_loggers': True,
-    'incremental': False,
-    'formatters':
-        {
-            'define_format': {
-                'class': 'logging.Formatter',
-                'format': '%(asctime)s %(levelname)-10s: %(message)s',
-                'datefmt': '%Y-%m-%d %H:%M:%S'
-            }
-        },
-    'handlers':
-        {
-            'define_console_handler': {
-                'class': 'logging.StreamHandler',
-                'level': logging.DEBUG,
-                'formatter': 'define_format',
-            },
-            'define_file_handler': {
-                'class': 'logging.handlers.RotatingFileHandler',
-                'level': logging.INFO,
-                'formatter': 'define_format',
-                'filename': './unpack.log',
-                'maxBytes': 1024 * 1024,
-                'backupCount': 3,
-                'encoding': 'UTF-8',
-            },
 
-        },
+def init_logger(filename: str, level: int = logging.DEBUG):
+    root = logging.getLogger()
+    define_format = Formatter(fmt='%(asctime)s %(levelname)-10s: %(message)s', datefmt='%Y-%m-%d %H:%M:%S')
 
-    'root':
-        {
-            'handlers': ['define_console_handler', 'define_file_handler'],
-            'level': logging.DEBUG,
-        },
+    file_handler = RotatingFileHandler(filename=filename, maxBytes=1024 * 1024 * 1024, backupCount=3, encoding='UTF-8')
+    file_handler.setFormatter(define_format)
 
-}
+    console_handler = StreamHandler()
+    console_handler.setFormatter(define_format)
 
-logging.config.dictConfig(config)
+    root.addHandler(file_handler)
+    root.addHandler(console_handler)
+    root.setLevel(level)
 
-logger = logging.getLogger()
-only_logger = logging.getLogger('only')
+    return root
+
+
+logger = init_logger('./unpack.log')
 
 if __name__ == '__main__':
     logger.debug("debug")

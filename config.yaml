@@ -1,67 +1,166 @@
-path:
+pack_path:
   #路径配置
 
   #密码表路径
-  passwords_path: ./passwords.txt
+  passwords: ./passwords.txt
 
-  #pack 待解压压缩包路径
-  pack_path: ./pack
+  #压缩包存放路径
+  pack: ./pack
 
-  #unpack 压缩包解压完成存放路径
-  unpack_path: ./unpack
+  #压缩包解压存放路径
+  unpack: ./unpack
 
-base:
-  #基础配置
+  #解压报告存放路径
+  report: ./report.txt
 
-  #是否将压缩包解压的文件放进新文件夹中 [true/false]
-  #开启过后压缩包的文件就不会爆开了
-  parcel_unpack_file: true
+pack_global:
+  # 全局配置
 
-  #解压成功后是否删除压缩包 [true/false]
-  unpack_success_del: false
+  #日志等级 info,debug,critical,error,warning
+  log_level: info
 
-  #是否删除解压完成后pack中的空文件夹 [true/false]
-  unpack_after_empty_folder_del: false
 
-  #解压是否保持文件的层级关系 [true/false]
-  #true: 保持原有目录层级关系
-  #false: 提取全部文件到指定目录
-  #       注意不同层级的相同名字的文件,可以搭配 unpack_over_write_model=t
-  keep_dir: true
+pack_scan:
+  #压缩包扫描配置
 
-  #自动解压是否包含子文件夹 [true/false]
-  deep_pack_file: true
+  #是否扫描子文件夹 [true/false]
+  is_deep_scan: true
 
-  #提取文件覆写模式 [a/s/t/u]
-  #提取文件与现有文件冲突时使用
-  #a: 覆盖所有现有文件
-  #s: 跳过提取现有文件
-  #t: 自动重命名提取文件
-  #u: 自动重命名现有文件
-  unpack_over_write_model: t
 
-  #并发解压的数量上限[>=1]
-  unpack_thread_pool_max: 10
+pack_rename:
+  #压缩包改名配置
 
-  #并发测试压缩包的数量上限[>=1]
-  test_pack_thread_pool_max: 20
+  #是否执行改名操作 [true/false]
+  is_open: false
+
+  #改名规则链
+  # 替换模式|捕获组模式:模式规则
+  #   replace:待替换字符串:替换字符串
+  #   group:正则(使用捕获组):结果文件名(捕获组别称\1,\g<1>)
+  rule_chain:
+
+    # 去掉文件名中的[删除] .7z.001删除 -> .7z.001
+    - 'replace:删除:'
+
+    # 去掉文件名中的末尾的[删除] .7z.001删除 -> .7z.001
+    #- group:(.*)删除$:\g<1>
+
+    # 去掉文件名中的末尾的[删除] .7z.001删除 -> .7z.001
+    #- group:(.*)删除$:\1
 
 pack_filter:
-  #压缩包文件过滤配置
+  #压缩包过滤配置
 
-  #过滤模式 [true/false]
-  #true 包含模式: filter_re 命中则尝试解压此文件
-  #false 排除模式: filter_re 未命中则尝试解压此文件
-  filter_include_model: true
+  #是否执行过滤操作 [true/false]
+  is_open: true
 
-  #压缩包过滤筛选正则
-  #匹配文件的名称(包含后缀名 例如: logo.png)
-  #   示例:
-  #   1. 解压全部非jpg后缀的文件
-  #        filter_model: false
-  #        filter_re: jpg$
-  #   2. 解压全部7z后缀的文件
-  #        filter_model: true
-  #        filter_re: 7z$
-  filter_re: .*
+  #过滤规则链
+  # 包含模式|排除模式:匹配正则(注意:匹配的是文件的名字,包含后缀名)
+  # include|exclude:re
+  #例如:
+  # 首先排除zip后缀的文件,接着筛选名称包含hello的文件
+  # - exclude:\.zip$
+  # - include:hello
+  rule_chain:
 
+    # 包含所有文件
+    - include:.*
+    # 排除 .gitkeep
+    - exclude:.gitkeep
+
+
+pack_analysis:
+  #压缩包识别配置
+
+  #是否执行识别操作 [true/false]
+  is_open: true
+
+  #并发识别数量上限[>=1]
+  thread_pool_max: 20
+
+
+pack_test:
+  #压缩包测试配置
+
+  #是否执行测试操作 [true/false]
+  is_open: true
+
+  #并发测试数量上限[>=1]
+  thread_pool_max: 10
+
+
+pack_unpack:
+  #压缩包解压配置
+
+  #是否执行解压操作 [true/false]
+  is_open: true
+
+  #是否将为解压文件创建包裹文件夹 [true/false]
+  # 开启过后压缩包的文件就不会爆开了(并且减少多线程之间的干扰,例如同时解压到同一文件时会出现异常)
+  # 若关闭,则最好将并发解压数量上限 thread_pool_max 设定为: 1
+  is_parcel_unpack_file: true
+
+  #是否保持压缩包解压文件的层级关系 [true/false]
+  #注意不同层级的相同名字的文件时,可以搭配 overwrite_model 覆盖/重命名 以确保文件不被覆盖
+  # true: 保持原有目录层级关系
+  # false: 提取全部文件到指定目录
+  is_keep_dir: true
+
+  #解压文件覆写模式 [a/s/t/u]
+  # 提取文件与现有文件冲突时使用
+  #   a: 覆盖所有现有文件
+  #   s: 跳过提取现有文件
+  #   t: 自动重命名现有文件
+  #   u: 自动重命名提取文件
+  overwrite_model: u
+
+  #是否删除解压成功的压缩包(注意:分卷压缩 和 未识别的文件 暂不支持删除) [true/false]
+  is_success_del: false
+
+  #并发解压数量上限[>=1]
+  thread_pool_max: 5
+
+
+pack_clear:
+  #压缩包清理配置
+
+  #是否执行清理操作 [true/false]
+  is_open: false
+
+  #是否删除压缩包存放文件夹中的空文件夹 [true/false]
+  is_del_pack_empty_folder: false
+
+  #是否删除压缩包解压存放文件夹中的空文件夹 [true/false]
+  is_del_unpack_empty_folder: false
+
+
+pack_report:
+  #解压报告配置
+
+  #是否显示配置信息 [true/false]
+  is_show_config: true
+
+  #是否显示统计信息 [true/false]
+  is_show_status: true
+
+  #是否显示压缩包解压信息 [true/false]
+  is_show_pack_info: true
+
+  #显示压缩包解压状态类型
+  #   all : 全部类型
+
+  #   scan : 扫描收录
+  #   rename : 修改名字
+  #   rename_fail : 改名失败
+  #   un_rename : 未改名字
+  #   filter_include : 过滤包含
+  #   filter_exclude : 过滤排除
+  #   analysis_success : 识别成功
+  #   analysis_fail : 识别失败
+  #   analysis_success_split = '识别成功(分卷子卷)'
+  #   test_success : 测试成功
+  #   test_fail : 测试失败
+  #   unpack_success : 解压成功
+  #   unpack_fail : 解压失败
+  show_pack_status:
+    - all

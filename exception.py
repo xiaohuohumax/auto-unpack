@@ -1,2 +1,0 @@
-class UnpackException(Exception):
-    pass

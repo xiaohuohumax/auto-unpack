@@ -7,7 +7,7 @@ from multiprocessing.pool import ThreadPool
 from typing import List
 
 import utils
-from config import Config, init_config, PackRenameEnum, PackFilterEnum
+from config import Config, init_config, PackRenameEnum, PackFilterEnum, PackParcelUnpackFileEnum
 from core import PackFile, UnpackStat, PackFileStatusEnum, UnpackException, TimeDuration
 from log import logger
 from util7zip import Util7zResCodeEnum, Util7z
@@ -364,9 +364,37 @@ class AutoUnpack(object):
     @classmethod
     @error_history(tip_msg="压缩包解压异常", error_status=PackFileStatusEnum.UNPACK_FAIL)
     def _pack_unpack_callback(cls, pack_file_item: PackFile):
-        if cls._config.pack_unpack.is_parcel_unpack_file:
-            # 添加包裹文件夹
 
+        parcel_unpack_file_obj = cls._config.pack_unpack.parcel_unpack_file_obj
+
+        is_need_parcel = False
+
+        if PackParcelUnpackFileEnum.ALWAYS == parcel_unpack_file_obj:
+            # 总是
+            is_need_parcel = True
+
+        elif PackParcelUnpackFileEnum.AUTO == parcel_unpack_file_obj:
+            # 自动
+            # 判断压缩包是否是单文件
+
+            if pack_file_item.is_has_status([PackFileStatusEnum.ANALYSIS_SUCCESS]):
+                analysis_info = pack_file_item.analysis_info
+                # 经过识别
+                if cls._config.pack_unpack.is_keep_dir and analysis_info.root_file_count > 1:
+                    # 保持解压层级关系 且 根目录文件数大于 1
+                    is_need_parcel = True
+                elif not cls._config.pack_unpack.is_keep_dir and analysis_info.file_list_count > 1:
+                    # 不保持解压层级关系 且 文件数大于 1
+                    is_need_parcel = True
+            else:
+                # 未识别
+                is_need_parcel = True
+
+        elif PackParcelUnpackFileEnum.NEVER == parcel_unpack_file_obj:
+            # 从不
+            pass
+
+        if is_need_parcel:
             # 保证包裹文件夹唯一性(添加uuid后缀)
             parcel_name = f'{pack_file_item.name}_{utils.create_uuid()}'
 

@@ -215,10 +215,17 @@ class PackOverwriteModelEnum(KeysValuesEnum):
     U = 'u'
 
 
+class PackParcelUnpackFileEnum(KeysValuesEnum):
+    ALWAYS = 'always'
+    AUTO = 'auto'
+    NEVER = 'never'
+
+
 @dataclass
 class ConfigPackUnpack:
     is_open: bool = True
-    is_parcel_unpack_file: bool = True
+    parcel_unpack_file: str = PackParcelUnpackFileEnum.ALWAYS.name
+    parcel_unpack_file_obj: PackParcelUnpackFileEnum = field(init=False)
     is_keep_dir: bool = True
     overwrite_model: str = PackOverwriteModelEnum.U.name
     overwrite_model_obj: PackOverwriteModelEnum = field(init=False)
@@ -228,17 +235,21 @@ class ConfigPackUnpack:
     def __post_init__(self):
         self.overwrite_model = self.overwrite_model.lower()
         self.overwrite_model_obj = PackOverwriteModelEnum.init_by_key(self.overwrite_model)
+        self.parcel_unpack_file_obj = PackParcelUnpackFileEnum.init_by_key(self.parcel_unpack_file)
 
         if self.overwrite_model_obj is None:
-            raise UnpackException(f'压缩包清理配置-提取文件覆写模式异常:{self.overwrite_model}')
+            raise UnpackException(f'压缩包解压配置-提取文件覆写模式异常:{self.overwrite_model}')
+
+        if self.parcel_unpack_file_obj is None:
+            raise UnpackException(f'压缩包解压配置-解压文件创建包裹文件夹异常:{self.parcel_unpack_file}')
 
         if self.thread_pool_max < 1:
-            raise UnpackException(f'压缩包测试配置-并发测试数量上限异常:{self.thread_pool_max}')
+            raise UnpackException(f'压缩包解压配置-并发测试数量上限异常:{self.thread_pool_max}')
 
     def __str__(self):
         return '\n'.join([
             f'是否执行解压操作:{utils.bool_map(self.is_open)}',
-            f'是否将为解压文件创建包裹文件夹:{utils.bool_map(self.is_parcel_unpack_file)}',
+            f'解压文件创建包裹文件夹:{self.parcel_unpack_file}',
             f'是否保持压缩包解压文件的层级关系:{utils.bool_map(self.is_keep_dir)}',
             f'解压文件覆写模式:{self.overwrite_model}',
             f'是否删除解压成功的压缩包:{utils.bool_map(self.is_success_del)}',

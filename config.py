@@ -262,12 +262,14 @@ class ConfigPackClear:
     is_open: bool = False
     is_del_pack_empty_folder: bool = False
     is_del_unpack_empty_folder: bool = False
+    is_format_passwords: bool = False
 
     def __str__(self):
         return '\n'.join([
             f'是否执行清理操作:{utils.bool_map(self.is_open)}',
             f'是否删除压缩包存放文件夹中的空文件夹:{utils.bool_map(self.is_del_pack_empty_folder)}',
             f'是否删除压缩包解压存放文件夹中的空文件夹:{utils.bool_map(self.is_del_unpack_empty_folder)}',
+            f'是否整理密码表:{utils.bool_map(self.is_format_passwords)}',
         ])
 
 

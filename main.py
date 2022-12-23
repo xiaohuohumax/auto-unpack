@@ -474,6 +474,11 @@ class AutoUnpack(object):
             _, del_count = utils.del_empty_folder(cls._config.pack_path.unpack)
             logger.info(f'删除压缩包解压存放文件夹中的空文件夹完成:{del_count}')
 
+        # 是否整理密码表
+        if cls._config.pack_clear.is_format_passwords:
+            # 默认添加无密码
+            utils.write_file(cls._config.pack_path.passwords, "\n".join(sorted(cls._passwords)))
+
     @classmethod
     def _pack_report(cls):
         UnpackStat.scan_count = cls._count_status_history([PackFileStatusEnum.SCAN])

@@ -137,6 +137,8 @@ pack_clear:
   #是否删除压缩包解压存放文件夹中的空文件夹 [true/false]
   is_del_unpack_empty_folder: false
 
+  #是否整理密码表(去除相同密码) [true/false]
+  is_format_passwords: false
 
 pack_report:
   #解压报告配置

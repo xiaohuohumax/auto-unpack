@@ -99,6 +99,7 @@ class AutoUnpack(object):
     _config: Config
     _passwords: set = set()
     _temp_passwords: set = set()
+    _lasting_passwords: set = set()
     _pack_files: List[PackFile] = []
 
     @classmethod
@@ -132,15 +133,18 @@ class AutoUnpack(object):
     @classmethod
     @encircle_intercept(start_tip='加载密码表开始', end_tip='加载密码表完成')
     def _load_passwords(cls):
-        password_line = utils.read_file(cls._config.pack_path.passwords).split('\n')
         # 默认添加无密码
         cls._passwords = {''}
-        cls._passwords = cls._passwords.union(password_line)
+
+        password_line = utils.read_file(cls._config.pack_path.passwords).split('\n')
+        cls._lasting_passwords = set(password_line)
+
+        cls._passwords = cls._passwords.union(cls._lasting_passwords)
 
         if utils.is_exists_file(cls._config.pack_path.temp_passwords):
             temp_password_line = utils.read_file(cls._config.pack_path.temp_passwords).split('\n')
-            cls._passwords = cls._passwords.union(temp_password_line)
-            cls._temp_passwords = cls._temp_passwords.union(temp_password_line)
+            cls._temp_passwords = set(temp_password_line)
+            cls._passwords = cls._passwords.union(cls._temp_passwords)
 
         logger.info(f'[{",".join(cls._passwords)}]')
 
@@ -493,7 +497,7 @@ class AutoUnpack(object):
         # 是否整理密码表
         if cls._config.pack_clear.is_format_passwords:
             # 默认添加无密码
-            utils.write_file(cls._config.pack_path.passwords, "\n".join(sorted(cls._passwords)))
+            utils.write_file(cls._config.pack_path.passwords, "\n".join(sorted(cls._lasting_passwords)))
 
     @classmethod
     def _pack_report(cls):

@@ -4,6 +4,9 @@ pack_path:
   #密码表路径
   passwords: ./passwords.txt
 
+  #临时密码表路径 (密码被使用则保留，未使用则删除)
+  temp_passwords: ./temp_passwords.txt
+
   #压缩包存放路径
   pack: ./pack
 

@@ -12,12 +12,14 @@ from core import PackFileStatusEnum, KeysValuesEnum, UnpackException
 @dataclass
 class ConfigPackPath:
     passwords: str = './passwords.txt'
+    temp_passwords: str = './temp_passwords.txt'
     pack: str = './pack'
     unpack: str = './unpack'
     report: str = './report.txt'
 
     def __post_init__(self):
         self.passwords = utils.abs_path(self.passwords)
+        self.temp_passwords = utils.abs_path(self.temp_passwords)
         self.pack = utils.abs_path(self.pack)
         self.unpack = utils.abs_path(self.unpack)
         self.report = utils.abs_path(self.report)
@@ -30,6 +32,7 @@ class ConfigPackPath:
     def __str__(self):
         return '\n'.join([
             f'密码表路径:{self.passwords}',
+            f'临时密码表路径:{self.temp_passwords}',
             f'压缩包存放路径:{self.pack}',
             f'压缩包解压存放路径:{self.unpack}',
             f'解压报告存放路径:{self.report}',

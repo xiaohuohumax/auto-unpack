@@ -98,6 +98,7 @@ class AutoUnpack(object):
     _config_path: str = utils.abs_path('./config.yaml')
     _config: Config
     _passwords: set = set()
+    _temp_passwords: set = set()
     _pack_files: List[PackFile] = []
 
     @classmethod
@@ -135,6 +136,12 @@ class AutoUnpack(object):
         # 默认添加无密码
         cls._passwords = {''}
         cls._passwords = cls._passwords.union(password_line)
+
+        if utils.is_exists_file(cls._config.pack_path.temp_passwords):
+            temp_password_line = utils.read_file(cls._config.pack_path.temp_passwords).split('\n')
+            cls._passwords = cls._passwords.union(temp_password_line)
+            cls._temp_passwords = cls._temp_passwords.union(temp_password_line)
+
         logger.info(f'[{",".join(cls._passwords)}]')
 
     @classmethod
@@ -458,6 +465,15 @@ class AutoUnpack(object):
         pool.join()
 
     @classmethod
+    def _save_temp_passwords(cls):
+        if utils.is_exists_file(cls._config.pack_path.temp_passwords):
+            used_password = [pack_file.password for pack_file in cls._pack_files if
+                             pack_file.status == PackFileStatusEnum.UNPACK_SUCCESS]
+
+            save_temp_passwords = cls._temp_passwords.intersection(used_password)
+            utils.write_file(cls._config.pack_path.temp_passwords, '\n'.join(save_temp_passwords))
+
+    @classmethod
     @duration_time(UnpackStat.clear_duration)
     @encircle_intercept(
         lambda cls: cls._config.pack_clear.is_open, un_open_tip='[功能已关闭]压缩包清理',
@@ -548,6 +564,8 @@ class AutoUnpack(object):
         cls._pack_test()
         # 压缩包解压
         cls._pack_unpack()
+        # 保存密码
+        cls._save_temp_passwords()
         # 压缩包清理
         cls._pack_clear()
         # 显示处理压缩包过程中的异常

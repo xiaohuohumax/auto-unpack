@@ -351,24 +351,13 @@ class AutoUnpack(object):
 
     @classmethod
     def _del_unpack(cls, pack_file_item: PackFile):
-        # 是否识别过文件类型 成功/分卷
-        is_analysis_success = pack_file_item.is_has_status(
-            [PackFileStatusEnum.ANALYSIS_SUCCESS, PackFileStatusEnum.ANALYSIS_SUCCESS_SPLIT])
-
-        # 未识别过压缩包类型
-        if (not is_analysis_success) or (pack_file_item.analysis_info is None):
-            logger.info(f'压缩包[{pack_file_item.name}]未识别/识别失败,暂不支持删除')
-            return
-
-        # 删除压缩包 (分卷压缩不支持删除)
-        if pack_file_item.analysis_info.is_split:
-            logger.info(f'压缩包[{pack_file_item.name}]为分卷压缩,暂不支持删除')
-            return
+        remove_file_paths = utils.get_volume_item_by_name(pack_file_item.get_file_full_path())
 
         try:
-            utils.remove_file(pack_file_item.get_file_full_path())
+            for file_path in remove_file_paths:
+                utils.remove_file(file_path)
             pack_file_item.is_del = True
-            logger.info(f'压缩包[{pack_file_item.name}]已删除')
+            logger.info(f'压缩包[{pack_file_item.name}]已删除:{remove_file_paths}')
         except Exception as e:
             logger.error(f'压缩包[{pack_file_item.name}]删除异常: {e}')
 

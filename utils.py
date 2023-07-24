@@ -2,6 +2,7 @@ import os
 import re
 import uuid
 from pathlib import Path
+from typing import List
 
 
 def abs_path(rel_path: str) -> str:
@@ -100,3 +101,54 @@ def is_re_match(pattern: str, string: str) -> bool:
 def create_uuid() -> str:
     # 创建 uuid 字符串
     return str(uuid.uuid1().hex)
+
+
+def get_volume_item_by_name(file_path: str) -> List[str]:
+    # 通过文件路径获取全部分卷压缩文件路径
+    res = [file_path]
+    try:
+        file = Path(file_path)
+        if not file.exists() or file.is_dir():
+            return res
+
+        file_name = file.name
+        file_name_list = list(file_name)
+
+        if len(file_name_list) < 2:
+            return res
+
+        number_count = 0
+        volume_number = ''
+        begin_index = len(file_name_list)
+
+        while begin_index >= 0:
+            begin_index -= 1
+            name_item = file_name_list[begin_index]
+            if name_item.isdigit():
+                number_count += 1
+                volume_number = name_item + volume_number
+            elif number_count != 0:
+                break
+
+        begin_index += 1
+
+        if number_count == 0:
+            return res
+
+        volume_number = int(volume_number)
+
+        while True:
+            volume_number += 1
+
+            next_number = str(volume_number).rjust(number_count, "0")
+            next_volume = file_name[:begin_index] + next_number + file_name[begin_index + number_count:]
+
+            next_file = Path(file.parent, next_volume)
+            if not next_file.exists() or next_file.is_dir():
+                break
+            res.append(str(next_file))
+
+        return res
+    except RuntimeError as _:
+        ...
+    return res

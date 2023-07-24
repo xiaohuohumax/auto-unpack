@@ -121,7 +121,7 @@ pack_unpack:
   #   u: 自动重命名提取文件
   overwrite_model: u
 
-  #是否删除解压成功的压缩包(注意:分卷压缩 和 未识别的文件 暂不支持删除) [true/false]
+  #是否删除解压成功的压缩包 [true/false]
   is_success_del: false
 
   #并发解压数量上限[>=1]

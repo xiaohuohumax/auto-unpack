@@ -137,6 +137,8 @@ class AnalysisInfo:
     # 分卷下标
     volume_index: int = None
 
+    offset: int = None
+
     solid: bool = None
     encrypted: bool = None
     # 是否分卷
@@ -155,6 +157,9 @@ class AnalysisInfo:
         if self.volumes is not None:
             return True
 
+        if self.offset is not None:
+            return True
+
         # 存在分卷下标
         if self.volume_index is not None:
             return True
@@ -167,6 +172,8 @@ class AnalysisInfo:
         if self.is_split:
             # 存在分卷下标 且 > 0
             if self.volume_index is not None and self.volume_index > 0:
+                return True
+            if self.offset is not None:
                 return True
         return False
 

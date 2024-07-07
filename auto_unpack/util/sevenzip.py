@@ -366,7 +366,7 @@ class SevenZipUtil:
         :return: 结果
         """
         cmds = [
-            str(cls._lib_path),
+            f'"{str(cls._lib_path)}"',
             sub,
             f'"{file_path}"',
             f'-p"{password}"',

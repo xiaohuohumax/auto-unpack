@@ -1,0 +1,15 @@
+# 测试压缩包完整性流程
+
+flow:
+  steps:
+
+    # 扫描压缩包
+    - name: scan
+      dir: archive/base
+
+    # 测试压缩包
+    - name: archive
+      # 测试模式
+      mode: test
+      # 测试统计信息 info/test.json
+      stat_file_name: test

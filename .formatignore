@@ -1,0 +1,6 @@
+*
+!auto_unpack/
+!auto_unpack/**/
+!auto_unpack/**/*.py
+!main.py
+!job.py

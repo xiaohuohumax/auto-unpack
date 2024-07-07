@@ -1,0 +1,40 @@
+# 文件名重命名使用流程
+
+# 例如：
+# 分卷压缩包多余文字导致识别错误，需要重命名
+# icon-v.7z.001, icon-v.7z.002删除, icon-v.7z.003删除
+# icon-v.7z.001, icon-v.7z.002, icon-v.7z.003
+
+flow:
+  steps:
+
+    # 清理输出目录(测试用)
+    - name: scan
+      include_dir: true
+      dir: output
+    - name: remove
+
+    # 复制压缩包到输出目录
+    - name: scan
+      dir: archive/rename
+    - name: transfer
+      mode: copy
+      target_dir: output/rename
+
+    # 扫描并重命名压缩包
+    - name: scan
+      dir: output/rename
+    - name: rename
+      rules:
+        - mode: replace
+          replace: ''
+          search: 删除
+
+    # 解压压缩包
+    - name: archive
+      # 解压模式
+      mode: extract
+      # 压缩文件保存目录
+      output_dir: output
+      # 解压统计信息 info/extract.json
+      stat_file_name: extract

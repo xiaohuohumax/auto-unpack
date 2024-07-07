@@ -1,5 +1,9 @@
-.idea
-unpack.log
-
 __pycache__
-report.txt
+.venv
+.vscode
+.cache
+output
+info
+dist
+
+*.log

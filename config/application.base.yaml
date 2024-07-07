@@ -1,0 +1,33 @@
+# 基础使用流程
+
+flow:
+  steps:
+
+    # 清理输出目录(测试用)
+    - name: scan
+      include_dir: true
+      dir: output
+    - name: remove
+
+    # 扫描压缩包
+    - name: scan
+      # 扫描路径
+      dir: archive/base
+      # 也可以设置过滤条件
+      # includes:
+      #   - "*.zip"
+      # excludes:
+      #   - "*.txt"
+
+    - name: log
+      # 上下文日志打印 info/scan.json
+      file_name: scan
+
+    # 解压压缩包
+    - name: archive
+      # 解压模式
+      mode: extract
+      # 压缩文件保存目录
+      output_dir: output
+      # 解压统计信息 info/extract.json
+      stat_file_name: extract

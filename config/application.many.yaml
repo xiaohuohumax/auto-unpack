@@ -1,0 +1,82 @@
+# 多路径解压压缩包使用流程
+
+# 多种方式实现:
+# 1. 扫描多个路径到不同上下文, 合并结果到默认上下文, 解压压缩包
+flow:
+  steps:
+
+    # 清理输出目录(测试用)
+    - name: scan
+      include_dir: true
+      dir: output
+    - name: remove
+
+    # 扫描多个路径到不同上下文
+    - name: scan
+      dir: archive/base
+      save_key: base_files
+    - name: scan
+      dir: archive/loop
+      save_key: loop_files
+
+    # 合并扫描结果到默认上下文
+    - name: merge
+      context_keys:
+        - base_files
+        - loop_files
+
+    - name: log
+      file_name: scan
+
+    # 解压压缩包
+    - name: archive
+      # 解压模式
+      mode: extract
+      # 压缩文件保存目录
+      output_dir: output
+      # 解压统计信息 info/extract.json
+      stat_file_name: extract
+
+# 2. 复制多个压缩包到临时目录, 扫描解压临时目录, 解压压缩包, 删除临时目录
+# flow:
+#   steps:
+#     # 清理输出目录(测试用)
+#     - name: scan
+#       include_dir: true
+#       dir: output
+#     - name: remove
+
+#     # 扫描多个路径到不同上下文
+#     - name: scan
+#       dir: archive/base
+#       save_key: base_files
+#     - name: scan
+#       dir: archive/loop
+#       save_key: loop_files
+
+#     # 拷贝压缩包到临时目录
+#     - name: transfer
+#       mode: copy
+#       load_key: base_files
+#       target_dir: .cache
+#     - name: transfer
+#       mode: copy
+#       load_key: loop_files
+#       target_dir: .cache
+
+#     # 扫描临时目录
+#     - name: scan
+#       dir: .cache
+#       # 解压压缩包
+#     - name: archive
+#       # 解压模式
+#       mode: extract
+#       # 压缩文件保存目录
+#       output_dir: output
+#       # 解压统计信息 info/extract.json
+#       stat_file_name: extract
+
+#     # 删除临时目录
+#     - name: scan
+#       dir: .cache
+#     - name: remove

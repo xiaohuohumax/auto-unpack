@@ -1,0 +1,40 @@
+# 分支筛选使用流程
+
+flow:
+  steps:
+
+    # 清理输出目录(测试用)
+    - name: scan
+      include_dir: true
+      dir: output
+    - name: remove
+
+    # 扫描压缩包
+    - name: scan
+      dir: archive
+
+    - name: log
+      file_name: log
+
+    - name: switch
+      # 未匹配到任何分支时使用默认分支
+      default_key: default
+      cases:
+        - includes:
+            - "*.png"
+          save_key: image
+        - includes:
+            - "*.txt"
+          save_key: txt
+
+    - name: log
+      load_key: image
+      file_name: image_log
+
+    - name: log
+      load_key: txt
+      file_name: txt_log
+
+    - name: log
+      load_key: default
+      file_name: default_log

@@ -1,0 +1,10 @@
+app:
+  name: auto-unpack
+  # 执行前清理 info 目录
+  clear_info_dir: true
+
+banner:
+  welcome: "Welcome to auto-unpack!"
+
+logging:
+  level: debug

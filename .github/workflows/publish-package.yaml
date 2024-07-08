@@ -18,7 +18,7 @@ jobs:
             version: 'latest'
 
       - name: Install dependencies
-        run: rye sync
+        run: rye sync --no-lock --no-dev
 
       - name: Build package
         run: rye build

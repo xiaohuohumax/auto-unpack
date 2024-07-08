@@ -12,6 +12,8 @@ annotated-types==0.6.0
     # via pydantic
 apscheduler==3.10.4
     # via auto-unpack
+backports-zoneinfo==0.2.1
+    # via tzlocal
 pydantic==2.7.1
     # via auto-unpack
     # via pydantic-settings
@@ -30,6 +32,7 @@ ruamel-yaml-clib==0.2.8
 six==1.16.0
     # via apscheduler
 typing-extensions==4.11.0
+    # via annotated-types
     # via pydantic
     # via pydantic-core
 tzdata==2024.1

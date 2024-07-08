@@ -1,8 +1,7 @@
 from pathlib import Path
-from typing import Any, List, Literal, Optional, Type, TypeVar
+from typing import Literal, Optional, Type, TypeVar
 
-from pydantic import BaseModel, model_validator
-from typing_extensions import Self
+from pydantic import BaseModel
 
 from .env import env
 from .util.config import load_config

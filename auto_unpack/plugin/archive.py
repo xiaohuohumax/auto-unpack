@@ -5,7 +5,8 @@ from collections import defaultdict
 from enum import Enum
 from multiprocessing.pool import ThreadPool
 from pathlib import Path
-from typing import Any, List, Literal, Optional, Self
+from typing import Any, List, Literal, Optional, Dict
+from typing_extensions import Self
 from uuid import uuid4
 
 from pydantic import (BaseModel, Field, field_serializer, model_serializer,
@@ -59,7 +60,7 @@ class ArchiveInfo(BaseModel):
     main_path: Path = Field(exclude=True)
 
     @model_serializer(when_used='json')
-    def serialize_v1(self) -> dict[str, Any]:
+    def serialize_v1(self) -> Dict[str, Any]:
         r = self.model_dump()
         if r['password'] is None:
             del r['password']

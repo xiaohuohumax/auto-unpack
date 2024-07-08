@@ -10,10 +10,6 @@
 -e file:.
 annotated-types==0.6.0
     # via pydantic
-apscheduler==3.10.4
-    # via auto-unpack
-backports-zoneinfo==0.2.1
-    # via tzlocal
 pydantic==2.7.1
     # via auto-unpack
     # via pydantic-settings
@@ -23,19 +19,11 @@ pydantic-settings==2.2.1
     # via auto-unpack
 python-dotenv==1.0.1
     # via pydantic-settings
-pytz==2024.1
-    # via apscheduler
 ruamel-yaml==0.18.6
     # via auto-unpack
 ruamel-yaml-clib==0.2.8
     # via ruamel-yaml
-six==1.16.0
-    # via apscheduler
 typing-extensions==4.11.0
     # via annotated-types
     # via pydantic
     # via pydantic-core
-tzdata==2024.1
-    # via tzlocal
-tzlocal==5.2
-    # via apscheduler

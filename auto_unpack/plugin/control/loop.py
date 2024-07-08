@@ -36,7 +36,7 @@ class LoopPlugin(Plugin[LoopPluginConfig]):
         logger.info("Creating loop flows...")
         steps = self.config.steps
         for step in steps:
-            plugin = pluginManager.create_plugin(
+            plugin = pluginManager.create_plugin_instance(
                 step, self.store, self.global_config
             )
             logger.debug(f"Flow step `{step.get('name')}` created")

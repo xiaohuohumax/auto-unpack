@@ -1,16 +1,41 @@
 [project]
 name = "auto_unpack"
-version = "2.0.0"
+version = "2.1.0"
 description = "压缩包自动解压工具，支持多种压缩包格式。通过组合各种插件，编排流程，则可满足日常解压需求。"
 authors = [{ name = "xiaohuohumax" }]
 dependencies = [
     "pydantic>=2.7.1",
     "pydantic-settings>=2.2.1",
     "ruamel-yaml>=0.18.6",
-    "apscheduler>=3.10.4",
 ]
 readme = "README.md"
 requires-python = ">= 3.8"
+keywords = [
+    "auto-unpack",
+    "unpack",
+    "auto",
+    "compress",
+    "archive",
+    "plugin",
+    "flow",
+    "schedule",
+]
+homepage = "https://github.com/xiaohuohumax/auto-unpack"
+repository = "https://github.com/xiaohuohumax/auto-unpack"
+documentation = "https://github.com/xiaohuohumax/auto-unpack"
+license = { text = "MIT" }
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Topic :: Software Development :: Libraries :: Python Modules",
+    "Topic :: System :: Archiving :: Compression",
+    "Topic :: Utilities",
+]
 
 [build-system]
 requires = ["hatchling"]
@@ -18,14 +43,23 @@ build-backend = "hatchling.build"
 
 [tool.rye]
 managed = true
-dev-dependencies = []
+dev-dependencies = ["apscheduler>=3.10.4"]
 
 [tool.hatch.metadata]
 allow-direct-references = true
 
 [tool.hatch.build.targets.wheel]
 packages = ["auto_unpack"]
-include = ["auto_unpack", "README.md", "LICENSE"]
+
+[tool.hatch.build]
+include = [
+    "auto_unpack",
+    "docs",
+    "README.md",
+    "LICENSE",
+    "logo.png",
+    "logo-dark.png",
+]
 
 [tool.rye.scripts]
 start = "python -m main"

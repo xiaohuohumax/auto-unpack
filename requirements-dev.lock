@@ -11,7 +11,6 @@
 annotated-types==0.6.0
     # via pydantic
 apscheduler==3.10.4
-    # via auto-unpack
 backports-zoneinfo==0.2.1
     # via tzlocal
 pydantic==2.7.1

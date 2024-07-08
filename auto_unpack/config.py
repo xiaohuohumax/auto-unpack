@@ -45,6 +45,8 @@ class AppConfig(BaseModel):
     info_dir: Path = Path("info")
     # 执行前是否清空信息输出目录
     clear_info_dir: bool = False
+    # 自定义插件路径
+    plugins_dir: Optional[Path] = None
 
 
 class ProjectConfig(BaseModel):

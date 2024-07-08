@@ -32,7 +32,7 @@ class ProjectFlowConfig(BaseModel):
 class App:
 
     # 插件目录
-    plugins_dir: Path = Path(__file__).parent/'plugin'
+    builtin_plugins_dir: Path = Path(__file__).parent/'plugin'
     # 流程(插件实例)
     flows: List[Plugin] = []
     # 数据仓库(插件间共享数据)
@@ -40,7 +40,7 @@ class App:
     # 插件全局配置
     plugin_global_config: PluginGlobalConfig
 
-    def create_flows(self):
+    def _create_flows(self):
         """
         根据配置创建流程
         """
@@ -49,7 +49,7 @@ class App:
         flow_config = load_config_by_class(ProjectFlowConfig)
         steps = flow_config.flow.steps
         for step in steps:
-            plugin = pluginManager.create_plugin(
+            plugin = pluginManager.create_plugin_instance(
                 step, self.store, self.plugin_global_config
             )
             logger.debug(f"Flow step `{step.get('name')}` created")
@@ -57,7 +57,7 @@ class App:
 
         logger.info(f"Flows created: {len(self.flows)}")
 
-    def execute_flows(self):
+    def _execute_flows(self):
         """
         执行流程
         """
@@ -76,11 +76,17 @@ class App:
 
     def __init__(self):
         logger.info("Initializing app...")
+        # 加载配置
+        pluginManager.load_plugin(self.builtin_plugins_dir)
+        # 加载自定义插件
+        if config.app.plugins_dir:
+            pluginManager.load_plugin(config.app.plugins_dir)
+
         self.plugin_global_config = PluginGlobalConfig(
             info_dir=config.app.info_dir
         )
         # 创建流程
-        self.create_flows()
+        self._create_flows()
 
     def run(self):
         """
@@ -94,7 +100,7 @@ class App:
             logger.info(f"Args: {args}")
 
             # 执行流程
-            self.execute_flows()
+            self._execute_flows()
 
             logger.info("Running app finished")
         except Exception as e:

@@ -112,23 +112,10 @@ class PluginManager:
     """
     插件管理器
     """
-    # todo: 自定义插件目录
-    # 插件路径
-    plugins_dir = Path(__file__).parent / 'plugin'
     # 插件列表
     plugins: List[Tuple[PluginConfig, Plugin]] = []
-    # 是否加载过插件
-    is_loaded = False
 
-    def reload_plugins(self):
-        """
-        重新加载插件
-        """
-        self.is_loaded = False
-        self.plugins = []
-        self.load_plugins()
-
-    def load_plugin(self, file_path: Path) -> Optional[Tuple[PluginConfig, Plugin]]:
+    def _load_plugin(self, file_path: Path) -> Optional[Tuple[PluginConfig, Plugin]]:
         """
         加载插件
 
@@ -166,33 +153,31 @@ class PluginManager:
 
         return None
 
-    def load_plugins(self):
+    def load_plugin(self, plugins_dir: Path):
         """
         加载插件
+
+        :param plugins_dir: 插件目录
         """
-        if self.is_loaded:
+        if not plugins_dir.exists():
+            logger.warning(f"Plugins directory {plugins_dir} not found")
             return
 
-        for root, _, files in os.walk(self.plugins_dir):
+        logger.debug(f"Loading plugins from {plugins_dir}")
+        for root, _, files in os.walk(plugins_dir):
             for file in files:
-                plugin = self.load_plugin(Path(root)/file)
+                plugin = self._load_plugin(Path(root)/file)
                 if plugin is not None:
                     self.plugins.append(plugin)
 
-        logger.info(f"Plugins loaded: {len(self.plugins)}")
-        self.is_loaded = True
-
-    def create_plugin(self, config: Any, store: DataStore, global_config: PluginGlobalConfig) -> Plugin:
+    def create_plugin_instance(self, config: Any, store: DataStore, global_config: PluginGlobalConfig) -> Plugin:
         """
-        根据配置创建插件
+        根据配置创建插件实例
 
         :param config: 插件配置
         :param store: 数据仓库
         :return: 插件实例
         """
-        if not self.is_loaded:
-            self.load_plugins()
-
         for config_class, plugin_class in self.plugins:
             if plugin_class.name == dict(config).get('name', None):
                 try:

@@ -39,7 +39,7 @@ pip3 install -r requirements.lock -i https://pypi.tuna.tsinghua.edu.cn/simple
 
 ### 3. 编写流程
 
-参考：`config/application[.mode].yaml` 等文件的 `flow` 流程配置。
+参考：[config/application[.mode].yaml](https://github.com/xiaohuohumax/auto-unpack/tree/main/config) 配置文件的 `flow` 流程配置。
 
 ### 4. 运行工具
 
@@ -56,7 +56,7 @@ rye run job
 
 Windows 也可搭配 [WinSW](https://github.com/winsw/winsw) 工具，将 auto-unpack 做成系统服务。
 
-参考：[auto-unpack.xml](./auto-unpack.xml)
+参考：[auto-unpack.xml](https://github.com/xiaohuohumax/auto-unpack/blob/main/auto-unpack.xml)
 
 ```shell
 # 安装服务
@@ -80,6 +80,7 @@ auto-unpack.exe uninstall
 ## 🌳 项目结构
 
 [项目结构](./docs/tree.md)
+
 
 ## 📚 支持格式
 

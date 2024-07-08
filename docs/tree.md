@@ -16,7 +16,7 @@ auto-unpack
  │   │   │   ├── filter.py
  │   │   │   ├── loop.py
  │   │   │   ├── merge.py
- │   │   │   ├── switch.py
+ │   │   │   └── switch.py
  │   │   ├── empty.py
  │   │   ├── log.py
  │   │   ├── remove.py
@@ -29,15 +29,12 @@ auto-unpack
  │   └── util               // 工具库目录
  │       ├── config.py
  │       ├── file.py
- │       ├── lib            // 第三方库7-zip目录
- │       │   ├── 7-zip.chm
- │       │   ├── 7-zip.chw
- │       │   ├── History.txt
- │       │   ├── License.txt
- │       │   ├── readme.txt
- │       │   └── win
+ │       ├── lib            // 第三方库目录
+ │       │   ├── 7zip_Windows       // 7-zip Windows 目录
+ │       │   └── RAR_macOS          // unRAR macOS 目录
  │       ├── logging.py      // 日志配置
- │       └── sevenzip.py     // 7-zip 工具封装
+ │       ├── sevenzip.py     // 7-zip 工具封装
+ │       └── unrarport.py    // unRAR 工具封装
  ├── banner.txt
  ├── config                  // 配置文件目录
  │   ├── application[.test].yaml    // 对应模式的配置文件

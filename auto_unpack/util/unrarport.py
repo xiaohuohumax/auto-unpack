@@ -27,22 +27,37 @@ def exec_cmd(cmds: List[str], decode: str = "utf-8") -> Tuple[int, str]:
 
 class ResultCode(Enum):
     """
-    7-zip 状态返回码定义
+    Code   Description
 
-    0 No error
-    1 Warning (Non fatal error(s)). For example, one or more files were locked by some other application,
-        so they were not compressed.
-    2 Fatal error
-    7 Command line error
-    8 Not enough memory for operation
-    255 User stopped the process
+     0     Successful operation.
+     1     Non fatal error(s) occurred.
+     2     A fatal error occurred.
+     3     Invalid checksum. Data is damaged.
+     4     Attempt to modify an archive locked by 'k' command.
+     5     Write error.
+     6     File open error.
+     7     Wrong command line option.
+     8     Not enough memory.
+     9     File create error
+    10     No files matching the specified mask and options were found.
+    11     Wrong password.
+    12     Read error.
+   255     User stopped the process.
     """
 
     NO_ERROR = (0, '成功')
     WARNING = (1, '警告(非致命错误)')
     FATAL_ERROR = (2, '致命错误')
+    INVALID_CHECKSUM_ERROR = (3, '数据损坏')
+    LOCKED_BY_K_ERROR = (4, '无法向已经锁定的RAR压缩文件中添加文件')
+    WRITE_ERROR = (5, '写入失败')
+    FILE_OPEN_ERROR = (6, '打开文件失败')
     COMMAND_LINE_ERROR = (7, '命令行错误')
     NOT_ENOUGH_MEMORY_ERROR = (8, '没有足够的内存进行操作')
+    CREATE_ERROR = (9, '创建文件失败')
+    NOTFOUND_ERROR = (10, '没有找到匹配指定掩码和选项的文件')
+    PWD_ERROR = (11, '密码错误')
+    READ_ERROR = (12, '读取失败')
     USER_STOPPED = (255, '用户停止进程')
 
     UNKNOWN = (-1, '未知')

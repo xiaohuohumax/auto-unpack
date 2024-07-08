@@ -1,6 +1,6 @@
 [project]
 name = "auto_unpack"
-version = "2.1.1"
+version = "2.1.2"
 description = "压缩包自动解压工具，支持多种压缩包格式。通过组合各种插件，编排流程，则可满足日常解压需求。"
 authors = [{ name = "xiaohuohumax" }]
 dependencies = [
@@ -8,7 +8,7 @@ dependencies = [
     "pydantic-settings>=2.2.1",
     "ruamel-yaml>=0.18.6",
 ]
-readme = "README.md"
+readme = "PYPI_README.md"
 requires-python = ">= 3.8"
 keywords = [
     "auto-unpack",
@@ -52,7 +52,14 @@ allow-direct-references = true
 packages = ["auto_unpack"]
 
 [tool.hatch.build]
-include = ["auto_unpack", "docs", "LICENSE", "logo.png", "logo-dark.png"]
+include = [
+    "auto_unpack",
+    "docs",
+    "PYPI_README.md",
+    "LICENSE",
+    "logo.png",
+    "logo-dark.png",
+]
 
 [tool.rye.scripts]
 start = "python -m main"

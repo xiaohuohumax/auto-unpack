@@ -88,6 +88,23 @@ class App:
         # 创建流程
         self._create_flows()
 
+    def load_plugin(self, plugin_path: Path):
+        """
+        通过文件/目录加载插件
+
+        :param plugin_path: 插件目录/文件路径
+        """
+        pluginManager.load_plugin(plugin_path)
+
+    def load_plugin_by_class(self, config_class: Any, plugin_class: Any):
+        """
+        通过类加载插件
+
+        :param config_class: 插件配置类
+        :param plugin_class: 插件类
+        """
+        pluginManager.load_plugin_by_class(config_class, plugin_class)
+
     def run(self):
         """
         运行

@@ -115,9 +115,24 @@ class PluginManager:
     # 插件列表
     plugins: List[Tuple[PluginConfig, Plugin]] = []
 
-    def _load_plugin(self, file_path: Path) -> Optional[Tuple[PluginConfig, Plugin]]:
+    def _save_plugin(self, config: PluginConfig, plugin: Plugin):
         """
-        加载插件
+        保存插件, 同名则覆盖(name)
+
+        :param config: 插件配置
+        :param plugin: 插件
+        """
+        index = next((i for i, (_, p) in enumerate(
+            self.plugins) if p.name == plugin.name), -1)
+        if index != -1:
+            logger.warning(f"Plugin `{plugin.name}` already exists, replaced")
+            self.plugins[index] = (config, plugin)
+        else:
+            self.plugins.append((config, plugin))
+
+    def _load_plugin_by_file(self, file_path: Path) -> Optional[Tuple[PluginConfig, Plugin]]:
+        """
+        通过文件加载插件
 
         :param file_path: 插件文件路径
         """
@@ -146,29 +161,51 @@ class PluginManager:
 
         if config_class is not None and plugin_class is not None:
             logger.debug(f"Plugin `{plugin_class.name}` loaded")
-            return (config_class, plugin_class)
+            self._save_plugin(config_class, plugin_class)
         else:
             logger.warning(
                 f"Plugin file {plugin_name} has no config or plugin class")
 
-        return None
-
-    def load_plugin(self, plugins_dir: Path):
+    def load_plugin(self, plugin_path: Path):
         """
         加载插件
 
-        :param plugins_dir: 插件目录
+        :param plugin_path: 插件目录/文件路径
         """
-        if not plugins_dir.exists():
-            logger.warning(f"Plugins directory {plugins_dir} not found")
+        if not plugin_path.exists():
+            logger.warning(f"Plugin path {plugin_path} not found")
             return
 
-        logger.debug(f"Loading plugins from {plugins_dir}")
-        for root, _, files in os.walk(plugins_dir):
+        if plugin_path.is_file():
+            logger.debug(f"Loading plugin from {plugin_path}")
+            self._load_plugin_by_file(plugin_path)
+            return
+
+        logger.debug(f"Loading plugins from {plugin_path}")
+        for root, _, files in os.walk(plugin_path):
             for file in files:
-                plugin = self._load_plugin(Path(root)/file)
-                if plugin is not None:
-                    self.plugins.append(plugin)
+                self._load_plugin_by_file(Path(root)/file)
+
+    def load_plugin_by_class(self, config_class: Any, plugin_class: Any):
+        """
+        通过类加载插件
+
+        :param config_class: 插件配置类
+        :param plugin_class: 插件类
+        """
+        logger.debug(f"Loading plugin by class `{config_class.__name__}`")
+
+        if not issubclass(plugin_class, Plugin):
+            logger.warning(
+                f"Plugin class `{plugin_class}` is not a subclass of `Plugin`")
+            return
+        elif not issubclass(config_class, PluginConfig):
+            logger.warning(
+                f"Plugin config class `{config_class}` is not a subclass of `PluginConfig`")
+            return
+
+        logger.debug(f"Plugin `{plugin_class.name}` loaded")
+        self._save_plugin(config_class, plugin_class)
 
     def create_plugin_instance(self, config: Any, store: DataStore, global_config: PluginGlobalConfig) -> Plugin:
         """

@@ -67,6 +67,47 @@ if __name__ == '__main__':
 
 最后，运行 `python main.py [--mode=local]` 即可启动程序。
 
+## 🧩 自定义流程插件
+
+```python
+from pathlib import Path
+from auto_unpack import App
+from auto_unpack.plugin import PluginConfig, Plugin
+
+
+class MyConfig(PluginConfig):
+    pass
+
+
+class MyPlugin(Plugin[MyConfig]):
+    name: str = "my"
+
+    def init(self):
+        print("my plugin init")
+
+    def execute(self):
+        print("my plugin execute")
+
+
+if __name__ == '__main__':
+    app = App()
+    # 通过类加载插件
+    app.load_plugin_by_class(MyConfig, MyPlugin)
+    # 通过配置文件/目录加载插件
+    app.load_plugin(Path('./plugins'))
+    app.load_plugin(Path('./plugins/my.py'))
+    # 运行程序
+    app.run()
+```
+配置使用
+
+```yaml
+flow:
+  steps:
+    - name: my
+      ...
+```
+
 ## 🚨 注意事项
 
 + 新流程请先小范围测试，确保功能正常，防止压缩包处理意外造成数据丢失或损坏。

@@ -1,6 +1,6 @@
 [project]
 name = "auto_unpack"
-version = "2.1.2"
+version = "2.1.3"
 description = "压缩包自动解压工具，支持多种压缩包格式。通过组合各种插件，编排流程，则可满足日常解压需求。"
 authors = [{ name = "xiaohuohumax" }]
 dependencies = [

@@ -61,6 +61,11 @@ include = [
     "logo-dark.png",
 ]
 
+# [[tool.poetry.source]]
+# name = "aliyun"
+# url = "http://mirrors.aliyun.com/pypi/simple"
+# default = true
+
 [tool.rye.scripts]
 start = "python -m main"
 job = "python -m job"

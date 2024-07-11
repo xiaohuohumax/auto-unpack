@@ -1,5 +1,6 @@
 import logging
 import os
+import platform
 import re
 import subprocess
 from enum import Enum
@@ -220,6 +221,7 @@ class ListResult(Result):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+        # todo: 关于p7zip解压缩较大的RAR格式文件 BUG 待修复 ISSUE #2
         if self.code == ResultCode.NO_ERROR:
             # 解析压缩包信息
             self._parse_infos()
@@ -338,11 +340,52 @@ def load_sevenzip_lib() -> Path:
 
     :return: 7zip 库路径
     """
-    # todo: 适配其他平台
-    lib_path = Path(__file__).parent/'lib/win/7z.exe'
-    if not lib_path.exists():
-        raise FileNotFoundError(f'7-zip lib not found: {lib_path}')
-    return lib_path
+    lib_path = Path(__file__).parent / 'lib'
+
+    # 系统
+    system = platform.system().lower()
+    system_path = lib_path / system
+    if not system_path.exists():
+        raise NotImplementedError(f'Platform not supported: {system}')
+
+    # 处理器
+    machine = platform.machine().lower()
+    machine_map = {'amd': 'amd', 'arm': 'arm', 'x86_64': 'amd'}
+
+    machine_name = next(
+        (v for k, v in machine_map.items() if k in machine), '')
+    machine_path = system_path / machine_name
+    if machine_name == '' or not machine_path.exists():
+        raise NotImplementedError(f'Machine not supported: {machine}')
+
+    # 位数
+    architecture = platform.architecture()[0].lower()
+    architecture_map = {
+        '64bit': 'x64', '32bit': 'x86',
+        'arm64': 'x64', 'arm32': 'x86'
+    }
+
+    architecture_name = architecture_map.get(architecture, '')
+    architecture_path = machine_path / architecture_name
+    if architecture_name == '' or not architecture_path.exists():
+        raise NotImplementedError(
+            f'Architecture not supported: {architecture}')
+
+    # 7zip 可执行文件
+    bin_map = {'windows': '7z.exe', 'linux': '7zzs', 'darwin': '7zz'}
+    bin_name = bin_map.get(system, '')
+    bin_path = architecture_path / bin_name
+    if bin_name == '' or not bin_path.exists():
+        raise NotImplementedError(f'System not supported: {system}')
+
+    try:
+        # 部分环境下, 7zip 权限不够, 需要 chmod 755
+        bin_path.chmod(0o755)
+    except Exception as e:
+        logger.warning(f'chmod 755 {bin_path} failed: {e}')
+
+    logger.debug(f'7zip lib path: {bin_path}')
+    return bin_path
 
 
 class SevenZipUtil:

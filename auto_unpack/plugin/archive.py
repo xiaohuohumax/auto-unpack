@@ -17,7 +17,8 @@ from auto_unpack.store import Context, FileData
 from auto_unpack.util.file import (get_next_not_exist_path,
                                    is_path_in_includes, path_equal,
                                    read_file_lines, write_file)
-from auto_unpack.util.sevenzip import ListResult, ResultCode, SevenZipUtil
+from auto_unpack.util.sevenzip import ExtractResult, ListResult, Result, ResultCode, SevenZipUtil
+from auto_unpack.util.sevenzip.result import Attr
 
 logger = logging.getLogger(__name__)
 
@@ -43,17 +44,24 @@ class ArchiveInfoStatus(Enum):
     # 解压成功
     EXTRACT_SUCCESS = (6, 'Extract Success')
 
+    @property
+    def tip(self):
+        """
+        状态码提示信息
+        """
+        return self.value[1]
+
 
 class ArchiveInfo(BaseModel):
     """
     压缩包信息
     """
-    # 密码
-    password: Optional[str] = None
-    # 类型
-    type: str
     # 是否分卷
     is_volume: bool
+    # 密码
+    password: Optional[str] = None
+    # 压缩包属性
+    attr: Attr
     # 分卷
     volumes: List[Path] = []
     # 入口文件路径
@@ -61,11 +69,12 @@ class ArchiveInfo(BaseModel):
 
     @model_serializer(when_used='json')
     def serialize_v1(self) -> Dict[str, Any]:
-        r = self.model_dump()
-        if r['password'] is None:
-            del r['password']
+        r = self.model_dump(exclude_none=True)
         if not r['is_volume']:
             del r['volumes']
+
+        if 'path' in r['attr']:
+            del r['attr']['path']
         return r
 
 
@@ -111,7 +120,11 @@ class ArchiveStatGroup(BaseModel):
 
     @field_serializer('status', when_used='json')
     def serialize_status(self, status: ArchiveInfoStatus) -> str:
-        return status.value[1]
+        return status.tip
+
+
+# 结果处理模式
+Result_Processing_Mode = Literal['strict', 'greedy']
 
 
 class ArchiveStat(BaseModel):
@@ -129,6 +142,8 @@ class ArchiveStat(BaseModel):
     test_fail: Optional[int] = None
     extract_success: Optional[int] = None
     extract_fail: Optional[int] = None
+    # 结果处理模式
+    result_processing_mode: Result_Processing_Mode = 'strict'
 
     # 详细信息
     groups: List[ArchiveStatGroup] = []
@@ -149,6 +164,10 @@ class ArchivePluginConfig(HandlePluginConfig):
     stat_file_name: Optional[str] = None
     # 线程池最大线程数
     thread_max: int = 10
+    # 结果处理模式
+    # strict：严格模式（结果绝对依靠 7-zip 命令行输出）
+    # greedy：贪婪模式（7-zip 返回某些错误码时，也会尝试识别/测试/解压）
+    result_processing_mode: Result_Processing_Mode = 'strict'
 
     # mode: extract 可用选项
     # 输出目录
@@ -162,6 +181,9 @@ class ArchivePluginConfig(HandlePluginConfig):
         if not password_path.exists():
             raise ValueError(f"Password file `{password_path}` does not exist")
         return self
+
+
+Result_Level = Literal['success', 'warning', 'error']
 
 
 class ArchivePlugin(Plugin[ArchivePluginConfig]):
@@ -200,6 +222,36 @@ class ArchivePlugin(Plugin[ArchivePluginConfig]):
         logger.info(
             f"Loaded {len(passwords)} passwords from `{self.config.password_path}`")
 
+    def _get_result_level(self, result: Result) -> Result_Level:
+        """
+        获取返回结果的级别
+
+        ```
+        success: 成功（无错误）
+        warning: 警告（存在错误，但不影响操作）
+        error: 错误（存在错误，影响操作）
+        ```
+
+        :param result: 结果
+        :return: 级别
+        """
+        if self.config.result_processing_mode == 'greedy':
+            # 贪婪模式
+
+            # 关于 p7zip 解压缩较大的RAR格式文件 BUG ISSUE #2
+            # 触发条件：
+            # Type = Rar
+            # Code = HEADERS_ERROR => Headers Error in encrypted archive.
+            # Characteristics = Recovery
+            if result.code == ResultCode.HEADERS_ERROR \
+                and result.attr.type == 'Rar' \
+                    and 'Recovery' in result.attr.characteristics:
+                return 'warning'
+
+        return 'success' \
+            if result.code == ResultCode.NO_ERROR \
+            else 'error'
+
     def _list_archives_item(self, archive_files: List[ArchiveFile]):
         """
         识别压缩包
@@ -221,14 +273,9 @@ class ArchivePlugin(Plugin[ArchivePluginConfig]):
                 continue
 
             # 跳过已被识别的分卷
-            include_successes = [c for c in success_archive_files
-                                 if is_path_in_includes(archive_file.path, c.info.volumes)]
-            if len(include_successes) > 0:
-                # 已被识别的分卷
-                success_archive_file = include_successes[0]
-                archive_file.status = success_archive_file.status
-                archive_file.info = success_archive_file.info
-                archive_file.info_result = success_archive_file.info_result
+            is_included = any((c for c in success_archive_files
+                               if is_path_in_includes(archive_file.path, c.info.volumes)))
+            if is_included:
                 continue
 
             if self.config.mode == 'list':
@@ -237,19 +284,24 @@ class ArchivePlugin(Plugin[ArchivePluginConfig]):
             for password in self.passwords:
                 list_result = SevenZipUtil.list(archive_file.path, password)
 
-                if list_result.code != ResultCode.NO_ERROR:
+                level = self._get_result_level(list_result)
+                if level == 'error':
                     continue
 
                 archive_file.status = ArchiveInfoStatus.LIST_SUCCESS
                 archive_file.info_result = list_result
                 archive_file.info = ArchiveInfo(
-                    type=list_result.type,
+                    attr=list_result.attr,
                     is_volume=list_result.is_volume,
                     volumes=list_result.volume_paths,
                     password=password if password != '' else None,
                     main_path=list_result.volume_main_path,
                 )
-
+                if level == 'warning':
+                    archive_file.error = ArchiveError(
+                        message=list_result.message,
+                        code=list_result.code,
+                    )
                 success_archive_files.append(archive_file)
                 break
             else:
@@ -294,10 +346,22 @@ class ArchivePlugin(Plugin[ArchivePluginConfig]):
             if archive_file.status != ArchiveInfoStatus.LIST_SUCCESS:
                 continue
 
-            # 分卷压缩 且 主卷不是当前压缩包
-            if len(archive_file.info.volumes) > 1 \
-                    and not path_equal(archive_file.info.main_path, archive_file.path):
-                archive_file.status = ArchiveInfoStatus.LIST_VOLUME
+            # 不是分卷
+            if not path_equal(archive_file.info.main_path, archive_file.path) \
+                    or len(archive_file.info.volumes) < 2:
+                continue
+
+            for archive_file_item in self.archive_files:
+                if archive_file_item == archive_file:
+                    continue
+                if not is_path_in_includes(archive_file_item.path, archive_file.info.volumes):
+                    continue
+
+                archive_file_item.status = ArchiveInfoStatus.LIST_VOLUME
+                # 拷贝参数
+                archive_file_item.info = archive_file.info.model_copy()
+                archive_file_item.info_result = archive_file.info_result.model_copy()
+                archive_file_item.error = None
 
     def _test_archives_item(self, archive_file: ArchiveFile):
         """
@@ -313,16 +377,28 @@ class ArchivePlugin(Plugin[ArchivePluginConfig]):
 
         test_result = SevenZipUtil.test(
             info_result.file_path, info_result.password)
+        level = self._get_result_level(test_result)
 
-        if test_result.code == ResultCode.NO_ERROR:
+        if level in ['success', 'warning']:
             archive_file.status = ArchiveInfoStatus.TEST_SUCCESS
+            if level == 'warning':
+                archive_file.error = ArchiveError(
+                    message=test_result.message,
+                    code=test_result.code,
+                )
             return
 
         for password in self.passwords:
             test_result = SevenZipUtil.test(info_result.file_path, password)
+            level = self._get_result_level(test_result)
 
-            if test_result.code == ResultCode.NO_ERROR:
+            if level in ['success', 'warning']:
                 archive_file.status = ArchiveInfoStatus.TEST_SUCCESS
+                if level == 'warning':
+                    archive_file.error = ArchiveError(
+                        message=test_result.message,
+                        code=test_result.code,
+                    )
                 # 更新密码
                 archive_file.info.password = password
                 break
@@ -377,7 +453,7 @@ class ArchivePlugin(Plugin[ArchivePluginConfig]):
 
         output_cache_dir = self._create_new_cache_dir()
 
-        def extract_success():
+        def extract_success(result: ExtractResult, level: Result_Level):
             with self.file_lock:
                 output = get_next_not_exist_path(
                     self.config.output_dir / archive_file.path.stem
@@ -386,6 +462,12 @@ class ArchivePlugin(Plugin[ArchivePluginConfig]):
             logger.debug(
                 f"Extracted archive `{output_cache_dir}` to `{output}`")
             archive_file.status = ArchiveInfoStatus.EXTRACT_SUCCESS
+
+            if level == 'warning':
+                archive_file.error = ArchiveError(
+                    message=result.message,
+                    code=result.code,
+                )
             archive_file.output = output
 
         extract_result = SevenZipUtil.extract(
@@ -395,8 +477,10 @@ class ArchivePlugin(Plugin[ArchivePluginConfig]):
             overwrite='u',
             keep_dir=self.config.keep_dir,
         )
-        if extract_result.code == ResultCode.NO_ERROR:
-            extract_success()
+        level = self._get_result_level(extract_result)
+
+        if level in ['success', 'warning']:
+            extract_success(extract_result, level)
             return
 
         for password in self.passwords:
@@ -408,9 +492,12 @@ class ArchivePlugin(Plugin[ArchivePluginConfig]):
                 overwrite='u',
                 keep_dir=self.config.keep_dir,
             )
-            if extract_result.code == ResultCode.NO_ERROR:
+
+            level = self._get_result_level(extract_result)
+
+            if level in ['success', 'warning']:
                 archive_file.info.password = password
-                extract_success()
+                extract_success(extract_result, level)
                 break
 
             # 解压失败，生成新的缓存目录
@@ -516,6 +603,7 @@ class ArchivePlugin(Plugin[ArchivePluginConfig]):
         ]
 
         archive_status.count = len(self.archive_files)
+        archive_status.result_processing_mode = self.config.result_processing_mode
         archive_status.groups = groups
 
         stat_json = archive_status.model_dump_json(
@@ -538,12 +626,10 @@ class ArchivePlugin(Plugin[ArchivePluginConfig]):
         for cache_dir in self.cache_dirs:
             shutil.rmtree(cache_dir, ignore_errors=True)
 
-    def init(self):
-        # 加载密码表
-        self._load_passwords()
-
     def execute(self):
         try:
+            # 加载密码表
+            self._load_passwords()
             # 解析压缩包
             self._list_archives()
             # 测试压缩包

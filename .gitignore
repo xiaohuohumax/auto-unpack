@@ -5,5 +5,6 @@ __pycache__
 output
 info
 dist
+config/*.local.yaml
 
 *.log

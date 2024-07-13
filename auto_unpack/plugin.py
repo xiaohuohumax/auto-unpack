@@ -17,7 +17,7 @@ class PluginConfig(BaseModel):
     插件配置基类
     """
     # 忽略多余参数
-    _config = ConfigDict(extra='ignore')
+    model_config = ConfigDict(extra='ignore')
 
 
 class InputPluginConfig(PluginConfig):

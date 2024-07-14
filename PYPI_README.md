@@ -31,6 +31,9 @@ pip install auto-unpack
 project
  ├── banner.txt                     // 程序启动banner【可选】
  ├── .env                           // 环境变量文件
+ ├── archive                        // 压缩包存放目录
+ ├── output                         // 解压后的文件存放目录
+ ├── plugins                        // 自定义插件目录
  ├── config
  │   ├── application[.mode].yaml    // 应用配置（不同模式）
  │   ├── application.yaml           // 应用配置

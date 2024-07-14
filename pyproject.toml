@@ -20,9 +20,6 @@ keywords = [
     "flow",
     "schedule",
 ]
-homepage = "https://github.com/xiaohuohumax/auto-unpack"
-repository = "https://github.com/xiaohuohumax/auto-unpack"
-documentation = "https://github.com/xiaohuohumax/auto-unpack"
 license = { text = "MIT" }
 classifiers = [
     "Development Status :: 4 - Beta",
@@ -36,6 +33,11 @@ classifiers = [
     "Topic :: System :: Archiving :: Compression",
     "Topic :: Utilities",
 ]
+
+[project.urls]
+Homepage = "https://github.com/xiaohuohumax/auto-unpack#readme"
+Source = "https://github.com/xiaohuohumax/auto-unpack"
+Tracker = "https://github.com/xiaohuohumax/auto-unpack/issues"
 
 [build-system]
 requires = ["hatchling"]

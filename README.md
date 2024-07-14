@@ -23,13 +23,23 @@
 
 ## 📖 使用说明
 
-### 1. 下载源码
+### 方式一：安装依赖
+
+```shell
+pip install auto-unpack
+```
+
+参考：[PyPI](./PYPI_README.md)
+
+### 方式二：直接运行
+
+#### 1. 下载源码
 
 ```shell
 git clone https://github.com/xiaohuohumax/auto-unpack.git
 ```
 
-### 2. 安装依赖
+#### 2. 安装依赖
 
 ```shell
 rye sync
@@ -37,11 +47,11 @@ rye sync
 pip3 install -r requirements.lock -i https://pypi.tuna.tsinghua.edu.cn/simple
 ```
 
-### 3. 编写流程
+#### 3. 编写流程
 
 参考：[config/application[.mode].yaml](./config) 配置文件的 `flow` 流程配置。
 
-### 4. 运行工具
+#### 4. 运行工具
 
 ```shell
 rye run start
@@ -75,15 +85,14 @@ auto-unpack.exe uninstall
 
 ## 🚧 后续计划
 
-+ [ ] 适配 Linux/Mac 环境
++ [x] 适配 Linux/Mac 环境
++ [ ] 文件夹展开插件（flat）
 
 ## 🌳 项目结构
 
 [项目结构](./docs/tree.md)
 
-
 ## 📚 支持格式
-
 
 + **压缩/解压缩**:
   7z、XZ、BZIP2、GZIP、TAR、ZIP 以及 WIM
@@ -95,3 +104,4 @@ auto-unpack.exe uninstall
 
 + [Rye](https://rye.astral.sh/)
 + [7-zip](https://7-zip.org/)
++ [WinSW](https://github.com/winsw/winsw)

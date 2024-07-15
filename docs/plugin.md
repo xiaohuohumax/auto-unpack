@@ -18,6 +18,7 @@
 + [x] [rename](../auto_unpack/plugin/rename.py) 文件重命名
 + [x] [scan](../auto_unpack/plugin/scan.py) 扫描文件
 + [x] [transfer](../auto_unpack/plugin/transfer.py) 移动文件
++ [x] [flat](../auto_unpack/plugin/flat.py) 扁平化文件夹
 
 ## 插件上下文
 

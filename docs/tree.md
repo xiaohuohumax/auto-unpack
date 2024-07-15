@@ -11,19 +11,6 @@ auto-unpack
  │   ├── config.py          // 配置文件解析
  │   ├── env.py             // 环境变量解析
  │   ├── plugin             // 插件目录
- │   │   ├── archive.py
- │   │   ├── control
- │   │   │   ├── filter.py
- │   │   │   ├── loop.py
- │   │   │   ├── merge.py
- │   │   │   ├── switch.py
- │   │   ├── empty.py
- │   │   ├── log.py
- │   │   ├── remove.py
- │   │   ├── rename.py
- │   │   ├── scan.py
- │   │   ├── template.py
- │   │   └── transfer.py
  │   ├── plugin.py          // 插件管理
  │   ├── store.py           // 数据仓库(插件上下文)
  │   └── util               // 工具库目录

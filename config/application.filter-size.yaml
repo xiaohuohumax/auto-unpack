@@ -1,0 +1,33 @@
+# 过滤文件大小流程
+
+flow:
+  steps:
+
+    # 扫描文件
+    - name: scan
+      dir: archive
+
+    - name: log
+      file_name: filter-before
+
+    # 过滤文件
+    - name: filter
+      exclude_key: excludes_key
+      rules:
+        # 保留文件大小 小于等于 100byte 的文件
+        # file_size operator size * unit => True(保留) False(过滤)
+        - mode: size
+          # 可选操作符: <, >, <=, >=, ==, !=
+          # 默认: >=
+          operator: '<='
+          size: 100.0
+          # 可选单位: b kb mb gb tb
+          # 默认: mb
+          unit: b
+
+    - name: log
+      file_name: filter-after
+
+    - name: log
+      load_key: excludes_key
+      file_name: filter-after-excludes

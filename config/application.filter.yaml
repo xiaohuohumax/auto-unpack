@@ -1,0 +1,24 @@
+# 过滤文件流程
+
+flow:
+  steps:
+
+    # 扫描文件
+    - name: scan
+      dir: archive
+
+    - name: log
+      file_name: filter-before
+
+    # 过滤文件
+    - name: filter
+      exclude_key: excludes_key
+      includes:
+        - "*.7z"
+
+    - name: log
+      file_name: filter-after
+
+    - name: log
+      load_key: excludes_key
+      file_name: filter-after-excludes

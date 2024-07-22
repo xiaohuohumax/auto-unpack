@@ -37,8 +37,8 @@ class ReplaceRule(Rule):
     def rename(self, file: Path) -> Path:
         new_name = file.name.replace(self.search, self.replace, self.count)
         new_file = file.with_name(new_name)
-        rename_file(file, new_file)
-        logger.info(f"Rename {file} to {new_file}")
+        if rename_file(file, new_file):
+            logger.info(f"Rename {file} to {new_file}")
         return new_file
 
 
@@ -85,9 +85,8 @@ class ReRule(Rule):
         new_name = re.sub(self.pattern, self.replace,
                           file.name, count=self.count, flags=flags)
         new_file = file.with_name(new_name)
-
-        rename_file(file, new_file)
-        logger.info(f"Rename {file} to {new_file}")
+        if rename_file(file, new_file):
+            logger.info(f"Rename {file} to {new_file}")
         return new_file
 
 

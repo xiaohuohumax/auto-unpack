@@ -83,17 +83,18 @@ def path_equal(path1: Path, path2: Path) -> bool:
     return str(path1.resolve()) == str(path2.resolve())
 
 
-def rename_file(old_file: Path, new_file: Path):
+def rename_file(old_file: Path, new_file: Path) -> bool:
     """
     文件重命名
 
     :param old_file: 老文件路径
     :param new_file: 新文件路径
-    :return: 是否已经重命名
+    :return: 是否重命名
     """
     if path_equal(old_file, new_file):
-        return
+        return False
     old_file.rename(new_file)
+    return True
 
 
 def is_path_in_includes(path: Path, includes: List[Path]) -> bool:

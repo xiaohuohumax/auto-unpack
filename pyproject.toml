@@ -45,7 +45,11 @@ build-backend = "hatchling.build"
 
 [tool.rye]
 managed = true
-dev-dependencies = ["apscheduler>=3.10.4"]
+dev-dependencies = [
+    "apscheduler>=3.10.4",
+    "mkdocs-material>=9.5.29",
+    "mkdocs>=1.6.0",
+]
 
 [tool.hatch.metadata]
 allow-direct-references = true
@@ -71,3 +75,5 @@ include = [
 [tool.rye.scripts]
 start = "python -m main"
 job = "python -m job"
+docs = "mkdocs serve"
+build-docs = "mkdocs build"

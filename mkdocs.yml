@@ -1,0 +1,29 @@
+site_name: auto-unpack
+repo_url: https://github.com/xiaohuohumax/auto-unpack
+nav:
+  - 项目介绍: index.md
+  - 插件介绍: plugin/index.md
+  - 内置插件:
+    - Filter: plugin/control/filter.md
+
+theme:
+  name: material
+  font:
+    code: Roboto Mono
+  palette:
+    - media: "(prefers-color-scheme)"
+      toggle:
+        icon: material/brightness-auto
+        name: Switch to light mode
+
+    - media: "(prefers-color-scheme: light)"
+      scheme: default 
+      toggle:
+        icon: material/brightness-7
+        name: Switch to dark mode
+
+    - media: "(prefers-color-scheme: dark)"
+      scheme: slate
+      toggle:
+        icon: material/brightness-4
+        name: Switch to system preference

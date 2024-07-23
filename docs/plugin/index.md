@@ -11,9 +11,9 @@
 
 ### 加工处理类插件
 
-+ 🚧 [Archive](./archive.md) 压缩包处理
-+ 🚧 [Empty](./empty.md) 删除空文件夹
-+ 🚧 [Log](./log.md) 日志记录
++ [Archive](./archive.md) 压缩包处理
++ [Empty](./empty.md) 删除空文件夹
++ [Log](./log.md) 日志记录
 + 🚧 [Remove](./remove.md) 删除文件
 + 🚧 [Rename](./rename.md) 文件重命名
 + 🚧 [Scan](./scan.md) 扫描文件

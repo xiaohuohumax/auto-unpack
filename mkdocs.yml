@@ -8,6 +8,9 @@ nav:
     - Loop: plugin/control/loop.md
     - Merge: plugin/control/merge.md
     - Switch: plugin/control/switch.md
+    - Archive: plugin/archive.md
+    - Empty: plugin/empty.md
+    - Log: plugin/log.md
 
 theme:
   name: material

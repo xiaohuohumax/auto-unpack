@@ -64,7 +64,7 @@ flow:
 
 ## 示例
 
-保留文件大小 大于等于 1MB 的 txt 和 md 文件，并排除名叫 README.md 文件。
+### 保留文件大小 大于等于 1MB 的 txt 和 md 文件，并排除名叫 README.md 文件。
 
 ```yaml
 flow:

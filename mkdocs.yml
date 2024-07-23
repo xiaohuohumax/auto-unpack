@@ -11,6 +11,9 @@ nav:
     - Archive: plugin/archive.md
     - Empty: plugin/empty.md
     - Log: plugin/log.md
+    - Remove: plugin/remove.md
+    - Rename: plugin/rename.md
+    - Scan: plugin/scan.md
 
 theme:
   name: material

@@ -22,7 +22,7 @@ flow:
 
 ## 示例
 
-将扫描到的 txt 和 md 文件合并到 `default` 上下文中。
+### 将扫描到的 txt 和 md 文件合并到 `default` 上下文中。
 
 ```yaml
 flow:

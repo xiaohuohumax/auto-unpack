@@ -32,7 +32,7 @@ class ProjectFlowConfig(BaseModel):
 class App:
 
     # 插件目录
-    builtin_plugins_dir: Path = Path(__file__).parent/'plugin'
+    builtin_plugins_dir: Path = Path(__file__).parent/'plugins'
     # 流程(插件实例)
     flows: List[Plugin] = []
     # 数据仓库(插件间共享数据)

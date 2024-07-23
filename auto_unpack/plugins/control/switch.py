@@ -1,0 +1,70 @@
+import logging
+from typing import List, Optional, Union
+
+from auto_unpack.plugin import OutputPluginConfig, Plugin
+from auto_unpack.plugins.control.filter import Filter, SizeFilter, GlobFilter
+from auto_unpack.store import Context
+
+logger = logging.getLogger(__name__)
+
+
+class Case(Filter):
+    """
+    数据分支条件
+    """
+    # 保存到数据仓库 key
+    save_key: str
+
+
+class SizeCase(SizeFilter, Case):
+    """
+    大小分支条件
+    """
+    pass
+
+
+class GlobCase(GlobFilter, Case):
+    """
+    文件 glob 表达式分支条件
+    """
+    pass
+
+
+Case_Type = Union[SizeCase, GlobCase]
+
+
+class SwitchPluginConfig(OutputPluginConfig):
+    """
+    条件分支上下文插件配置
+    """
+    # 分支条件
+    cases: List[Case_Type] = []
+    # 未匹配到分支条件时key
+    default_key: Optional[str] = None
+
+
+class SwitchPlugin(Plugin[SwitchPluginConfig]):
+    """
+    条件分支上下文插件
+
+    作用: 依据条件对当前上下文数据分组, 并保存到新上下文
+    """
+    name: str = "switch"
+
+    def execute(self):
+        context = self.load_context()
+
+        file_datas = context.file_datas
+
+        for ca in self.config.cases:
+            # 分支条件匹配
+            case_file_datas = ca.filter(file_datas)
+            # 剔除已保存到新上下文的分支条件匹配数据
+            file_datas = [fd for fd in file_datas if fd not in case_file_datas]
+            # 保存到新上下文
+            self.save_context(Context(file_datas=case_file_datas), ca.save_key)
+
+        if self.config.default_key is not None:
+            # 未匹配到分支条件的数据
+            self.save_context(Context(file_datas=file_datas),
+                              self.config.default_key)

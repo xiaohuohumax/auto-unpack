@@ -20,10 +20,12 @@ flow:
       # 未匹配到任何分支时使用默认分支
       default_key: default
       cases:
-        - includes:
+        - mode: glob
+          includes:
             - "*.png"
           save_key: image
-        - includes:
+        - mode: glob
+          includes:
             - "*.txt"
           save_key: txt
 

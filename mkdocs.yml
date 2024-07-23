@@ -3,6 +3,7 @@ repo_url: https://github.com/xiaohuohumax/auto-unpack
 nav:
   - 项目介绍: index.md
   - 插件介绍: plugin/index.md
+  - 扩展插件: custom-plugin.md
   - 内置插件:
     - Filter: plugin/control/filter.md
     - Loop: plugin/control/loop.md

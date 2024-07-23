@@ -30,6 +30,7 @@ auto-unpack
  │   ├── application[.test].yaml    // 对应模式的配置文件
  │   ├── application.yaml           // 程序配置
  │   └── logging.yaml               // 日志配置
+ ├── docs                   // 文档目录
  ├── info                   // 流程执行期间产生的信息
  ├── job.py                 // 解压做成任务
  ├── LICENSE

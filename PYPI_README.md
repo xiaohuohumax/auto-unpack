@@ -25,12 +25,12 @@ pip install auto-unpack
 
 ## 🖥️ 使用
 
-创建项目文件夹大致结构如下：
+### 🌳 项目结构
 
 ```txt
 project
  ├── banner.txt                     // 程序启动banner【可选】
- ├── .env                           // 环境变量文件
+ ├── .env                           // 环境变量文件【可选】
  ├── archive                        // 压缩包存放目录
  ├── output                         // 解压后的文件存放目录
  ├── plugins                        // 自定义插件目录
@@ -42,18 +42,25 @@ project
  └── passwords.txt                  // 密码表
 ```
 
-logging.yaml 配置参考：[config/logging.yaml](https://github.com/xiaohuohumax/auto-unpack/blob/main/config/logging.yaml)
+### ⚙️ 配置文件
+
+logging.yaml 配置参考：
+
+[config/logging.yaml](https://github.com/xiaohuohumax/auto-unpack/blob/main/config/logging.yaml)
 
 application.yaml 配置参考：
 
+推荐使用 `application.yaml` 作为主配置文件，`application.base.yaml` 作为流程配置文件。
+
 - [config/application.yaml](https://github.com/xiaohuohumax/auto-unpack/blob/main/config/application.yaml)
 - [config/application.base.yaml](https://github.com/xiaohuohumax/auto-unpack/blob/main/config/application.base.yaml)
+
 
 .env 环境变量：
 
 ```txt
 # 运行模式，对应配置文件中的 application[.mode].yaml
-MODE=local
+MODE=base
 # 配置文件目录 => config
 config_dir=config
 ```
@@ -68,48 +75,9 @@ if __name__ == '__main__':
     app.run()
 ```
 
-最后，运行 `python main.py [--mode=local]` 即可启动程序。
+### 🏃 运行项目
 
-## 🧩 自定义流程插件
-
-```python
-from pathlib import Path
-from auto_unpack import App
-from auto_unpack.plugin import PluginConfig, Plugin
-
-
-class MyConfig(PluginConfig):
-    pass
-
-
-class MyPlugin(Plugin[MyConfig]):
-    name: str = "my"
-
-    def init(self):
-        print("my plugin init")
-
-    def execute(self):
-        print("my plugin execute")
-
-
-if __name__ == '__main__':
-    app = App()
-    # 通过类加载插件
-    app.load_plugin_by_class(MyConfig, MyPlugin)
-    # 通过配置文件/目录加载插件
-    app.load_plugin(Path('./plugins'))
-    app.load_plugin(Path('./plugins/my.py'))
-    # 运行程序
-    app.run()
-```
-配置使用
-
-```yaml
-flow:
-  steps:
-    - name: my
-      ...
-```
+运行 `python main.py [--mode=base]` 即可启动程序。
 
 ## 🚨 注意事项
 

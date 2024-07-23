@@ -5,9 +5,9 @@
 ### 流程控制，循环类插件
 
 - [Filter](./control/filter.md) 筛选
-- 🚧 [Loop](./control/loop.md) 循环
-- 🚧 [Merge](./control/merge.md) 合并
-- 🚧 [Switch](./control/switch.md) 分支
+- [Loop](./control/loop.md) 循环
+- [Merge](./control/merge.md) 合并
+- [Switch](./control/switch.md) 分支
 
 ### 加工处理类插件
 

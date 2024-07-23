@@ -5,6 +5,9 @@ nav:
   - 插件介绍: plugin/index.md
   - 内置插件:
     - Filter: plugin/control/filter.md
+    - Loop: plugin/control/loop.md
+    - Merge: plugin/control/merge.md
+    - Switch: plugin/control/switch.md
 
 theme:
   name: material

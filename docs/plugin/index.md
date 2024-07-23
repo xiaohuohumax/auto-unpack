@@ -17,5 +17,5 @@
 + [Remove](./remove.md) 删除文件
 + [Rename](./rename.md) 文件重命名
 + [Scan](./scan.md) 扫描文件
-+ 🚧 [Transfer](./transfer.md) 移动文件
-+ 🚧 [Flat](./flat.md) 扁平化文件夹
++ [Transfer](./transfer.md) 移动文件
++ [Flat](./flat.md) 扁平化文件夹

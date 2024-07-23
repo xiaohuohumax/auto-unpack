@@ -14,6 +14,8 @@ nav:
     - Remove: plugin/remove.md
     - Rename: plugin/rename.md
     - Scan: plugin/scan.md
+    - Transfer: plugin/transfer.md
+    - Flat: plugin/flat.md
 
 theme:
   name: material

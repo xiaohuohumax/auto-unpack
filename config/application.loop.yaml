@@ -3,7 +3,6 @@
 
 flow:
   steps:
-
     # 清理输出目录(测试用)
     - name: scan
       include_dir: true
@@ -28,7 +27,6 @@ flow:
       max_loops: 10
       # 执行步骤 同: flow.steps 一样
       steps:
-
         # 解压文件
         - name: archive
           mode: extract

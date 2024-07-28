@@ -4,11 +4,11 @@ disable_existing_loggers: False
 
 formatters:
   simple_formatter:
-    format: '%(asctime)s.%(msecs)04d %(levelname)-8s: %(message)s'
-    datefmt: '%Y-%m-%d %H:%M:%S'
+    format: "%(asctime)s.%(msecs)04d %(levelname)-8s: %(message)s"
+    datefmt: "%Y-%m-%d %H:%M:%S"
   upgrade_formatter:
     format: "%(asctime)s.%(msecs)04d %(levelname)-8s: %(message)s"
-    datefmt: '%Y-%m-%d %H:%M:%S'
+    datefmt: "%Y-%m-%d %H:%M:%S"
 
 defaults:
   console: &default_console_handler

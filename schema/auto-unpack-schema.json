@@ -1,0 +1,57 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "properties": {
+        "app": {
+            "type": "object",
+            "properties": {
+                "name": {
+                    "type": "string"
+                },
+                "info_dir": {
+                    "type": "string"
+                },
+                "clear_info_dir": {
+                    "type": "boolean"
+                },
+                "plugins_dir": {
+                    "type": "string"
+                }
+            },
+            "required": [
+                "name"
+            ]
+        },
+        "logging": {
+            "properties": {
+                "level": {
+                    "enum": [
+                        "critical",
+                        "fatal",
+                        "error",
+                        "warn",
+                        "warning",
+                        "info",
+                        "debug",
+                        "notset"
+                    ]
+                },
+                "config_path": {
+                    "type": "string"
+                }
+            }
+        },
+        "banner": {
+            "properties": {
+                "enabled": {
+                    "type": "boolean"
+                },
+                "file_path": {
+                    "type": "string"
+                },
+                "welcome": {
+                    "type": "string"
+                }
+            }
+        }
+    }
+}

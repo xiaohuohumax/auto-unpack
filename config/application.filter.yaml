@@ -2,7 +2,6 @@
 
 flow:
   steps:
-
     # 扫描文件
     - name: scan
       dir: archive

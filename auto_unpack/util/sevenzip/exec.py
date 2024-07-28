@@ -1,6 +1,6 @@
 import logging
 import subprocess
-from typing import List,  Tuple
+from typing import List, Tuple
 
 logger = logging.getLogger(__name__)
 

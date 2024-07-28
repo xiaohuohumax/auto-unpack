@@ -2,7 +2,7 @@ import logging
 from typing import List, Optional, Union
 
 from auto_unpack.plugin import OutputPluginConfig, Plugin
-from auto_unpack.plugins.control.filter import Filter, SizeFilter, GlobFilter
+from auto_unpack.plugins.control.filter import Filter, GlobFilter, SizeFilter
 from auto_unpack.store import Context
 
 logger = logging.getLogger(__name__)

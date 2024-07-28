@@ -1,6 +1,7 @@
 __pycache__
 .venv
 .vscode
+!.vscode/extensions.json
 .cache
 output
 info

@@ -2,7 +2,6 @@
 
 flow:
   steps:
-
     # 扫描文件
     - name: scan
       dir: archive
@@ -19,7 +18,7 @@ flow:
         - mode: size
           # 可选操作符: <, >, <=, >=, ==, !=
           # 默认: >=
-          operator: '<='
+          operator: "<="
           size: 100.0
           # 可选单位: b kb mb gb tb
           # 默认: mb

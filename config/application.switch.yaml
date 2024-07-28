@@ -2,7 +2,6 @@
 
 flow:
   steps:
-
     # 清理输出目录(测试用)
     - name: scan
       include_dir: true

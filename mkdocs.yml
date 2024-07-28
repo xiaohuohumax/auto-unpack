@@ -4,19 +4,20 @@ nav:
   - 项目介绍: index.md
   - 插件介绍: plugin/index.md
   - 扩展插件: custom-plugin.md
+  - 配置校验: schema.md
   - 内置插件:
-    - Filter: plugin/control/filter.md
-    - Loop: plugin/control/loop.md
-    - Merge: plugin/control/merge.md
-    - Switch: plugin/control/switch.md
-    - Archive: plugin/archive.md
-    - Empty: plugin/empty.md
-    - Log: plugin/log.md
-    - Remove: plugin/remove.md
-    - Rename: plugin/rename.md
-    - Scan: plugin/scan.md
-    - Transfer: plugin/transfer.md
-    - Flat: plugin/flat.md
+      - Filter: plugin/control/filter.md
+      - Loop: plugin/control/loop.md
+      - Merge: plugin/control/merge.md
+      - Switch: plugin/control/switch.md
+      - Archive: plugin/archive.md
+      - Empty: plugin/empty.md
+      - Log: plugin/log.md
+      - Remove: plugin/remove.md
+      - Rename: plugin/rename.md
+      - Scan: plugin/scan.md
+      - Transfer: plugin/transfer.md
+      - Flat: plugin/flat.md
 
 theme:
   name: material
@@ -29,7 +30,7 @@ theme:
         name: Switch to light mode
 
     - media: "(prefers-color-scheme: light)"
-      scheme: default 
+      scheme: default
       toggle:
         icon: material/brightness-7
         name: Switch to dark mode

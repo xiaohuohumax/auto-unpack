@@ -3,8 +3,8 @@ import platform
 from pathlib import Path
 from typing import List, TypeVar
 
-from .result import Result, ResultCode, ExtractResult, ListResult, TestResult
 from .exec import exec_cmd
+from .result import ExtractResult, ListResult, Result, ResultCode, TestResult
 
 logger = logging.getLogger(__name__)
 

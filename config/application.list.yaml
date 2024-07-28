@@ -2,7 +2,6 @@
 
 flow:
   steps:
-
     # 扫描压缩包
     - name: scan
       dir: archive/base

@@ -1,6 +1,6 @@
 import logging
 import operator
-from typing import Any, Dict, List, Literal, Optional, Union, Callable
+from typing import Any, Callable, Dict, List, Literal, Optional, Union
 
 from pydantic import BaseModel, field_validator
 

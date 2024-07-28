@@ -4,7 +4,6 @@
 # 1. 扫描多个路径到不同上下文, 合并结果到默认上下文, 解压压缩包
 flow:
   steps:
-
     # 清理输出目录(测试用)
     - name: scan
       include_dir: true
@@ -36,7 +35,6 @@ flow:
       output_dir: output
       # 解压统计信息 info/extract.json
       stat_file_name: extract
-
 # 2. 复制多个压缩包到临时目录, 扫描解压临时目录, 解压压缩包, 删除临时目录
 # flow:
 #   steps:

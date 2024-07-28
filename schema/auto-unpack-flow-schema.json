@@ -1,0 +1,564 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "definitions": {
+        "steps": {
+            "type": "array",
+            "items": {
+                "oneOf": [
+                    {
+                        "$ref": "#/definitions/customStep"
+                    },
+                    {
+                        "$ref": "#/definitions/filterStep"
+                    },
+                    {
+                        "$ref": "#/definitions/loopStep"
+                    },
+                    {
+                        "$ref": "#/definitions/mergeStep"
+                    },
+                    {
+                        "$ref": "#/definitions/switchStep"
+                    },
+                    {
+                        "$ref": "#/definitions/archiveStep"
+                    },
+                    {
+                        "$ref": "#/definitions/emptyStep"
+                    },
+                    {
+                        "$ref": "#/definitions/flatStep"
+                    },
+                    {
+                        "$ref": "#/definitions/logStep"
+                    },
+                    {
+                        "$ref": "#/definitions/removeStep"
+                    },
+                    {
+                        "$ref": "#/definitions/renameStep"
+                    },
+                    {
+                        "$ref": "#/definitions/scanStep"
+                    },
+                    {
+                        "$ref": "#/definitions/transferStep"
+                    }
+                ]
+            }
+        },
+        "customStep": {
+            "type": "object",
+            "properties": {
+                "name": {
+                    "type": "string",
+                    "not": {
+                        "enum": [
+                            "filter",
+                            "loop",
+                            "merge",
+                            "switch",
+                            "archive",
+                            "empty",
+                            "flat",
+                            "log",
+                            "remove",
+                            "rename",
+                            "scan",
+                            "transfer"
+                        ]
+                    }
+                }
+            },
+            "required": [
+                "name"
+            ]
+        },
+        "filterSize": {
+            "type": "object",
+            "properties": {
+                "mode": {
+                    "const": "size"
+                },
+                "size": {
+                    "type": "number"
+                },
+                "operator": {
+                    "type": "string",
+                    "enum": [
+                        "<",
+                        ">",
+                        "<=",
+                        ">=",
+                        "==",
+                        "!="
+                    ]
+                },
+                "unit": {
+                    "type": "string",
+                    "enum": [
+                        "b",
+                        "kb",
+                        "mb",
+                        "gb",
+                        "tb"
+                    ]
+                }
+            },
+            "required": [
+                "mode"
+            ]
+        },
+        "filterGlob": {
+            "type": "object",
+            "properties": {
+                "mode": {
+                    "const": "glob"
+                },
+                "includes": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "excludes": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                }
+            },
+            "required": [
+                "mode"
+            ]
+        },
+        "filterStep": {
+            "type": "object",
+            "properties": {
+                "name": {
+                    "const": "filter"
+                },
+                "save_key": {
+                    "type": "string"
+                },
+                "load_key": {
+                    "type": "string"
+                },
+                "exclude_key": {
+                    "type": "string"
+                },
+                "rules": {
+                    "type": "array",
+                    "items": {
+                        "oneOf": [
+                            {
+                                "$ref": "#/definitions/filterSize"
+                            },
+                            {
+                                "$ref": "#/definitions/filterGlob"
+                            }
+                        ]
+                    }
+                }
+            },
+            "required": [
+                "name"
+            ]
+        },
+        "loopStep": {
+            "type": "object",
+            "properties": {
+                "name": {
+                    "const": "loop"
+                },
+                "load_key": {
+                    "type": "string"
+                },
+                "steps": {
+                    "$ref": "#/definitions/steps"
+                },
+                "max_loops": {
+                    "type": "integer"
+                },
+                "loop_interval": {
+                    "type": "number"
+                }
+            },
+            "required": [
+                "name"
+            ]
+        },
+        "mergeStep": {
+            "type": "object",
+            "properties": {
+                "name": {
+                    "const": "merge"
+                },
+                "save_key": {
+                    "type": "string"
+                },
+                "context_keys": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                }
+            },
+            "required": [
+                "name"
+            ]
+        },
+        "switchStep": {
+            "type": "object",
+            "properties": {
+                "name": {
+                    "const": "switch"
+                },
+                "load_key": {
+                    "type": "string"
+                },
+                "default_key": {
+                    "type": "string"
+                },
+                "cases": {
+                    "type": "array",
+                    "items": {
+                        "oneOf": [
+                            {
+                                "allOf": [
+                                    {
+                                        "$ref": "#/definitions/filterSize"
+                                    },
+                                    {
+                                        "properties": {
+                                            "save_key": {
+                                                "type": "string"
+                                            }
+                                        },
+                                        "required": [
+                                            "save_key"
+                                        ]
+                                    }
+                                ]
+                            },
+                            {
+                                "allOf": [
+                                    {
+                                        "$ref": "#/definitions/filterGlob"
+                                    },
+                                    {
+                                        "properties": {
+                                            "save_key": {
+                                                "type": "string"
+                                            }
+                                        },
+                                        "required": [
+                                            "save_key"
+                                        ]
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                }
+            },
+            "required": [
+                "name",
+                "cases"
+            ]
+        },
+        "archiveStep": {
+            "type": "object",
+            "properties": {
+                "name": {
+                    "const": "archive"
+                },
+                "save_key": {
+                    "type": "string"
+                },
+                "load_key": {
+                    "type": "string"
+                },
+                "fail_key": {
+                    "type": "string"
+                },
+                "mode": {
+                    "type": "string",
+                    "enum": [
+                        "list",
+                        "extract",
+                        "test"
+                    ]
+                },
+                "password_path": {
+                    "type": "string"
+                },
+                "stat_file_name": {
+                    "type": "string"
+                },
+                "thread_max": {
+                    "type": "integer",
+                    "minimum": 2
+                },
+                "result_processing_mode": {
+                    "type": "string",
+                    "enum": [
+                        "strict",
+                        "greedy"
+                    ]
+                },
+                "output_dir": {
+                    "type": "string"
+                },
+                "keep_dir": {
+                    "type": "boolean"
+                }
+            },
+            "required": [
+                "name",
+                "mode"
+            ]
+        },
+        "emptyStep": {
+            "type": "object",
+            "properties": {
+                "name": {
+                    "const": "empty"
+                },
+                "dir": {
+                    "type": "string"
+                }
+            },
+            "required": [
+                "name",
+                "dir"
+            ]
+        },
+        "flatStep": {
+            "type": "object",
+            "properties": {
+                "name": {
+                    "const": "flat"
+                },
+                "dir": {
+                    "type": "string"
+                },
+                "depth": {
+                    "type": "integer",
+                    "minimum": 1
+                }
+            },
+            "required": [
+                "name",
+                "dir"
+            ]
+        },
+        "logStep": {
+            "type": "object",
+            "properties": {
+                "name": {
+                    "const": "log"
+                },
+                "load_key": {
+                    "type": "string"
+                },
+                "file_name": {
+                    "type": "string"
+                }
+            },
+            "required": [
+                "name"
+            ]
+        },
+        "removeStep": {
+            "type": "object",
+            "properties": {
+                "name": {
+                    "const": "remove"
+                },
+                "load_key": {
+                    "type": "string"
+                }
+            },
+            "required": [
+                "name"
+            ]
+        },
+        "renameReplace": {
+            "type": "object",
+            "properties": {
+                "mode": {
+                    "const": "replace"
+                },
+                "search": {
+                    "type": "string"
+                },
+                "replace": {
+                    "type": "string"
+                },
+                "count": {
+                    "oneOf": [
+                        {
+                            "type": "integer",
+                            "minimum": 1
+                        },
+                        {
+                            "const": -1
+                        }
+                    ]
+                }
+            },
+            "required": [
+                "mode",
+                "search",
+                "replace"
+            ]
+        },
+        "renameRe": {
+            "type": "object",
+            "properties": {
+                "mode": {
+                    "const": "re"
+                },
+                "pattern": {
+                    "type": "string"
+                },
+                "replace": {
+                    "type": "string"
+                },
+                "count": {
+                    "type": "integer",
+                    "minimum": 0
+                },
+                "flags": {
+                    "type": "string",
+                    "pattern": "^(?!.*(.).*\\1)[aiu]+$"
+                }
+            },
+            "required": [
+                "mode",
+                "search",
+                "replace"
+            ]
+        },
+        "renameStep": {
+            "type": "object",
+            "properties": {
+                "name": {
+                    "const": "rename"
+                },
+                "save_key": {
+                    "type": "string"
+                },
+                "load_key": {
+                    "type": "string"
+                },
+                "rules": {
+                    "type": "array",
+                    "items": {
+                        "oneOf": [
+                            {
+                                "$ref": "#/definitions/renameReplace"
+                            },
+                            {
+                                "$ref": "#/definitions/renameRe"
+                            }
+                        ]
+                    }
+                }
+            },
+            "required": [
+                "name",
+                "rules"
+            ]
+        },
+        "scanStep": {
+            "type": "object",
+            "properties": {
+                "name": {
+                    "const": "scan"
+                },
+                "save_key": {
+                    "type": "string"
+                },
+                "dir": {
+                    "type": "string"
+                },
+                "includes": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "excludes": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "include_dir": {
+                    "type": "boolean"
+                }
+            },
+            "required": [
+                "name",
+                "dir"
+            ]
+        },
+        "transferStep": {
+            "type": "object",
+            "properties": {
+                "name": {
+                    "const": "transfer"
+                },
+                "save_key": {
+                    "type": "string"
+                },
+                "load_key": {
+                    "type": "string"
+                },
+                "mode": {
+                    "type": "string",
+                    "enum": [
+                        "move",
+                        "copy"
+                    ]
+                },
+                "target_dir": {
+                    "type": "string"
+                },
+                "keep_structure": {
+                    "type": "boolean"
+                },
+                "overwrite_mode": {
+                    "type": "string",
+                    "enum": [
+                        "rename",
+                        "overwrite",
+                        "skip"
+                    ]
+                }
+            },
+            "required": [
+                "name",
+                "mode"
+            ]
+        }
+    },
+    "properties": {
+        "flow": {
+            "type": "object",
+            "properties": {
+                "steps": {
+                    "$ref": "#/definitions/steps"
+                }
+            },
+            "required": [
+                "steps"
+            ]
+        }
+    },
+    "required": [
+        "flow"
+    ]
+}

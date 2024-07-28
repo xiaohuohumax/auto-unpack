@@ -7,7 +7,6 @@
 
 flow:
   steps:
-
     # 清理输出目录(测试用)
     - name: scan
       include_dir: true
@@ -27,7 +26,7 @@ flow:
     - name: rename
       rules:
         - mode: replace
-          replace: ''
+          replace: ""
           search: 删除
 
     # 解压压缩包

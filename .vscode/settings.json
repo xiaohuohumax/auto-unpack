@@ -1,0 +1,43 @@
+{
+    "yaml.schemas": {
+        // cdn
+        // "https://cdn.jsdelivr.net/gh/xiaohuohumax/auto-unpack@main/schema/auto-unpack-schema.json": "config/application.yaml",
+        // "https://cdn.jsdelivr.net/gh/xiaohuohumax/auto-unpack@main/schema/auto-unpack-flow-schema.json": "config/application.*.yaml",
+        // local
+        "schema/auto-unpack-schema.json": "config/application.yaml",
+        "schema/auto-unpack-flow-schema.json": "config/application.*.yaml",
+    },
+    "cSpell.words": [
+        "apscheduler",
+        "asctime",
+        "clib",
+        "CPIO",
+        "datefmt",
+        "dotenv",
+        "eifinger",
+        "IHEX",
+        "levelname",
+        "LZMA",
+        "mkdocs",
+        "msecs",
+        "noreply",
+        "notset",
+        "NSIS",
+        "NTFS",
+        "pathlib",
+        "pydantic",
+        "PYPI",
+        "pyproject",
+        "pytz",
+        "QCOW",
+        "Roboto",
+        "ruamel",
+        "sevenzip",
+        "srcset",
+        "tzdata",
+        "tzlocal",
+        "UEFI",
+        "winsw",
+        "zipx"
+    ]
+}

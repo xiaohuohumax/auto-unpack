@@ -1,8 +1,8 @@
 import logging
 from pathlib import Path
-from typing import Any, List, Optional, Literal
+from typing import Any, List, Literal, Optional
 
-from pydantic import field_validator, Field
+from pydantic import Field, field_validator
 
 from auto_unpack.plugin import Plugin, PluginConfig
 from auto_unpack.util.file import get_next_not_exist_path

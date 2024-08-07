@@ -3,7 +3,7 @@ import re
 from pathlib import Path
 from typing import List, Literal, Union
 
-from pydantic import BaseModel, model_validator, Field
+from pydantic import BaseModel, Field, model_validator
 from typing_extensions import Self
 
 from auto_unpack.plugin import HandlePluginConfig, Plugin

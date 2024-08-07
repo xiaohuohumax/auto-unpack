@@ -2,7 +2,7 @@ import logging
 import operator
 from typing import Any, Callable, Dict, List, Literal, Optional, Union
 
-from pydantic import BaseModel, field_validator, Field
+from pydantic import BaseModel, Field, field_validator
 
 from auto_unpack.plugin import HandlePluginConfig, Plugin
 from auto_unpack.store import Context, FileData, paths_excludes, paths_includes

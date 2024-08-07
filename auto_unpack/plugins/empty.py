@@ -1,5 +1,8 @@
 import logging
+from typing import Literal
 from pathlib import Path
+
+from pydantic import Field
 
 from auto_unpack.plugin import Plugin, PluginConfig
 from auto_unpack.util.file import clean_empty_dir
@@ -11,8 +14,13 @@ class EmptyPluginConfig(PluginConfig):
     """
     空文件夹清理插件配置
     """
-    # 要清理的目录
-    dir: Path
+    name: Literal['empty'] = Field(
+        default='empty',
+        description='空文件夹清理插件'
+    )
+    dir: Path = Field(
+        description='要清理的目录'
+    )
 
 
 class EmptyPlugin(Plugin[EmptyPluginConfig]):

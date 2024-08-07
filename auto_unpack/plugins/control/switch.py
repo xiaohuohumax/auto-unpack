@@ -1,5 +1,7 @@
 import logging
-from typing import List, Optional, Union
+from typing import List, Optional, Union, Literal
+
+from pydantic import Field
 
 from auto_unpack.plugin import OutputPluginConfig, Plugin
 from auto_unpack.plugins.control.filter import Filter, GlobFilter, SizeFilter
@@ -37,10 +39,18 @@ class SwitchPluginConfig(OutputPluginConfig):
     """
     条件分支上下文插件配置
     """
-    # 分支条件
-    cases: List[Case_Type] = []
-    # 未匹配到分支条件时key
-    default_key: Optional[str] = None
+    name: Literal["switch"] = Field(
+        default="switch",
+        description="条件分支上下文插件"
+    )
+    cases: List[Case_Type] = Field(
+        default=[],
+        description="分支条件(默认: [])"
+    )
+    default_key: Optional[str] = Field(
+        default=None,
+        description="未匹配到分支条件时上下文 key(默认: null)"
+    )
 
 
 class SwitchPlugin(Plugin[SwitchPluginConfig]):

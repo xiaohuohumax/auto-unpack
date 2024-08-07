@@ -1,6 +1,8 @@
 import logging
 import time
-from typing import Any, List
+from typing import Any, List, Literal
+
+from pydantic import Field
 
 from auto_unpack.plugin import OutputPluginConfig, Plugin, pluginManager
 
@@ -11,12 +13,22 @@ class LoopPluginConfig(OutputPluginConfig):
     """
     循环插件配置
     """
-    # 步骤配置
-    steps: List[Any] = []
-    # 最大循环次数 -1不限制
-    max_loops: int = 1024
-    # 循环间隔时间 单位秒
-    loop_interval: int = 1
+    name: Literal['loop'] = Field(
+        default='loop',
+        description="循环插件"
+    )
+    steps: List[Any] = Field(
+        default=[],
+        description="步骤配置(默认: [])"
+    )
+    max_loops: int = Field(
+        default=1024,
+        description="最大循环次数(-1: 不限制, 默认: 1024)"
+    )
+    loop_interval: int = Field(
+        default=1,
+        description="循环间隔时间(单位: 秒, 默认: 1)"
+    )
 
 
 class LoopPlugin(Plugin[LoopPluginConfig]):

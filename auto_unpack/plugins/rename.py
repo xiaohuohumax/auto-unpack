@@ -3,7 +3,7 @@ import re
 from pathlib import Path
 from typing import List, Literal, Union
 
-from pydantic import BaseModel, model_validator
+from pydantic import BaseModel, model_validator, Field
 from typing_extensions import Self
 
 from auto_unpack.plugin import HandlePluginConfig, Plugin
@@ -26,13 +26,20 @@ class ReplaceRule(Rule):
     """
     改名规则：替换
     """
-    mode: Literal['replace'] = 'replace'
-    # 匹配字符串
-    search: str
-    # 替换字符串
-    replace: str
-    # 替换次数，-1 表示全部替换
-    count: int = -1
+    mode: Literal['replace'] = Field(
+        default='replace',
+        description="替换模式"
+    )
+    search: str = Field(
+        description="匹配字符串"
+    )
+    replace: str = Field(
+        description="替换字符串"
+    )
+    count: int = Field(
+        default=-1,
+        description="替换次数(-1: 全部替换, 默认: -1)"
+    )
 
     def rename(self, file: Path) -> Path:
         new_name = file.name.replace(self.search, self.replace, self.count)
@@ -59,15 +66,24 @@ class ReRule(Rule):
     """
     改名规则：正则表达式
     """
-    mode: Literal['re'] = 're'
-    # 正则表达式
-    pattern: str
-    # 替换字符串
-    replace: str
-    # 替换次数，0 表示不限次数
-    count: int = 0
-    # 正则表达式匹配模式
-    flags: str = ''
+    mode: Literal['re'] = Field(
+        default='re',
+        description="正则表达式模式"
+    )
+    pattern: str = Field(
+        description="正则表达式"
+    )
+    replace: str = Field(
+        description="替换字符串"
+    )
+    count: int = Field(
+        default=0,
+        description="替换次数(0: 不限次数, 默认: 0)"
+    )
+    flags: str = Field(
+        default='',
+        description="正则表达式匹配模式(默认: '')"
+    )
 
     @model_validator(mode='after')
     def check_flags(self) -> Self:
@@ -94,8 +110,14 @@ class RenamePluginConfig(HandlePluginConfig):
     """
     改名插件配置
     """
-    # 规则链
-    rules: List[Union[ReplaceRule, ReRule]] = []
+    name: Literal['rename'] = Field(
+        default='rename',
+        description="改名插件"
+    )
+    rules: List[Union[ReplaceRule, ReRule]] = Field(
+        default=[],
+        description="规则链(默认: [])"
+    )
 
 
 class RenamePlugin(Plugin[RenamePluginConfig]):

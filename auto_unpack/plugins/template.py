@@ -1,4 +1,7 @@
 import logging
+from typing import Literal
+
+from pydantic import Field
 
 from auto_unpack.plugin import Plugin, PluginConfig
 
@@ -9,7 +12,10 @@ class TemplatePluginConfig(PluginConfig):
     """
     插件模板配置
     """
-    pass
+    name: Literal["_template"] = Field(
+        default='_template',
+        description="插件模板"
+    )
 
 
 class TemplatePlugin(Plugin[TemplatePluginConfig]):

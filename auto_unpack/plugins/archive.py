@@ -154,27 +154,43 @@ class ArchivePluginConfig(HandlePluginConfig):
     """
     压缩包处理插件配置
     """
+    name: Literal['archive'] = Field(
+        default='archive',
+        description="压缩包处理插件"
+    )
     # 压缩包处理模式
-    # list: 列出压缩包内文件信息，extract: 解压压缩包，test: 测试压缩包完整性
-    mode: Literal['list', 'extract', 'test']
-    # 密码文件路径
-    password_path: Path = Path('passwords.txt')
-    # 失败上下文 key
-    fail_key: Optional[str] = None
-    # 统计信息问件名
-    stat_file_name: Optional[str] = None
-    # 线程池最大线程数
-    thread_max: int = 10
-    # 结果处理模式
-    # strict：严格模式（结果绝对依靠 7-zip 命令行输出）
-    # greedy：贪婪模式（7-zip 返回某些错误码时，也会尝试识别/测试/解压）
-    result_processing_mode: Result_Processing_Mode = 'strict'
-
+    mode: Literal['list', 'extract', 'test'] = Field(
+        description="压缩包处理模式\nlist: 列出压缩包内文件信息\nextract: 解压压缩包\ntest: 测试压缩包完整性"
+    )
+    password_path: Path = Field(
+        default_factory=lambda: Path('passwords.txt'),
+        description="密码文件路径(默认: passwords.txt)"
+    )
+    fail_key: Optional[str] = Field(
+        default=None,
+        description="失败上下文 key(默认: null)"
+    )
+    stat_file_name: Optional[str] = Field(
+        default=None,
+        description="统计信息问件名(默认: null)"
+    )
+    thread_max: int = Field(
+        default=10,
+        description="线程池最大线程数(默认: 10)"
+    )
+    result_processing_mode: Result_Processing_Mode = Field(
+        default='strict',
+        description="结果处理模式(默认: strict)\nstrict: 严格模式[结果绝对依靠 7-zip 命令行输出]\ngreedy: 贪婪模式[7-zip 返回某些错误码时, 也会尝试识别/测试/解压]"
+    )
     # mode: extract 可用选项
-    # 输出目录
-    output_dir: Path = Path('output')
-    # 是否保留压缩包目录
-    keep_dir: bool = True
+    output_dir: Path = Field(
+        default_factory=lambda: Path('output'),
+        description="输出目录(默认: output)"
+    )
+    keep_dir: bool = Field(
+        default=True,
+        description="是否保留压缩包目录(默认: true)"
+    )
 
     @model_validator(mode='after')
     def validator(self) -> Self:

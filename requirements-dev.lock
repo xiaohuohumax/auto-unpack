@@ -97,6 +97,7 @@ ruamel-yaml-clib==0.2.8
 six==1.16.0
     # via apscheduler
     # via python-dateutil
+toml==0.10.2
 typing-extensions==4.11.0
     # via annotated-types
     # via pydantic

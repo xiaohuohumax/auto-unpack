@@ -1,4 +1,7 @@
 import logging
+from typing import Literal
+
+from pydantic import Field
 
 from auto_unpack.plugin import OutputPluginConfig, Plugin
 from auto_unpack.util.file import get_next_not_exist_path, write_file
@@ -10,8 +13,14 @@ class LogPluginConfig(OutputPluginConfig):
     """
     日志插件配置
     """
-    # 日志文件名
-    file_name: str = 'log'
+    name: Literal['log'] = Field(
+        default='log',
+        description="日志插件"
+    )
+    file_name: str = Field(
+        default='log',
+        description="日志文件名(默认: log)"
+    )
 
 
 class LogPlugin(Plugin[LogPluginConfig]):

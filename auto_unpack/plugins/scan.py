@@ -1,6 +1,8 @@
 import logging
 from pathlib import Path
-from typing import List
+from typing import List, Literal
+
+from pydantic import Field
 
 from auto_unpack.plugin import InputPluginConfig, Plugin
 from auto_unpack.store import Context, FileData, paths_excludes
@@ -12,14 +14,25 @@ class ScanPluginConfig(InputPluginConfig):
     """
     扫描文件插件配置
     """
-    # 扫描目录
-    dir: Path
-    # 包含的文件类型 glob 语法
-    includes: List[str] = ["**/*"]
-    # 排除的文件类型 glob 语法
-    excludes: List[str] = []
-    # 是否包含文件夹
-    include_dir: bool = False
+    name: Literal["scan"] = Field(
+        default="scan",
+        description="扫描文件插件"
+    )
+    dir: Path = Field(
+        description="扫描目录"
+    )
+    includes: List[str] = Field(
+        default=["**/*"],
+        description="包含的文件类型(glob 语法, 默认: [**/*])"
+    )
+    excludes: List[str] = Field(
+        default=[],
+        description="排除的文件类型(glob 语法, 默认: [])"
+    )
+    include_dir: bool = Field(
+        default=False,
+        description="是否包含文件夹(默认: false)"
+    )
 
 
 class ScanPlugin(Plugin[ScanPluginConfig]):

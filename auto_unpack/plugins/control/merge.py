@@ -1,5 +1,7 @@
 import logging
-from typing import List, Set
+from typing import List, Set, Literal
+
+from pydantic import Field
 
 from auto_unpack.plugin import InputPluginConfig, Plugin
 from auto_unpack.store import Context, FileData
@@ -11,7 +13,14 @@ class MergePluginConfig(InputPluginConfig):
     """
     合并上下文插件配置
     """
-    context_keys: List[str] = []
+    name: Literal['merge'] = Field(
+        default='merge',
+        description='合并上下文插件'
+    )
+    context_keys: List[str] = Field(
+        default=[],
+        description='需要合并的上下文 key 集合(默认: [])'
+    )
 
 
 class MergePlugin(Plugin[MergePluginConfig]):

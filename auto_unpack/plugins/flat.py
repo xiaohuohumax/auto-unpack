@@ -1,8 +1,8 @@
 import logging
 from pathlib import Path
-from typing import Any, List, Optional
+from typing import Any, List, Optional, Literal
 
-from pydantic import field_validator
+from pydantic import field_validator, Field
 
 from auto_unpack.plugin import Plugin, PluginConfig
 from auto_unpack.util.file import get_next_not_exist_path
@@ -14,11 +14,17 @@ class FlatPluginConfig(PluginConfig):
     """
     扁平化文件夹插件配置
     """
-    # 需要扁平化的文件夹
-    dir: Path
-    # 扁平化的深度, None表示不限制深度
-    # 例如：depth=1 表示只扁平化第一层文件夹
-    depth: Optional[int] = None
+    name: Literal['flat'] = Field(
+        default='flat',
+        description="扁平化文件夹插件"
+    )
+    dir: Path = Field(
+        description="需要扁平化的文件夹"
+    )
+    depth: Optional[int] = Field(
+        default=None,
+        description="扁平化的深度(null: 不限制深度, 默认: null)"
+    )
 
     @field_validator('depth')
     @classmethod

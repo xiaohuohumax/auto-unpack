@@ -2,7 +2,7 @@ import logging
 import operator
 from typing import Any, Callable, Dict, List, Literal, Optional, Union
 
-from pydantic import BaseModel, field_validator
+from pydantic import BaseModel, field_validator, Field
 
 from auto_unpack.plugin import HandlePluginConfig, Plugin
 from auto_unpack.store import Context, FileData, paths_excludes, paths_includes
@@ -44,13 +44,21 @@ class SizeFilter(Filter):
     """
     文件大小过滤
     """
-    mode: Literal['size'] = 'size'
-    # 文件大小限制
-    size: float
-    # 大小比较运算符
-    operator: Literal['<', '>', '<=', '>=', '==', '!='] = '>='
-    # 单位 默认 mb
-    unit: Literal['b', 'kb', 'mb', 'gb', 'tb'] = 'mb'
+    mode: Literal['size'] = Field(
+        default='size',
+        description="文件大小过滤"
+    )
+    size: float = Field(
+        description="文件大小限制"
+    )
+    operator: Literal['<', '>', '<=', '>=', '==', '!='] = Field(
+        default='>=',
+        description="大小比较运算符(默认: >=)"
+    )
+    unit: Literal['b', 'kb', 'mb', 'gb', 'tb'] = Field(
+        default='mb',
+        description="单位(默认: mb)"
+    )
 
     @field_validator('unit', mode='before')
     @classmethod
@@ -79,13 +87,20 @@ class SizeFilter(Filter):
 
 class GlobFilter(Filter):
     """
-    文件 glob 表达式过滤
+    文件名过滤
     """
-    mode: Literal['glob'] = 'glob'
-    # 包含的文件 glob 表达式
-    includes: List[str] = ["**/*"]
-    # 排除的文件 glob 表达式
-    excludes: List[str] = []
+    mode: Literal['glob'] = Field(
+        default='glob',
+        description="文件名过滤(glob 表达式)"
+    )
+    includes: List[str] = Field(
+        default=["**/*"],
+        description="包含的文件(glob 表达式, 默认: [**/*])"
+    )
+    excludes: List[str] = Field(
+        default=[],
+        description="排除的文件(glob 表达式, 默认: [])"
+    )
 
     def filter(self, file_datas: List[FileData]) -> List[FileData]:
         include_file_datas = paths_includes(
@@ -101,14 +116,26 @@ class FilterPluginConfig(HandlePluginConfig):
     """
     过滤插件配置
     """
-    # 包含的文件 glob 表达式
-    includes: List[str] = ["**/*"]
-    # 排除的文件 glob 表达式
-    excludes: List[str] = []
-    # 排除掉的上下文 key
-    exclude_key: Optional[str] = None
-    # 筛选规则
-    rules: List[Filter_Type] = []
+    name: Literal['filter'] = Field(
+        default='filter',
+        description="过滤插件"
+    )
+    includes: List[str] = Field(
+        default=["**/*"],
+        description="包含的文件(glob 表达式, 默认: [**/*])"
+    )
+    excludes: List[str] = Field(
+        default=[],
+        description="排除的文件(glob 表达式, 默认: [])"
+    )
+    exclude_key: Optional[str] = Field(
+        default=None,
+        description="排除掉的上下文(默认: null)"
+    )
+    rules: List[Filter_Type] = Field(
+        default=[],
+        description="筛选规则(默认: [])"
+    )
 
 
 class FilterPlugin(Plugin[FilterPluginConfig]):

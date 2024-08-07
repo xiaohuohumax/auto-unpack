@@ -5,7 +5,7 @@ import os
 from pathlib import Path
 from typing import Any, Generic, List, Optional, Tuple, TypeVar
 
-from pydantic import BaseModel, ConfigDict
+from pydantic import BaseModel, ConfigDict, Field
 
 from .store import Context, DataStore, context_default_key
 
@@ -18,6 +18,8 @@ class PluginConfig(BaseModel):
     """
     # 忽略多余参数
     model_config = ConfigDict(extra='ignore')
+    # 插件名称
+    name: str = ''
 
 
 class InputPluginConfig(PluginConfig):
@@ -25,7 +27,7 @@ class InputPluginConfig(PluginConfig):
     入口类型插件配置，用作加载数据
     """
     # 上下文保存 key
-    save_key: str = context_default_key
+    save_key: str = Field(context_default_key, description='上下文保存 key')
 
 
 class OutputPluginConfig(PluginConfig):
@@ -33,7 +35,7 @@ class OutputPluginConfig(PluginConfig):
     出口类型插件配置，用作数据最终处理
     """
     # 上下文加载 key
-    load_key: str = context_default_key
+    load_key: str = Field(context_default_key, description='上下文加载 key')
 
 
 class HandlePluginConfig(InputPluginConfig, OutputPluginConfig):

@@ -1,7 +1,7 @@
 from pathlib import Path
 from typing import Literal, Optional, Type, TypeVar
 
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 
 from .util.config import load_config
 
@@ -17,9 +17,15 @@ class LoggingConfig(BaseModel):
     日志配置
     """
     # 日志级别
-    level: Optional[LogLevelType] = None
+    level: Optional[LogLevelType] = Field(
+        default=None,
+        description="日志级别(null: 使用日志配置文件的配置, 默认: null)"
+    )
     # 日志配置文件路径
-    config_path: Path = Path("config/logging.yaml")
+    config_path: Path = Field(
+        default_factory=lambda: Path("config/logging.yaml"),
+        description="日志配置文件路径(默认: config/logging.yaml)"
+    )
 
 
 class BannerConfig(BaseModel):
@@ -27,11 +33,20 @@ class BannerConfig(BaseModel):
     banner配置
     """
     # 是否启用banner
-    enabled: bool = True
+    enabled: bool = Field(
+        default=True,
+        description="是否启用banner"
+    )
     # banner文件路径
-    file_path: Path = Path("banner.txt")
+    file_path: Path = Field(
+        default_factory=lambda: Path("banner.txt"),
+        description="banner文件路径(默认: banner.txt)"
+    )
     # 欢迎信息
-    welcome: str = ""
+    welcome: str = Field(
+        default="welcome to use auto-unpack!",
+        description="欢迎信息(默认: welcome to use auto-unpack!)"
+    )
 
 
 class AppConfig(BaseModel):
@@ -39,13 +54,25 @@ class AppConfig(BaseModel):
     应用配置
     """
     # 应用名称
-    name: str = ""
+    name: str = Field(
+        default="auto-unpack",
+        description="应用名称(默认: auto-unpack)"
+    )
     # 信息输出目录
-    info_dir: Path = Path("info")
+    info_dir: Path = Field(
+        default_factory=lambda: Path("info"),
+        description="信息输出目录(默认: info)"
+    )
     # 执行前是否清空信息输出目录
-    clear_info_dir: bool = False
+    clear_info_dir: bool = Field(
+        default=False,
+        description="执行前是否清空信息输出目录(默认: false)"
+    )
     # 自定义插件路径
-    plugins_dir: Optional[Path] = None
+    plugins_dir: Optional[Path] = Field(
+        default=None,
+        description="自定义插件路径(默认: null)"
+    )
 
 
 class ProjectConfig(BaseModel):
@@ -53,11 +80,20 @@ class ProjectConfig(BaseModel):
     项目配置信息
     """
     # 应用配置
-    app: AppConfig = AppConfig()
+    app: AppConfig = Field(
+        default=AppConfig(),
+        description="应用配置"
+    )
     # 日志配置
-    logging: LoggingConfig = LoggingConfig()
-    # banner
-    banner: BannerConfig = BannerConfig()
+    logging: LoggingConfig = Field(
+        default=LoggingConfig(),
+        description="日志配置"
+    )
+    # banner配置
+    banner: BannerConfig = Field(
+        default=BannerConfig(),
+        description="banner配置"
+    )
 
 
 _T = TypeVar('_T', bound=BaseModel)

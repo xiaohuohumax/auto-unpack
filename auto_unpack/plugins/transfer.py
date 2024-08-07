@@ -3,6 +3,8 @@ import shutil
 from pathlib import Path
 from typing import List, Literal
 
+from pydantic import Field
+
 from auto_unpack.plugin import HandlePluginConfig, Plugin
 from auto_unpack.store import Context, FileData
 from auto_unpack.util.file import get_next_not_exist_path, path_equal
@@ -14,14 +16,24 @@ class TransferPluginConfig(HandlePluginConfig):
     """
     转移插件配置
     """
-    # 转移模式
-    mode: Literal['move', 'copy']
-    # 目标路径
-    target_dir: Path
-    # 是否保持目录结构(相对于扫描路径)
-    keep_structure: bool = True
-    # 覆盖模式 rename: 重命名, overwrite: 覆盖, skip: 跳过
-    overwrite_mode: Literal['rename', 'overwrite', 'skip'] = 'rename'
+    name: Literal['transfer'] = Field(
+        default='transfer',
+        description="转移插件"
+    )
+    mode: Literal['move', 'copy'] = Field(
+        description="转移模式\nmove: 移动\ncopy: 复制"
+    )
+    target_dir: Path = Field(
+        description="目标路径"
+    )
+    keep_structure: bool = Field(
+        default=True,
+        description="是否保持目录结构(相对于扫描路径, 默认: true)"
+    )
+    overwrite_mode: Literal['rename', 'overwrite', 'skip'] = Field(
+        default='rename',
+        description="覆盖模式(默认: rename)\nrename: 重命名\noverwrite: 覆盖\nskip: 跳过"
+    )
 
 
 class TransferPlugin(Plugin[TransferPluginConfig]):

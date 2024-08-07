@@ -1,5 +1,8 @@
 import logging
 import shutil
+from typing import Literal
+
+from pydantic import Field
 
 from auto_unpack.plugin import OutputPluginConfig, Plugin
 from auto_unpack.store import Context
@@ -11,7 +14,10 @@ class RemovePluginConfig(OutputPluginConfig):
     """
     删除文件插件配置
     """
-    pass
+    name: Literal['remove'] = Field(
+        default='remove',
+        description='删除文件插件'
+    )
 
 
 class RemovePlugin(Plugin[RemovePluginConfig]):

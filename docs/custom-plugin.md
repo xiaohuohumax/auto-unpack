@@ -5,13 +5,19 @@
 ### 通过类加载插件
 
 ```python
-from pathlib import Path
+from typing import Literal
+
+from pydantic import Field
+
 from auto_unpack import App
 from auto_unpack.plugin import PluginConfig, Plugin
 
 
 class MyConfig(PluginConfig):
-    pass
+    name: Literal['my'] = Field(
+        default='my',
+        description='我的插件'
+    )
 
 
 class MyPlugin(Plugin[MyConfig]):
@@ -45,11 +51,18 @@ flow:
 plugins/my.py
 
 ```python
+from typing import Literal
+
+from pydantic import Field
+
 from auto_unpack.plugin import PluginConfig, Plugin
 
 
 class MyConfig(PluginConfig):
-    pass
+    name: Literal['my'] = Field(
+        default='my',
+        description='我的插件'
+    )
 
 
 class MyPlugin(Plugin[MyConfig]):

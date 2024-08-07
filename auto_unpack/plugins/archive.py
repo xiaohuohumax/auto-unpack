@@ -5,19 +5,20 @@ from collections import defaultdict
 from enum import Enum
 from multiprocessing.pool import ThreadPool
 from pathlib import Path
-from typing import Any, List, Literal, Optional, Dict
-from typing_extensions import Self
+from typing import Any, Dict, List, Literal, Optional
 from uuid import uuid4
 
 from pydantic import (BaseModel, Field, field_serializer, model_serializer,
                       model_validator)
+from typing_extensions import Self
 
 from auto_unpack.plugin import HandlePluginConfig, Plugin
 from auto_unpack.store import Context, FileData
 from auto_unpack.util.file import (get_next_not_exist_path,
                                    is_path_in_includes, path_equal,
                                    read_file_lines, write_file)
-from auto_unpack.util.sevenzip import ExtractResult, ListResult, Result, ResultCode, SevenZipUtil
+from auto_unpack.util.sevenzip import (ExtractResult, ListResult, Result,
+                                       ResultCode, SevenZipUtil)
 from auto_unpack.util.sevenzip.result import Attr
 
 logger = logging.getLogger(__name__)

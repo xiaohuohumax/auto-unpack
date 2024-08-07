@@ -147,8 +147,8 @@ class PluginManager:
         module = importlib.util.module_from_spec(spec)
         spec.loader.exec_module(module)
 
-        config_class: PluginConfig = None
-        plugin_class: Plugin = None
+        config_class: Optional[PluginConfig] = None
+        plugin_class: Optional[Plugin] = None
 
         for _, module_class in inspect.getmembers(module, inspect.isclass):
             if module_class.__module__ != module.__name__:
@@ -184,6 +184,8 @@ class PluginManager:
         logger.debug(f"Loading plugins from {plugin_path}")
         for root, _, files in os.walk(plugin_path):
             for file in files:
+                if file.startswith('__') or not file.endswith('.py'):
+                    continue
                 self._load_plugin_by_file(Path(root)/file)
 
     def load_plugin_by_class(self, config_class: Any, plugin_class: Any):

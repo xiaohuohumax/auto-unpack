@@ -5,11 +5,14 @@ from typing import Any, List
 
 from pydantic import BaseModel
 
-from .args import args
-from .config import config, load_config_by_class
-from .env import env
+from auto_unpack.util.file import read_file
+
+from .args import Args, load_args
+from .config import ProjectConfig, load_config_by_class
+from .env import Env, load_env_by_mode
 from .plugin import Plugin, PluginGlobalConfig, pluginManager
 from .store import DataStore
+from .util.logging import config_logging
 
 logger = logging.getLogger(__name__)
 
@@ -30,7 +33,12 @@ class ProjectFlowConfig(BaseModel):
 
 
 class App:
-
+    # 命令行参数
+    args: Args
+    # 环境变量
+    env: Env
+    # 项目配置
+    config: ProjectConfig
     # 插件目录
     builtin_plugins_dir: Path = Path(__file__).parent/'plugins'
     # 流程(插件实例)
@@ -40,13 +48,27 @@ class App:
     # 插件全局配置
     plugin_global_config: PluginGlobalConfig
 
+    def _print_banner(self):
+        """
+        打印 banner
+        """
+        if not self.config.banner.enabled:
+            return
+
+        if not self.config.banner.file_path.exists():
+            return
+
+        print(read_file(self.config.banner.file_path))
+        print(self.config.banner.welcome + '\n')
+
     def _create_flows(self):
         """
         根据配置创建流程
         """
         self.flows = []
         logger.info("Creating flows...")
-        flow_config = load_config_by_class(ProjectFlowConfig)
+        flow_config = load_config_by_class(
+            ProjectFlowConfig, self.env.config_dir, self.env.mode)
         steps = flow_config.flow.steps
         for step in steps:
             plugin = pluginManager.create_plugin_instance(
@@ -61,11 +83,11 @@ class App:
         """
         执行流程
         """
-        if config.app.clear_info_dir:
+        if self.config.app.clear_info_dir:
             logger.info("Clearing info dir...")
-            shutil.rmtree(config.app.info_dir, ignore_errors=True)
+            shutil.rmtree(self.config.app.info_dir, ignore_errors=True)
 
-        config.app.info_dir.mkdir(parents=True, exist_ok=True)
+        self.config.app.info_dir.mkdir(parents=True, exist_ok=True)
 
         logger.info("Executing flows...")
         flows_count = len(self.flows)
@@ -75,15 +97,26 @@ class App:
             flow.execute()
 
     def __init__(self):
-        logger.info("Initializing app...")
         # 加载配置
+        self.args = load_args()
+        self.env = load_env_by_mode(self.args.mode)
+        self.config = load_config_by_class(
+            ProjectConfig, self.env.config_dir, self.env.mode)
+        # 配置日志
+        config_logging(self.config.logging.config_path,
+                       self.config.logging.level)
+        # 打印 banner
+        self._print_banner()
+
+        logger.info("Initializing app...")
+        # 加载内置插件
         pluginManager.load_plugin(self.builtin_plugins_dir)
         # 加载自定义插件
-        if config.app.plugins_dir:
-            pluginManager.load_plugin(config.app.plugins_dir)
+        if self.config.app.plugins_dir:
+            pluginManager.load_plugin(self.config.app.plugins_dir)
 
         self.plugin_global_config = PluginGlobalConfig(
-            info_dir=config.app.info_dir
+            info_dir=self.config.app.info_dir
         )
         # 创建流程
         self._create_flows()
@@ -112,9 +145,9 @@ class App:
         try:
             logger.info("Running app...")
 
-            logger.info(f"Configs: {config}")
-            logger.info(f"Envs: {env}")
-            logger.info(f"Args: {args}")
+            logger.info(f"Configs: {self.config}")
+            logger.info(f"Envs: {self.env}")
+            logger.info(f"Args: {self.args}")
 
             # 执行流程
             self._execute_flows()

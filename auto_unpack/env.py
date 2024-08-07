@@ -1,9 +1,8 @@
 from pathlib import Path
+from typing import Optional
 
 from dotenv import load_dotenv
 from pydantic_settings import BaseSettings
-
-from .args import args
 
 load_dotenv(override=True)
 
@@ -20,9 +19,14 @@ class Env(BaseSettings, case_sensitive=False):
     config_dir: Path = Path('config')
 
 
-# 环境变量
-env = Env()
+def load_env_by_mode(mode: Optional[str] = None) -> Env:
+    """
+    根据模式加载环境变量
 
-
-if args.mode is not None:
-    env.mode = args.mode
+    :param mode: 环境模式
+    :return: 环境变量
+    """
+    env = Env()
+    if mode is not None:
+        env.mode = mode
+    return env

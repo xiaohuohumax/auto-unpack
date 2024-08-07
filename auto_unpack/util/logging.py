@@ -17,7 +17,6 @@ def config_logging(config_path: Path, level: Optional[str]):
 
     # 读取日志配置
     log_config = read_yaml_file(config_path)
-
     # 当日志文件夹不存在时，创建日志文件夹
     for handler in log_config.get('handlers', {}).values():
         if handler['class'] == 'logging.handlers.RotatingFileHandler':
@@ -25,7 +24,9 @@ def config_logging(config_path: Path, level: Optional[str]):
             if not log_directory.exists():
                 log_directory.mkdir(parents=True, exist_ok=True)
 
-    if level is not None:
-        log_config.get('root', {})['level'] = level.upper()
+    if level is None:
+        level = "info"
+
+    log_config.get('root', {})['level'] = level.upper()
 
     logging.config.dictConfig(config=log_config)

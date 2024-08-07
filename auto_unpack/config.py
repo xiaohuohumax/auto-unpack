@@ -3,7 +3,6 @@ from typing import Literal, Optional, Type, TypeVar
 
 from pydantic import BaseModel
 
-from .env import env
 from .util.config import load_config
 
 LogLevelType = Literal[
@@ -64,15 +63,13 @@ class ProjectConfig(BaseModel):
 _T = TypeVar('_T', bound=BaseModel)
 
 
-def load_config_by_class(config_class: Type[_T]) -> _T:
+def load_config_by_class(config_class: Type[_T], config_dir: Path, mode: str) -> _T:
     """
     加载项目配置
 
     :param config_class: 配置类
+    :param config_dir: 配置目录
+    :param mode: 运行模式
     :return: 配置实例
     """
-    return load_config(config_class, env.config_dir, env.mode)
-
-
-# 配置
-config = load_config_by_class(ProjectConfig)
+    return load_config(config_class, config_dir, mode)

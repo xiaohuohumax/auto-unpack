@@ -118,8 +118,6 @@ class App:
         self.plugin_global_config = PluginGlobalConfig(
             info_dir=self.config.app.info_dir
         )
-        # 创建流程
-        self._create_flows()
 
     def load_plugin(self, plugin_path: Path):
         """
@@ -143,6 +141,10 @@ class App:
         运行
         """
         try:
+            if len(self.flows) == 0:
+                # 创建流程
+                self._create_flows()
+
             logger.info("Running app...")
 
             logger.info(f"Configs: {self.config}")

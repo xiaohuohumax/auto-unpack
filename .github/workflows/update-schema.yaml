@@ -20,7 +20,7 @@ jobs:
           version: "latest"
 
       - name: Install dependencies
-        run: rye sync --no-lock --no-dev
+        run: rye sync --no-lock
 
       - name: Update schema
         run: rye run schema

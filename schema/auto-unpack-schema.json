@@ -125,7 +125,7 @@
             ],
             "default": {
                 "level": null,
-                "config_path": "config/logging.yaml"
+                "config_path": "config\\logging.yaml"
             },
             "description": "日志配置"
         },

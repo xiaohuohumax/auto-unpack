@@ -49,7 +49,6 @@ dev-dependencies = [
     "apscheduler>=3.10.4",
     "mkdocs-material>=9.5.29",
     "mkdocs>=1.6.0",
-    "toml>=0.10.2",
 ]
 
 [tool.hatch.metadata]

@@ -106,19 +106,19 @@
                     "type": "string",
                     "not": {
                         "enum": [
-                            "log",
                             "archive",
-                            "transfer",
                             "empty",
+                            "flat",
+                            "log",
+                            "remove",
+                            "rename",
                             "scan",
                             "_template",
-                            "rename",
-                            "flat",
-                            "remove",
-                            "merge",
-                            "switch",
+                            "transfer",
+                            "filter",
                             "loop",
-                            "filter"
+                            "merge",
+                            "switch"
                         ]
                     }
                 }
@@ -271,16 +271,22 @@
                                 "$ref": "#/$defs/CustomStep"
                             },
                             {
-                                "$ref": "#/$defs/LogPluginConfig"
-                            },
-                            {
                                 "$ref": "#/$defs/ArchivePluginConfig"
                             },
                             {
-                                "$ref": "#/$defs/TransferPluginConfig"
+                                "$ref": "#/$defs/EmptyPluginConfig"
                             },
                             {
-                                "$ref": "#/$defs/EmptyPluginConfig"
+                                "$ref": "#/$defs/FlatPluginConfig"
+                            },
+                            {
+                                "$ref": "#/$defs/LogPluginConfig"
+                            },
+                            {
+                                "$ref": "#/$defs/RemovePluginConfig"
+                            },
+                            {
+                                "$ref": "#/$defs/RenamePluginConfig"
                             },
                             {
                                 "$ref": "#/$defs/ScanPluginConfig"
@@ -289,25 +295,19 @@
                                 "$ref": "#/$defs/TemplatePluginConfig"
                             },
                             {
-                                "$ref": "#/$defs/RenamePluginConfig"
+                                "$ref": "#/$defs/TransferPluginConfig"
                             },
                             {
-                                "$ref": "#/$defs/FlatPluginConfig"
+                                "$ref": "#/$defs/FilterPluginConfig"
                             },
                             {
-                                "$ref": "#/$defs/RemovePluginConfig"
+                                "$ref": "#/$defs/LoopPluginConfig"
                             },
                             {
                                 "$ref": "#/$defs/MergePluginConfig"
                             },
                             {
                                 "$ref": "#/$defs/SwitchPluginConfig"
-                            },
-                            {
-                                "$ref": "#/$defs/LoopPluginConfig"
-                            },
-                            {
-                                "$ref": "#/$defs/FilterPluginConfig"
                             }
                         ]
                     },
@@ -444,16 +444,22 @@
                                 "$ref": "#/$defs/CustomStep"
                             },
                             {
-                                "$ref": "#/$defs/LogPluginConfig"
-                            },
-                            {
                                 "$ref": "#/$defs/ArchivePluginConfig"
                             },
                             {
-                                "$ref": "#/$defs/TransferPluginConfig"
+                                "$ref": "#/$defs/EmptyPluginConfig"
                             },
                             {
-                                "$ref": "#/$defs/EmptyPluginConfig"
+                                "$ref": "#/$defs/FlatPluginConfig"
+                            },
+                            {
+                                "$ref": "#/$defs/LogPluginConfig"
+                            },
+                            {
+                                "$ref": "#/$defs/RemovePluginConfig"
+                            },
+                            {
+                                "$ref": "#/$defs/RenamePluginConfig"
                             },
                             {
                                 "$ref": "#/$defs/ScanPluginConfig"
@@ -462,25 +468,19 @@
                                 "$ref": "#/$defs/TemplatePluginConfig"
                             },
                             {
-                                "$ref": "#/$defs/RenamePluginConfig"
+                                "$ref": "#/$defs/TransferPluginConfig"
                             },
                             {
-                                "$ref": "#/$defs/FlatPluginConfig"
+                                "$ref": "#/$defs/FilterPluginConfig"
                             },
                             {
-                                "$ref": "#/$defs/RemovePluginConfig"
+                                "$ref": "#/$defs/LoopPluginConfig"
                             },
                             {
                                 "$ref": "#/$defs/MergePluginConfig"
                             },
                             {
                                 "$ref": "#/$defs/SwitchPluginConfig"
-                            },
-                            {
-                                "$ref": "#/$defs/LoopPluginConfig"
-                            },
-                            {
-                                "$ref": "#/$defs/FilterPluginConfig"
                             }
                         ]
                     },

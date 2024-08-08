@@ -31,7 +31,3 @@ jobs:
         with:
           commit_message: 更新 schema
           file_pattern: schema
-
-      - name: Run if no changes have been detected
-        if: steps.auto-commit-action.outputs.changes_detected == 'false'
-        run: echo "schema 未更新!"

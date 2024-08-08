@@ -5,10 +5,9 @@ from typing import Dict, List
 
 from pydantic import BaseModel
 
-logger = logging.getLogger(__name__)
+from . import constant
 
-# 上下文默认key
-context_default_key = "default"
+logger = logging.getLogger(__name__)
 
 
 class FileData(BaseModel):
@@ -114,7 +113,7 @@ class DataStore:
 
     def __init__(self):
         self.empty_all_context()
-        self.save_context(context_default_key, Context())
+        self.save_context(constant.CONTEXT_DEFAULT_KEY, Context())
 
     def load_context(self, context_key) -> Context:
         """

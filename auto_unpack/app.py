@@ -7,6 +7,7 @@ from pydantic import BaseModel
 
 from auto_unpack.util.file import read_file
 
+from . import constant
 from .args import Args, load_args
 from .config import ProjectConfig, load_config_by_class
 from .env import Env, load_env_by_mode
@@ -39,8 +40,6 @@ class App:
     env: Env
     # 项目配置
     config: ProjectConfig
-    # 插件目录
-    builtin_plugins_dir: Path = Path(__file__).parent/'plugins'
     # 流程(插件实例)
     flows: List[Plugin] = []
     # 数据仓库(插件间共享数据)
@@ -110,7 +109,7 @@ class App:
 
         logger.info("Initializing app...")
         # 加载内置插件
-        pluginManager.load_plugin(self.builtin_plugins_dir)
+        pluginManager.load_plugin(constant.BUILTIN_PLUGINS_DIR)
         # 加载自定义插件
         if self.config.app.plugins_dir:
             pluginManager.load_plugin(self.config.app.plugins_dir)

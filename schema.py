@@ -1,11 +1,11 @@
 import json
 from pathlib import Path
-from typing import Any, Union, List
+from typing import Any, List, Union
 
-from pydantic import create_model, Field
+import toml
+from pydantic import Field, create_model
 from pydantic.json_schema import GenerateJsonSchema
 from pydantic_core.core_schema import ListSchema
-import toml
 
 from auto_unpack import config, plugin
 from auto_unpack.util import file

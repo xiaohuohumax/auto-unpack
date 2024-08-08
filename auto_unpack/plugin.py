@@ -7,7 +7,8 @@ from typing import Any, Generic, List, Optional, Tuple, TypeVar
 
 from pydantic import BaseModel, ConfigDict, Field
 
-from .store import Context, DataStore, context_default_key
+from . import constant
+from .store import Context, DataStore
 
 logger = logging.getLogger(__name__)
 
@@ -27,7 +28,10 @@ class InputPluginConfig(PluginConfig):
     入口类型插件配置，用作加载数据
     """
     # 上下文保存 key
-    save_key: str = Field(context_default_key, description='上下文保存 key')
+    save_key: str = Field(
+        default=constant.CONTEXT_DEFAULT_KEY,
+        description='上下文保存 key'
+    )
 
 
 class OutputPluginConfig(PluginConfig):
@@ -35,7 +39,10 @@ class OutputPluginConfig(PluginConfig):
     出口类型插件配置，用作数据最终处理
     """
     # 上下文加载 key
-    load_key: str = Field(context_default_key, description='上下文加载 key')
+    load_key: str = Field(
+        constant.CONTEXT_DEFAULT_KEY,
+        description='上下文加载 key'
+    )
 
 
 class HandlePluginConfig(InputPluginConfig, OutputPluginConfig):

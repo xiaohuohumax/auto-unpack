@@ -5,14 +5,13 @@ from typing import Any, List
 
 from pydantic import BaseModel
 
-from auto_unpack.util.file import read_file
-
 from . import constant
 from .args import Args, load_args
 from .config import ProjectConfig, load_config_by_class
 from .env import Env, load_env_by_mode
 from .plugin import Plugin, PluginGlobalConfig, pluginManager
 from .store import DataStore
+from .util.file import read_file
 from .util.logging import config_logging
 
 logger = logging.getLogger(__name__)

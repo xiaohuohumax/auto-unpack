@@ -14,9 +14,9 @@ auto-unpack
  │   └── util                       // 工具库目录
  │       ├── config.py
  │       ├── file.py
+ │       ├── exec.py
  │       ├── logging.py
  │       └── sevenzip               // 7zip工具包
- │           ├── exec.py
  │           ├── result.py
  │           └── lib                // 7zip库文件
  │               ├── darwin         // MacOS

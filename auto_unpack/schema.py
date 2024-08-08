@@ -4,8 +4,8 @@ from pydantic import Field, create_model
 from pydantic.json_schema import GenerateJsonSchema
 from pydantic_core.core_schema import ListSchema
 
-from auto_unpack import config
-from auto_unpack.plugin import PluginManager
+from . import config
+from .plugin import PluginManager
 
 
 class CustomSchemaGenerator(GenerateJsonSchema):

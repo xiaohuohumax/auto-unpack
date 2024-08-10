@@ -5,14 +5,16 @@
     <img alt="auto-unpack" src="https://raw.githubusercontent.com/xiaohuohumax/auto-unpack/main/logo.png">
   </picture>
 
-  <img alt="GitHub Actions Workflow Status" src="https://img.shields.io/github/actions/workflow/status/xiaohuohumax/auto-unpack/publish-package.yaml?label=Build">
-  <img alt="GitHub Issues" src="https://img.shields.io/github/issues/xiaohuohumax/auto-unpack?label=Issues">
-  <img alt="GitHub Pull Requests" src="https://img.shields.io/github/issues-pr/xiaohuohumax/auto-unpack?label=Pull%20Requests">
-  <img alt="PyPI - License" src="https://img.shields.io/pypi/l/auto-unpack?label=License">
-  <img alt="PyPI - Version" src="https://img.shields.io/pypi/v/auto-unpack?label=PyPi">
-  <img alt="PyPI - Downloads" src="https://img.shields.io/pypi/dm/auto-unpack?label=PyPi%20Downloads">
-  <img alt="GitHub Repo stars" src="https://img.shields.io/github/stars/xiaohuohumax/auto-unpack">
-  <img alt="GitHub forks" src="https://img.shields.io/github/forks/xiaohuohumax/auto-unpack">
+  <div>
+    <img alt="GitHub Actions Workflow Status" src="https://img.shields.io/github/actions/workflow/status/xiaohuohumax/auto-unpack/publish-package.yaml?label=Build">
+    <img alt="GitHub Issues" src="https://img.shields.io/github/issues/xiaohuohumax/auto-unpack?label=Issues">
+    <img alt="GitHub Pull Requests" src="https://img.shields.io/github/issues-pr/xiaohuohumax/auto-unpack?label=Pull%20Requests">
+    <img alt="PyPI - License" src="https://img.shields.io/pypi/l/auto-unpack?label=License">
+    <img alt="PyPI - Version" src="https://img.shields.io/pypi/v/auto-unpack?label=PyPi">
+    <img alt="PyPI - Downloads" src="https://img.shields.io/pypi/dm/auto-unpack?label=PyPi%20Downloads">
+    <img alt="GitHub Repo stars" src="https://img.shields.io/github/stars/xiaohuohumax/auto-unpack">
+    <img alt="GitHub forks" src="https://img.shields.io/github/forks/xiaohuohumax/auto-unpack">
+  </div>
 </div>
 
 # auto-unpack

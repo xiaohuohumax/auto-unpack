@@ -1,0 +1,37 @@
+version: 1
+
+disable_existing_loggers: False
+
+formatters:
+  simple_formatter:
+    format: "%(asctime)s.%(msecs)04d %(levelname)-8s: %(message)s"
+    datefmt: "%Y-%m-%d %H:%M:%S"
+  upgrade_formatter:
+    format: "%(asctime)s.%(msecs)04d %(levelname)-8s: %(message)s"
+    datefmt: "%Y-%m-%d %H:%M:%S"
+
+defaults:
+  console: &default_console_handler
+    class: logging.StreamHandler
+    stream: ext://sys.stdout
+
+  file: &default_file_handler
+    class: logging.handlers.RotatingFileHandler
+    filename: log/app.log
+    maxBytes: 10485760
+    backupCount: 20
+    encoding: utf8
+
+handlers:
+  console_handler:
+    <<: *default_console_handler
+    formatter: simple_formatter
+
+  file_handler:
+    <<: *default_file_handler
+    formatter: upgrade_formatter
+
+root:
+  handlers:
+    - console_handler
+    - file_handler

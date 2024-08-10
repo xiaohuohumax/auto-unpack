@@ -3,18 +3,31 @@
         // cdn
         // "https://cdn.jsdelivr.net/gh/xiaohuohumax/auto-unpack@main/schema/auto-unpack-schema.json": "config/application.yaml",
         // "https://cdn.jsdelivr.net/gh/xiaohuohumax/auto-unpack@main/schema/auto-unpack-flow-schema.json": "config/application.*.yaml",
+        // github
+        // "https://raw.githubusercontent.com/xiaohuohumax/auto-unpack/main/schema/auto-unpack-schema.json": "config/application.yaml",
+        // "https://raw.githubusercontent.com/xiaohuohumax/auto-unpack/main/schema/auto-unpack-flow-schema.json": "config/application.*.yaml",
         // local
         "schema/auto-unpack-schema.json": "config/application.yaml",
         "schema/auto-unpack-flow-schema.json": "config/application.*.yaml",
     },
+    "yaml.customTags": [
+        "!ENV scalar",
+        "!ENV sequence",
+        "!relative scalar",
+        "tag:yaml.org,2002:python/name:material.extensions.emoji.to_svg",
+        "tag:yaml.org,2002:python/name:material.extensions.emoji.twemoji",
+        "tag:yaml.org,2002:python/name:pymdownx.superfences.fence_code_format"
+    ],
     "cSpell.words": [
         "apscheduler",
         "asctime",
+        "autohide",
         "clib",
         "CPIO",
         "datefmt",
         "dotenv",
         "eifinger",
+        "extrahead",
         "IHEX",
         "levelname",
         "LZMA",
@@ -26,6 +39,7 @@
         "NTFS",
         "pathlib",
         "pydantic",
+        "pymdownx",
         "PYPI",
         "pyproject",
         "pytz",
@@ -35,6 +49,8 @@
         "sevenzip",
         "srcset",
         "stefanzweifel",
+        "superfences",
+        "twemoji",
         "tzdata",
         "tzlocal",
         "UEFI",

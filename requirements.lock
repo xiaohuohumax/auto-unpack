@@ -10,6 +10,16 @@
 -e file:.
 annotated-types==0.6.0
     # via pydantic
+ansicon==1.89.0
+    # via jinxed
+blessed==1.20.0
+    # via inquirer
+editor==1.6.6
+    # via inquirer
+inquirer==3.3.0
+    # via auto-unpack
+jinxed==1.3.0
+    # via blessed
 pydantic==2.7.1
     # via auto-unpack
     # via pydantic-settings
@@ -19,11 +29,22 @@ pydantic-settings==2.2.1
     # via auto-unpack
 python-dotenv==1.0.1
     # via pydantic-settings
+readchar==4.1.0
+    # via inquirer
 ruamel-yaml==0.18.6
     # via auto-unpack
 ruamel-yaml-clib==0.2.8
     # via ruamel-yaml
+runs==1.2.2
+    # via editor
+six==1.16.0
+    # via blessed
 typing-extensions==4.11.0
     # via annotated-types
     # via pydantic
     # via pydantic-core
+wcwidth==0.2.13
+    # via blessed
+xmod==1.8.1
+    # via editor
+    # via runs

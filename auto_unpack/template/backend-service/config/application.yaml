@@ -1,0 +1,9 @@
+app:
+  name: backend-service
+  clear_info_dir: true
+
+banner:
+  welcome: "Welcome to backend-service!"
+
+logging:
+  level: debug

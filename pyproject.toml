@@ -7,6 +7,7 @@ dependencies = [
     "pydantic>=2.7.1",
     "pydantic-settings>=2.2.1",
     "ruamel-yaml>=0.18.6",
+    "inquirer>=3.3.0",
 ]
 readme = "PYPI_README.md"
 requires-python = ">= 3.8"
@@ -39,6 +40,9 @@ Homepage = "https://github.com/xiaohuohumax/auto-unpack#readme"
 Source = "https://github.com/xiaohuohumax/auto-unpack"
 Tracker = "https://github.com/xiaohuohumax/auto-unpack/issues"
 
+[project.scripts]
+auto-unpack = "auto_unpack.cli:main"
+
 [build-system]
 requires = ["hatchling"]
 build-backend = "hatchling.build"
@@ -46,9 +50,9 @@ build-backend = "hatchling.build"
 [tool.rye]
 managed = true
 dev-dependencies = [
-    "apscheduler>=3.10.4",
     "mkdocs-material>=9.5.29",
     "mkdocs>=1.6.0",
+    "mkdocs-minify-plugin>=0.8.0",
 ]
 
 [tool.hatch.metadata]
@@ -66,6 +70,7 @@ include = [
     "logo.png",
     "logo-dark.png",
 ]
+exclude = ["__pycache__"]
 
 # [[tool.poetry.source]]
 # name = "aliyun"
@@ -74,7 +79,7 @@ include = [
 
 [tool.rye.scripts]
 start = "python -m main"
-job = "python -m job"
 docs = "mkdocs serve"
 build-docs = "mkdocs build"
 schema = "python -m schema"
+cli = "python -m auto_unpack.cli"

@@ -95,11 +95,11 @@ class GlobFilter(Filter):
     )
     includes: List[str] = Field(
         default=["**/*"],
-        description="包含的文件(glob 表达式, 默认: [**/*])"
+        description="包含的文件路径列表(glob 表达式, 默认: [**/*])"
     )
     excludes: List[str] = Field(
         default=[],
-        description="排除的文件(glob 表达式, 默认: [])"
+        description="排除的文件路径列表(glob 表达式, 默认: [])"
     )
 
     def filter(self, file_datas: List[FileData]) -> List[FileData]:
@@ -122,11 +122,11 @@ class FilterPluginConfig(HandlePluginConfig):
     )
     includes: List[str] = Field(
         default=["**/*"],
-        description="包含的文件(glob 表达式, 默认: [**/*])"
+        description="[已废弃]包含的文件路径列表(glob 表达式, 默认: [**/*])"
     )
     excludes: List[str] = Field(
         default=[],
-        description="排除的文件(glob 表达式, 默认: [])"
+        description="[已废弃]排除的文件路径列表(glob 表达式, 默认: [])"
     )
     exclude_key: Optional[str] = Field(
         default=None,

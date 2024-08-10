@@ -1,7 +1,7 @@
 .*
 !.vscode
 archive
-docs
+docs/page
 **/sevenzip/lib
 
 *.exe
@@ -10,3 +10,4 @@ docs
 *.txt
 *.lock
 LICENSE
+_gitignore

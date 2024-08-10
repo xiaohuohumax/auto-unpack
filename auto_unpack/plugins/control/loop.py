@@ -19,7 +19,7 @@ class LoopPluginConfig(OutputPluginConfig):
     )
     steps: List[Any] = Field(
         default=[],
-        description="步骤配置(默认: [])"
+        description="需要循环执行的步骤(默认: [])"
     )
     max_loops: int = Field(
         default=1024,

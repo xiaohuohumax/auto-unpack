@@ -1,0 +1,9 @@
+app:
+  name: simple-project
+  clear_info_dir: true
+
+banner:
+  welcome: "Welcome to simple-project!"
+
+logging:
+  level: debug

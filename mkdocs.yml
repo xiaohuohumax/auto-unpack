@@ -1,42 +1,118 @@
-site_name: auto-unpack
-repo_url: https://github.com/xiaohuohumax/auto-unpack
-nav:
-  - 项目介绍: index.md
-  - 插件介绍: plugin/index.md
-  - 扩展插件: custom-plugin.md
-  - 配置校验: schema.md
-  - 内置插件:
-      - Filter: plugin/control/filter.md
-      - Loop: plugin/control/loop.md
-      - Merge: plugin/control/merge.md
-      - Switch: plugin/control/switch.md
-      - Archive: plugin/archive.md
-      - Empty: plugin/empty.md
-      - Log: plugin/log.md
-      - Remove: plugin/remove.md
-      - Rename: plugin/rename.md
-      - Scan: plugin/scan.md
-      - Transfer: plugin/transfer.md
-      - Flat: plugin/flat.md
+docs_dir: docs/page
 
+site_name: auto-unpack
+site_author: xiaohuohumax
+site_url: https://xiaohuohumax.github.io/auto-unpack/
+site_description: 压缩包自动解压工具，支持多种压缩包格式。通过组合各种内置插件，编排解压流程，则可满足日常解压需求。
+
+repo_name: xiaohuohumax/auto-unpack
+repo_url: https://github.com/xiaohuohumax/auto-unpack
+
+# edit_uri: "https://github.com/xiaohuohumax/auto-unpack/tree/main/docs/page/"
+edit_uri: ""
+
+copyright: Copyright (c) 2024 xiaohuohumax
+
+nav:
+  - 首页: index.md
+  - 快速开始: start.md
+  - 内置插件:
+      - filter: plugins/builtin/control/filter.md
+      - loop: plugins/builtin/control/loop.md
+      - merge: plugins/builtin/control/merge.md
+      - switch: plugins/builtin/control/switch.md
+      - archive: plugins/builtin/archive.md
+      - empty: plugins/builtin/empty.md
+      - flat: plugins/builtin/flat.md
+      - log: plugins/builtin/log.md
+      - remove: plugins/builtin/remove.md
+      - rename: plugins/builtin/rename.md
+      - scan: plugins/builtin/scan.md
+      - transfer: plugins/builtin/transfer.md
+  - 自定义插件: plugins/custom.md
+  - 配置约束: schema.md
+  - 场景示例:
+      - 识别压缩包: examples/list-archive.md
+      - 解压嵌套压缩包: examples/loop-archive.md
+  - 关于: about.md
+
+plugins:
+  - search:
+      separator: '[\s\u200b\-_,:!=\[\]()"`/]+|\.(?!\d)|&[lg]t;|(?!\b)(?=[A-Z][a-z])'
+  - minify:
+      minify_html: true
+
+markdown_extensions:
+  - admonition
+  - tables
+  - toc:
+      permalink: true
+  - pymdownx.superfences:
+      custom_fences:
+        - name: mermaid
+          class: mermaid
+  - pymdownx.tabbed:
+      alternate_style: true
+      combine_header_slug: true
+  - attr_list
+  - pymdownx.emoji:
+      emoji_index: !!python/name:material.extensions.emoji.twemoji
+      emoji_generator: !!python/name:material.extensions.emoji.to_svg
+
+watch:
+  - docs/material/overrides
 theme:
   name: material
+  custom_dir: docs/material/overrides
   font:
     code: Roboto Mono
+  # icon:
+  #   edit: material/pencil
+  #   view: material/eye
+  features:
+    - announce.dismiss
+    - content.action.edit
+    - content.action.view
+    - content.code.annotate
+    - content.code.copy
+    # - content.code.select
+    # - content.footnote.tooltips
+    # - content.tabs.link
+    - content.tooltips
+    # - header.autohide
+    # - navigation.expand
+    - navigation.footer
+    - navigation.indexes
+    # - navigation.instant
+    # - navigation.instant.prefetch
+    # - navigation.instant.progress
+    # - navigation.prune
+    - navigation.sections
+    - navigation.tabs
+    # - navigation.tabs.sticky
+    - navigation.top
+    - navigation.tracking
+    - search.highlight
+    - search.share
+    - search.suggest
+    - toc.follow
+    # - toc.integrate
   palette:
     - media: "(prefers-color-scheme)"
       toggle:
         icon: material/brightness-auto
         name: Switch to light mode
-
     - media: "(prefers-color-scheme: light)"
       scheme: default
+      primary: indigo
+      accent: indigo
       toggle:
         icon: material/brightness-7
         name: Switch to dark mode
-
     - media: "(prefers-color-scheme: dark)"
       scheme: slate
+      primary: black
+      accent: indigo
       toggle:
         icon: material/brightness-4
         name: Switch to system preference

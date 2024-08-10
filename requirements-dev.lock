@@ -10,11 +10,12 @@
 -e file:.
 annotated-types==0.6.0
     # via pydantic
-apscheduler==3.10.4
+ansicon==1.89.0
+    # via jinxed
 babel==2.15.0
     # via mkdocs-material
-backports-zoneinfo==0.2.1
-    # via tzlocal
+blessed==1.20.0
+    # via inquirer
 certifi==2024.7.4
     # via requests
 charset-normalizer==3.3.2
@@ -25,17 +26,29 @@ colorama==0.4.6
     # via click
     # via mkdocs
     # via mkdocs-material
+csscompressor==0.9.5
+    # via mkdocs-minify-plugin
+editor==1.6.6
+    # via inquirer
 ghp-import==2.1.0
     # via mkdocs
+htmlmin2==0.1.13
+    # via mkdocs-minify-plugin
 idna==3.7
     # via requests
 importlib-metadata==8.0.0
     # via markdown
     # via mkdocs
     # via mkdocs-get-deps
+inquirer==3.3.0
+    # via auto-unpack
 jinja2==3.1.4
     # via mkdocs
     # via mkdocs-material
+jinxed==1.3.0
+    # via blessed
+jsmin==3.0.1
+    # via mkdocs-minify-plugin
 markdown==3.6
     # via mkdocs
     # via mkdocs-material
@@ -48,11 +61,13 @@ mergedeep==1.3.4
     # via mkdocs-get-deps
 mkdocs==1.6.0
     # via mkdocs-material
+    # via mkdocs-minify-plugin
 mkdocs-get-deps==0.2.0
     # via mkdocs
 mkdocs-material==9.5.29
 mkdocs-material-extensions==1.3.1
     # via mkdocs-material
+mkdocs-minify-plugin==0.8.0
 packaging==24.1
     # via mkdocs
 paginate==0.5.6
@@ -77,7 +92,6 @@ python-dateutil==2.9.0.post0
 python-dotenv==1.0.1
     # via pydantic-settings
 pytz==2024.1
-    # via apscheduler
     # via babel
 pyyaml==6.0.1
     # via mkdocs
@@ -86,6 +100,8 @@ pyyaml==6.0.1
     # via pyyaml-env-tag
 pyyaml-env-tag==0.1
     # via mkdocs
+readchar==4.1.0
+    # via inquirer
 regex==2024.5.15
     # via mkdocs-material
 requests==2.32.3
@@ -94,20 +110,23 @@ ruamel-yaml==0.18.6
     # via auto-unpack
 ruamel-yaml-clib==0.2.8
     # via ruamel-yaml
+runs==1.2.2
+    # via editor
 six==1.16.0
-    # via apscheduler
+    # via blessed
     # via python-dateutil
 typing-extensions==4.11.0
     # via annotated-types
     # via pydantic
     # via pydantic-core
-tzdata==2024.1
-    # via tzlocal
-tzlocal==5.2
-    # via apscheduler
 urllib3==2.2.2
     # via requests
 watchdog==4.0.1
     # via mkdocs
+wcwidth==0.2.13
+    # via blessed
+xmod==1.8.1
+    # via editor
+    # via runs
 zipp==3.19.2
     # via importlib-metadata

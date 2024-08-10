@@ -19,7 +19,7 @@ class EmptyPluginConfig(PluginConfig):
         description='空文件夹清理插件'
     )
     dir: Path = Field(
-        description='要清理的目录'
+        description='需要清理空文件夹的目录'
     )
 
 

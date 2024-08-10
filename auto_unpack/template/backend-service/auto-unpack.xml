@@ -1,0 +1,23 @@
+<service>
+    <!-- 服务配置 -->
+    <!-- 参考: https://github.com/winsw/winsw/blob/v3/docs/xml-config-file.md -->
+    <!-- 服务ID -->
+    <id>auto-unpack</id>
+    <!-- 服务名称 -->
+    <name>auto-unpack</name>
+    <!-- 服务描述 -->
+    <description>auto unpack service</description>
+    <!-- 服务可执行文件 -->
+    <executable>.venv/Scripts/python.exe</executable>
+    <!-- 服务启动参数 -->
+    <arguments>-m app.job</arguments>
+
+    <!-- 服务日志目录 -->
+    <logpath>%BASE%/log</logpath>
+    <!-- <logmode>rotate</logmode> -->
+    <!-- 关闭WinSW日志 -->
+    <log mode="none" />
+
+    <!-- 服务自启动 -->
+    <startmode>Automatic</startmode>
+</service>

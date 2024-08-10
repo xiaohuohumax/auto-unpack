@@ -116,7 +116,7 @@ class RenamePluginConfig(HandlePluginConfig):
     )
     rules: List[Union[ReplaceRule, ReRule]] = Field(
         default=[],
-        description="规则链(默认: [])"
+        description="改名规则(默认: [])"
     )
 
 

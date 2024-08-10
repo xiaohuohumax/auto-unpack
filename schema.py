@@ -10,6 +10,9 @@ schema_folder = Path("schema")
 config_schema_name = "auto-unpack-schema.json"
 config_schema_flow_name = "auto-unpack-flow-schema.json"
 
+# todo: 多版本 schema 文件相同时只保留版本号最小的
+# 例如： 1.0.0 与 1.0.1 版本的 schema 文件只保留 1.0.0 版本的
+
 
 def write_schema_file(schema_dict: Dict[str, Any], file_path: Path):
     """

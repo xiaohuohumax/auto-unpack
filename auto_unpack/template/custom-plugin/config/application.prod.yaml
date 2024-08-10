@@ -1,0 +1,4 @@
+flow:
+  steps:
+    - name: print
+      message: "Hello, world!"

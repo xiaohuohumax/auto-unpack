@@ -164,7 +164,7 @@ class ArchivePluginConfig(HandlePluginConfig):
     )
     password_path: Path = Field(
         default_factory=lambda: Path('passwords.txt'),
-        description="密码文件路径(默认: passwords.txt)"
+        description="密码表文件路径(默认: passwords.txt)"
     )
     fail_key: Optional[str] = Field(
         default=None,
@@ -172,7 +172,7 @@ class ArchivePluginConfig(HandlePluginConfig):
     )
     stat_file_name: Optional[str] = Field(
         default=None,
-        description="统计信息问件名(默认: null)"
+        description="统计信息文件名，不同模式对应不同统计信息(默认: null)"
     )
     thread_max: int = Field(
         default=10,
@@ -185,11 +185,11 @@ class ArchivePluginConfig(HandlePluginConfig):
     # mode: extract 可用选项
     output_dir: Path = Field(
         default_factory=lambda: Path('output'),
-        description="输出目录(默认: output)"
+        description="压缩包存放目录(默认: output)"
     )
     keep_dir: bool = Field(
         default=True,
-        description="是否保留压缩包目录(默认: true)"
+        description="是否保持解压后的文件夹结构(默认: true)"
     )
 
     @model_validator(mode='after')

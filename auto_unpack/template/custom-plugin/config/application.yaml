@@ -1,0 +1,10 @@
+app:
+  name: custom-plugin
+  clear_info_dir: true
+  plugins_dir: plugins
+
+banner:
+  welcome: "Welcome to custom-plugin!"
+
+logging:
+  level: debug

@@ -14,8 +14,10 @@ class Case(Filter):
     """
     数据分支条件
     """
-    # 保存到数据仓库 key
-    save_key: str
+    # 分支上下文
+    save_key: str = Field(
+        description="分支上下文"
+    )
 
 
 class SizeCase(SizeFilter, Case):

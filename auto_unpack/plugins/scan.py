@@ -23,11 +23,11 @@ class ScanPluginConfig(InputPluginConfig):
     )
     includes: List[str] = Field(
         default=["**/*"],
-        description="包含的文件类型(glob 语法, 默认: [**/*])"
+        description="包含的文件路径列表(glob 语法, 默认: [**/*])"
     )
     excludes: List[str] = Field(
         default=[],
-        description="排除的文件类型(glob 语法, 默认: [])"
+        description="排除的文件路径列表(glob 语法, 默认: [])"
     )
     include_dir: bool = Field(
         default=False,

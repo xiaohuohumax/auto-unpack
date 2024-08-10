@@ -1,0 +1,988 @@
+{
+    "$defs": {
+        "ArchivePluginConfig": {
+            "properties": {
+                "name": {
+                    "const": "archive",
+                    "default": "archive",
+                    "description": "压缩包处理插件",
+                    "title": "Name",
+                    "type": "string"
+                },
+                "load_key": {
+                    "default": "default",
+                    "description": "上下文加载 key",
+                    "title": "Load Key",
+                    "type": "string"
+                },
+                "save_key": {
+                    "default": "default",
+                    "description": "上下文保存 key",
+                    "title": "Save Key",
+                    "type": "string"
+                },
+                "mode": {
+                    "description": "压缩包处理模式\nlist: 列出压缩包内文件信息\nextract: 解压压缩包\ntest: 测试压缩包完整性",
+                    "enum": [
+                        "list",
+                        "extract",
+                        "test"
+                    ],
+                    "title": "Mode",
+                    "type": "string"
+                },
+                "password_path": {
+                    "description": "密码文件路径(默认: passwords.txt)",
+                    "format": "path",
+                    "title": "Password Path",
+                    "type": "string"
+                },
+                "fail_key": {
+                    "default": null,
+                    "description": "失败上下文 key(默认: null)",
+                    "oneOf": [
+                        {
+                            "type": "string"
+                        },
+                        {
+                            "type": "null"
+                        }
+                    ],
+                    "title": "Fail Key"
+                },
+                "stat_file_name": {
+                    "default": null,
+                    "description": "统计信息问件名(默认: null)",
+                    "oneOf": [
+                        {
+                            "type": "string"
+                        },
+                        {
+                            "type": "null"
+                        }
+                    ],
+                    "title": "Stat File Name"
+                },
+                "thread_max": {
+                    "default": 10,
+                    "description": "线程池最大线程数(默认: 10)",
+                    "title": "Thread Max",
+                    "type": "integer"
+                },
+                "result_processing_mode": {
+                    "default": "strict",
+                    "description": "结果处理模式(默认: strict)\nstrict: 严格模式[结果绝对依靠 7-zip 命令行输出]\ngreedy: 贪婪模式[7-zip 返回某些错误码时, 也会尝试识别/测试/解压]",
+                    "enum": [
+                        "strict",
+                        "greedy"
+                    ],
+                    "title": "Result Processing Mode",
+                    "type": "string"
+                },
+                "output_dir": {
+                    "description": "输出目录(默认: output)",
+                    "format": "path",
+                    "title": "Output Dir",
+                    "type": "string"
+                },
+                "keep_dir": {
+                    "default": true,
+                    "description": "是否保留压缩包目录(默认: true)",
+                    "title": "Keep Dir",
+                    "type": "boolean"
+                }
+            },
+            "required": [
+                "mode"
+            ],
+            "title": "ArchivePluginConfig",
+            "type": "object"
+        },
+        "CustomStep": {
+            "properties": {
+                "name": {
+                    "description": "自定义插件",
+                    "title": "Name",
+                    "type": "string",
+                    "not": {
+                        "enum": [
+                            "archive",
+                            "empty",
+                            "flat",
+                            "log",
+                            "remove",
+                            "rename",
+                            "scan",
+                            "_template",
+                            "transfer",
+                            "filter",
+                            "loop",
+                            "merge",
+                            "switch",
+                            "print"
+                        ]
+                    }
+                }
+            },
+            "required": [
+                "name"
+            ],
+            "title": "CustomStep",
+            "type": "object"
+        },
+        "EmptyPluginConfig": {
+            "properties": {
+                "name": {
+                    "const": "empty",
+                    "default": "empty",
+                    "description": "空文件夹清理插件",
+                    "title": "Name",
+                    "type": "string"
+                },
+                "dir": {
+                    "description": "要清理的目录",
+                    "format": "path",
+                    "title": "Dir",
+                    "type": "string"
+                }
+            },
+            "required": [
+                "dir"
+            ],
+            "title": "EmptyPluginConfig",
+            "type": "object"
+        },
+        "FilterPluginConfig": {
+            "properties": {
+                "name": {
+                    "const": "filter",
+                    "default": "filter",
+                    "description": "过滤插件",
+                    "title": "Name",
+                    "type": "string"
+                },
+                "load_key": {
+                    "default": "default",
+                    "description": "上下文加载 key",
+                    "title": "Load Key",
+                    "type": "string"
+                },
+                "save_key": {
+                    "default": "default",
+                    "description": "上下文保存 key",
+                    "title": "Save Key",
+                    "type": "string"
+                },
+                "includes": {
+                    "default": [
+                        "**/*"
+                    ],
+                    "description": "包含的文件(glob 表达式, 默认: [**/*])",
+                    "items": {
+                        "type": "string"
+                    },
+                    "title": "Includes",
+                    "type": "array"
+                },
+                "excludes": {
+                    "default": [],
+                    "description": "排除的文件(glob 表达式, 默认: [])",
+                    "items": {
+                        "type": "string"
+                    },
+                    "title": "Excludes",
+                    "type": "array"
+                },
+                "exclude_key": {
+                    "default": null,
+                    "description": "排除掉的上下文(默认: null)",
+                    "oneOf": [
+                        {
+                            "type": "string"
+                        },
+                        {
+                            "type": "null"
+                        }
+                    ],
+                    "title": "Exclude Key"
+                },
+                "rules": {
+                    "default": [],
+                    "description": "筛选规则(默认: [])",
+                    "items": {
+                        "oneOf": [
+                            {
+                                "$ref": "#/$defs/SizeFilter"
+                            },
+                            {
+                                "$ref": "#/$defs/GlobFilter"
+                            }
+                        ]
+                    },
+                    "title": "Rules",
+                    "type": "array"
+                }
+            },
+            "title": "FilterPluginConfig",
+            "type": "object"
+        },
+        "FlatPluginConfig": {
+            "properties": {
+                "name": {
+                    "const": "flat",
+                    "default": "flat",
+                    "description": "扁平化文件夹插件",
+                    "title": "Name",
+                    "type": "string"
+                },
+                "dir": {
+                    "description": "需要扁平化的文件夹",
+                    "format": "path",
+                    "title": "Dir",
+                    "type": "string"
+                },
+                "depth": {
+                    "default": null,
+                    "description": "扁平化的深度(null: 不限制深度, 默认: null)",
+                    "oneOf": [
+                        {
+                            "type": "integer"
+                        },
+                        {
+                            "type": "null"
+                        }
+                    ],
+                    "title": "Depth"
+                }
+            },
+            "required": [
+                "dir"
+            ],
+            "title": "FlatPluginConfig",
+            "type": "object"
+        },
+        "FlowConfig": {
+            "description": "流程配置",
+            "properties": {
+                "steps": {
+                    "description": "流程步骤",
+                    "items": {
+                        "oneOf": [
+                            {
+                                "$ref": "#/$defs/CustomStep"
+                            },
+                            {
+                                "$ref": "#/$defs/ArchivePluginConfig"
+                            },
+                            {
+                                "$ref": "#/$defs/EmptyPluginConfig"
+                            },
+                            {
+                                "$ref": "#/$defs/FlatPluginConfig"
+                            },
+                            {
+                                "$ref": "#/$defs/LogPluginConfig"
+                            },
+                            {
+                                "$ref": "#/$defs/RemovePluginConfig"
+                            },
+                            {
+                                "$ref": "#/$defs/RenamePluginConfig"
+                            },
+                            {
+                                "$ref": "#/$defs/ScanPluginConfig"
+                            },
+                            {
+                                "$ref": "#/$defs/TemplatePluginConfig"
+                            },
+                            {
+                                "$ref": "#/$defs/TransferPluginConfig"
+                            },
+                            {
+                                "$ref": "#/$defs/FilterPluginConfig"
+                            },
+                            {
+                                "$ref": "#/$defs/LoopPluginConfig"
+                            },
+                            {
+                                "$ref": "#/$defs/MergePluginConfig"
+                            },
+                            {
+                                "$ref": "#/$defs/SwitchPluginConfig"
+                            },
+                            {
+                                "$ref": "#/$defs/PrintPluginConfig"
+                            }
+                        ]
+                    },
+                    "title": "Steps",
+                    "type": "array"
+                }
+            },
+            "required": [
+                "steps"
+            ],
+            "title": "FlowConfig",
+            "type": "object"
+        },
+        "GlobCase": {
+            "description": "文件 glob 表达式分支条件",
+            "properties": {
+                "save_key": {
+                    "title": "Save Key",
+                    "type": "string"
+                },
+                "mode": {
+                    "const": "glob",
+                    "default": "glob",
+                    "description": "文件名过滤(glob 表达式)",
+                    "title": "Mode",
+                    "type": "string"
+                },
+                "includes": {
+                    "default": [
+                        "**/*"
+                    ],
+                    "description": "包含的文件(glob 表达式, 默认: [**/*])",
+                    "items": {
+                        "type": "string"
+                    },
+                    "title": "Includes",
+                    "type": "array"
+                },
+                "excludes": {
+                    "default": [],
+                    "description": "排除的文件(glob 表达式, 默认: [])",
+                    "items": {
+                        "type": "string"
+                    },
+                    "title": "Excludes",
+                    "type": "array"
+                }
+            },
+            "required": [
+                "save_key"
+            ],
+            "title": "GlobCase",
+            "type": "object"
+        },
+        "GlobFilter": {
+            "description": "文件名过滤",
+            "properties": {
+                "mode": {
+                    "const": "glob",
+                    "default": "glob",
+                    "description": "文件名过滤(glob 表达式)",
+                    "title": "Mode",
+                    "type": "string"
+                },
+                "includes": {
+                    "default": [
+                        "**/*"
+                    ],
+                    "description": "包含的文件(glob 表达式, 默认: [**/*])",
+                    "items": {
+                        "type": "string"
+                    },
+                    "title": "Includes",
+                    "type": "array"
+                },
+                "excludes": {
+                    "default": [],
+                    "description": "排除的文件(glob 表达式, 默认: [])",
+                    "items": {
+                        "type": "string"
+                    },
+                    "title": "Excludes",
+                    "type": "array"
+                }
+            },
+            "title": "GlobFilter",
+            "type": "object"
+        },
+        "LogPluginConfig": {
+            "properties": {
+                "name": {
+                    "const": "log",
+                    "default": "log",
+                    "description": "日志插件",
+                    "title": "Name",
+                    "type": "string"
+                },
+                "load_key": {
+                    "default": "default",
+                    "description": "上下文加载 key",
+                    "title": "Load Key",
+                    "type": "string"
+                },
+                "file_name": {
+                    "default": "log",
+                    "description": "日志文件名(默认: log)",
+                    "title": "File Name",
+                    "type": "string"
+                }
+            },
+            "title": "LogPluginConfig",
+            "type": "object"
+        },
+        "LoopPluginConfig": {
+            "properties": {
+                "name": {
+                    "const": "loop",
+                    "default": "loop",
+                    "description": "循环插件",
+                    "title": "Name",
+                    "type": "string"
+                },
+                "load_key": {
+                    "default": "default",
+                    "description": "上下文加载 key",
+                    "title": "Load Key",
+                    "type": "string"
+                },
+                "steps": {
+                    "description": "循环步骤",
+                    "items": {
+                        "oneOf": [
+                            {
+                                "$ref": "#/$defs/CustomStep"
+                            },
+                            {
+                                "$ref": "#/$defs/ArchivePluginConfig"
+                            },
+                            {
+                                "$ref": "#/$defs/EmptyPluginConfig"
+                            },
+                            {
+                                "$ref": "#/$defs/FlatPluginConfig"
+                            },
+                            {
+                                "$ref": "#/$defs/LogPluginConfig"
+                            },
+                            {
+                                "$ref": "#/$defs/RemovePluginConfig"
+                            },
+                            {
+                                "$ref": "#/$defs/RenamePluginConfig"
+                            },
+                            {
+                                "$ref": "#/$defs/ScanPluginConfig"
+                            },
+                            {
+                                "$ref": "#/$defs/TemplatePluginConfig"
+                            },
+                            {
+                                "$ref": "#/$defs/TransferPluginConfig"
+                            },
+                            {
+                                "$ref": "#/$defs/FilterPluginConfig"
+                            },
+                            {
+                                "$ref": "#/$defs/LoopPluginConfig"
+                            },
+                            {
+                                "$ref": "#/$defs/MergePluginConfig"
+                            },
+                            {
+                                "$ref": "#/$defs/SwitchPluginConfig"
+                            },
+                            {
+                                "$ref": "#/$defs/PrintPluginConfig"
+                            }
+                        ]
+                    },
+                    "title": "Steps",
+                    "type": "array"
+                },
+                "max_loops": {
+                    "default": 1024,
+                    "description": "最大循环次数(-1: 不限制, 默认: 1024)",
+                    "title": "Max Loops",
+                    "type": "integer"
+                },
+                "loop_interval": {
+                    "default": 1,
+                    "description": "循环间隔时间(单位: 秒, 默认: 1)",
+                    "title": "Loop Interval",
+                    "type": "integer"
+                }
+            },
+            "required": [
+                "steps"
+            ],
+            "title": "LoopPluginConfig",
+            "type": "object"
+        },
+        "MergePluginConfig": {
+            "properties": {
+                "name": {
+                    "const": "merge",
+                    "default": "merge",
+                    "description": "合并上下文插件",
+                    "title": "Name",
+                    "type": "string"
+                },
+                "save_key": {
+                    "default": "default",
+                    "description": "上下文保存 key",
+                    "title": "Save Key",
+                    "type": "string"
+                },
+                "context_keys": {
+                    "default": [],
+                    "description": "需要合并的上下文 key 集合(默认: [])",
+                    "items": {
+                        "type": "string"
+                    },
+                    "title": "Context Keys",
+                    "type": "array"
+                }
+            },
+            "title": "MergePluginConfig",
+            "type": "object"
+        },
+        "PrintPluginConfig": {
+            "properties": {
+                "name": {
+                    "const": "print",
+                    "default": "print",
+                    "description": "打印插件",
+                    "title": "Name",
+                    "type": "string"
+                },
+                "message": {
+                    "default": "Hello, world!",
+                    "description": "打印的消息",
+                    "title": "Message",
+                    "type": "string"
+                }
+            },
+            "title": "PrintPluginConfig",
+            "type": "object"
+        },
+        "ReRule": {
+            "description": "改名规则：正则表达式",
+            "properties": {
+                "mode": {
+                    "const": "re",
+                    "default": "re",
+                    "description": "正则表达式模式",
+                    "title": "Mode",
+                    "type": "string"
+                },
+                "pattern": {
+                    "description": "正则表达式",
+                    "title": "Pattern",
+                    "type": "string"
+                },
+                "replace": {
+                    "description": "替换字符串",
+                    "title": "Replace",
+                    "type": "string"
+                },
+                "count": {
+                    "default": 0,
+                    "description": "替换次数(0: 不限次数, 默认: 0)",
+                    "title": "Count",
+                    "type": "integer"
+                },
+                "flags": {
+                    "default": "",
+                    "description": "正则表达式匹配模式(默认: '')",
+                    "title": "Flags",
+                    "type": "string"
+                }
+            },
+            "required": [
+                "pattern",
+                "replace"
+            ],
+            "title": "ReRule",
+            "type": "object"
+        },
+        "RemovePluginConfig": {
+            "properties": {
+                "name": {
+                    "const": "remove",
+                    "default": "remove",
+                    "description": "删除文件插件",
+                    "title": "Name",
+                    "type": "string"
+                },
+                "load_key": {
+                    "default": "default",
+                    "description": "上下文加载 key",
+                    "title": "Load Key",
+                    "type": "string"
+                }
+            },
+            "title": "RemovePluginConfig",
+            "type": "object"
+        },
+        "RenamePluginConfig": {
+            "properties": {
+                "name": {
+                    "const": "rename",
+                    "default": "rename",
+                    "description": "改名插件",
+                    "title": "Name",
+                    "type": "string"
+                },
+                "load_key": {
+                    "default": "default",
+                    "description": "上下文加载 key",
+                    "title": "Load Key",
+                    "type": "string"
+                },
+                "save_key": {
+                    "default": "default",
+                    "description": "上下文保存 key",
+                    "title": "Save Key",
+                    "type": "string"
+                },
+                "rules": {
+                    "default": [],
+                    "description": "规则链(默认: [])",
+                    "items": {
+                        "oneOf": [
+                            {
+                                "$ref": "#/$defs/ReplaceRule"
+                            },
+                            {
+                                "$ref": "#/$defs/ReRule"
+                            }
+                        ]
+                    },
+                    "title": "Rules",
+                    "type": "array"
+                }
+            },
+            "title": "RenamePluginConfig",
+            "type": "object"
+        },
+        "ReplaceRule": {
+            "description": "改名规则：替换",
+            "properties": {
+                "mode": {
+                    "const": "replace",
+                    "default": "replace",
+                    "description": "替换模式",
+                    "title": "Mode",
+                    "type": "string"
+                },
+                "search": {
+                    "description": "匹配字符串",
+                    "title": "Search",
+                    "type": "string"
+                },
+                "replace": {
+                    "description": "替换字符串",
+                    "title": "Replace",
+                    "type": "string"
+                },
+                "count": {
+                    "default": -1,
+                    "description": "替换次数(-1: 全部替换, 默认: -1)",
+                    "title": "Count",
+                    "type": "integer"
+                }
+            },
+            "required": [
+                "search",
+                "replace"
+            ],
+            "title": "ReplaceRule",
+            "type": "object"
+        },
+        "ScanPluginConfig": {
+            "properties": {
+                "name": {
+                    "const": "scan",
+                    "default": "scan",
+                    "description": "扫描文件插件",
+                    "title": "Name",
+                    "type": "string"
+                },
+                "save_key": {
+                    "default": "default",
+                    "description": "上下文保存 key",
+                    "title": "Save Key",
+                    "type": "string"
+                },
+                "dir": {
+                    "description": "扫描目录",
+                    "format": "path",
+                    "title": "Dir",
+                    "type": "string"
+                },
+                "includes": {
+                    "default": [
+                        "**/*"
+                    ],
+                    "description": "包含的文件类型(glob 语法, 默认: [**/*])",
+                    "items": {
+                        "type": "string"
+                    },
+                    "title": "Includes",
+                    "type": "array"
+                },
+                "excludes": {
+                    "default": [],
+                    "description": "排除的文件类型(glob 语法, 默认: [])",
+                    "items": {
+                        "type": "string"
+                    },
+                    "title": "Excludes",
+                    "type": "array"
+                },
+                "include_dir": {
+                    "default": false,
+                    "description": "是否包含文件夹(默认: false)",
+                    "title": "Include Dir",
+                    "type": "boolean"
+                }
+            },
+            "required": [
+                "dir"
+            ],
+            "title": "ScanPluginConfig",
+            "type": "object"
+        },
+        "SizeCase": {
+            "description": "大小分支条件",
+            "properties": {
+                "save_key": {
+                    "title": "Save Key",
+                    "type": "string"
+                },
+                "mode": {
+                    "const": "size",
+                    "default": "size",
+                    "description": "文件大小过滤",
+                    "title": "Mode",
+                    "type": "string"
+                },
+                "size": {
+                    "description": "文件大小限制",
+                    "title": "Size",
+                    "type": "number"
+                },
+                "operator": {
+                    "default": ">=",
+                    "description": "大小比较运算符(默认: >=)",
+                    "enum": [
+                        "<",
+                        ">",
+                        "<=",
+                        ">=",
+                        "==",
+                        "!="
+                    ],
+                    "title": "Operator",
+                    "type": "string"
+                },
+                "unit": {
+                    "default": "mb",
+                    "description": "单位(默认: mb)",
+                    "enum": [
+                        "b",
+                        "kb",
+                        "mb",
+                        "gb",
+                        "tb"
+                    ],
+                    "title": "Unit",
+                    "type": "string"
+                }
+            },
+            "required": [
+                "save_key",
+                "size"
+            ],
+            "title": "SizeCase",
+            "type": "object"
+        },
+        "SizeFilter": {
+            "description": "文件大小过滤",
+            "properties": {
+                "mode": {
+                    "const": "size",
+                    "default": "size",
+                    "description": "文件大小过滤",
+                    "title": "Mode",
+                    "type": "string"
+                },
+                "size": {
+                    "description": "文件大小限制",
+                    "title": "Size",
+                    "type": "number"
+                },
+                "operator": {
+                    "default": ">=",
+                    "description": "大小比较运算符(默认: >=)",
+                    "enum": [
+                        "<",
+                        ">",
+                        "<=",
+                        ">=",
+                        "==",
+                        "!="
+                    ],
+                    "title": "Operator",
+                    "type": "string"
+                },
+                "unit": {
+                    "default": "mb",
+                    "description": "单位(默认: mb)",
+                    "enum": [
+                        "b",
+                        "kb",
+                        "mb",
+                        "gb",
+                        "tb"
+                    ],
+                    "title": "Unit",
+                    "type": "string"
+                }
+            },
+            "required": [
+                "size"
+            ],
+            "title": "SizeFilter",
+            "type": "object"
+        },
+        "SwitchPluginConfig": {
+            "properties": {
+                "name": {
+                    "const": "switch",
+                    "default": "switch",
+                    "description": "条件分支上下文插件",
+                    "title": "Name",
+                    "type": "string"
+                },
+                "load_key": {
+                    "default": "default",
+                    "description": "上下文加载 key",
+                    "title": "Load Key",
+                    "type": "string"
+                },
+                "cases": {
+                    "default": [],
+                    "description": "分支条件(默认: [])",
+                    "items": {
+                        "oneOf": [
+                            {
+                                "$ref": "#/$defs/SizeCase"
+                            },
+                            {
+                                "$ref": "#/$defs/GlobCase"
+                            }
+                        ]
+                    },
+                    "title": "Cases",
+                    "type": "array"
+                },
+                "default_key": {
+                    "default": null,
+                    "description": "未匹配到分支条件时上下文 key(默认: null)",
+                    "oneOf": [
+                        {
+                            "type": "string"
+                        },
+                        {
+                            "type": "null"
+                        }
+                    ],
+                    "title": "Default Key"
+                }
+            },
+            "title": "SwitchPluginConfig",
+            "type": "object"
+        },
+        "TemplatePluginConfig": {
+            "properties": {
+                "name": {
+                    "const": "_template",
+                    "default": "_template",
+                    "description": "插件模板",
+                    "title": "Name",
+                    "type": "string"
+                }
+            },
+            "title": "TemplatePluginConfig",
+            "type": "object"
+        },
+        "TransferPluginConfig": {
+            "properties": {
+                "name": {
+                    "const": "transfer",
+                    "default": "transfer",
+                    "description": "转移插件",
+                    "title": "Name",
+                    "type": "string"
+                },
+                "load_key": {
+                    "default": "default",
+                    "description": "上下文加载 key",
+                    "title": "Load Key",
+                    "type": "string"
+                },
+                "save_key": {
+                    "default": "default",
+                    "description": "上下文保存 key",
+                    "title": "Save Key",
+                    "type": "string"
+                },
+                "mode": {
+                    "description": "转移模式\nmove: 移动\ncopy: 复制",
+                    "enum": [
+                        "move",
+                        "copy"
+                    ],
+                    "title": "Mode",
+                    "type": "string"
+                },
+                "target_dir": {
+                    "description": "目标路径",
+                    "format": "path",
+                    "title": "Target Dir",
+                    "type": "string"
+                },
+                "keep_structure": {
+                    "default": true,
+                    "description": "是否保持目录结构(相对于扫描路径, 默认: true)",
+                    "title": "Keep Structure",
+                    "type": "boolean"
+                },
+                "overwrite_mode": {
+                    "default": "rename",
+                    "description": "覆盖模式(默认: rename)\nrename: 重命名\noverwrite: 覆盖\nskip: 跳过",
+                    "enum": [
+                        "rename",
+                        "overwrite",
+                        "skip"
+                    ],
+                    "title": "Overwrite Mode",
+                    "type": "string"
+                }
+            },
+            "required": [
+                "mode",
+                "target_dir"
+            ],
+            "title": "TransferPluginConfig",
+            "type": "object"
+        }
+    },
+    "description": "项目流程配置",
+    "properties": {
+        "flow": {
+            "$ref": "#/$defs/FlowConfig"
+        }
+    },
+    "required": [
+        "flow"
+    ],
+    "title": "ProjectFlowConfig",
+    "type": "object"
+}

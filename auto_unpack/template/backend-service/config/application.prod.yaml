@@ -1,0 +1,20 @@
+flow:
+  steps:
+    - name: scan
+      include_dir: true
+      dir: output
+    - name: remove
+
+    - name: scan
+      dir: archive
+      excludes:
+        - "*.gitkeep"
+
+    - name: log
+      file_name: scan
+
+    - name: archive
+      mode: extract
+      output_dir: output
+      password_path: passwords.txt
+      stat_file_name: extract

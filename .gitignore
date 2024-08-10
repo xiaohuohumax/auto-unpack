@@ -8,3 +8,4 @@ config/*.local.yaml
 site/
 
 *.log
+auto_unpack/template/**/requirements*.lock

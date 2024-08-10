@@ -2,7 +2,7 @@
 
 这是一个 auto-unpack 的简单项目模板。
 
-> [!NOTE] 实现功能
+> [!NOTE]
 > 将 archive 文件夹中的压缩包解压到 output 目录。
 
 ## 📖 使用文档

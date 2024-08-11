@@ -23,17 +23,17 @@ icon: material/source-branch
 
     `auto_unpack.plugins.control.switch.SwitchPluginConfig`
 
-| 名称                      | 类型                                                      | 描述                        | 默认值     |
-| ------------------------- | --------------------------------------------------------- | --------------------------- | ---------- |
-| :star: `name`             | Literal['switch']                                         | 插件名称，固定为 `'switch'` | `'switch'` |
-| `cases`                   | List[Union[[SizeCase](#sizecase), [GlobCase](#globcase)]] | 分支条件                    | `[]`       |
-| [`上下文字段见上文`](#_1) |                                                           |                             |            |
+| 名称                      | 类型                                                                                                        | 描述                        | 默认值     |
+| ------------------------- | ----------------------------------------------------------------------------------------------------------- | --------------------------- | ---------- |
+| :star: `name`             | Literal['switch']                                                                                           | 插件名称，固定为 `'switch'` | `'switch'` |
+| `cases`                   | List[Union[[SizeCase](#sizecase), [GlobCase](#globcase), [CTimeCase](#ctimecase), [MTimeCase](#mtimecase)]] | 分支条件                    | `[]`       |
+| [`上下文字段见上文`](#_1) |                                                                                                             |                             |            |
 
 ### SizeCase
 
 !!! info "SizeCase"
 
-    `auto_unpack.plugins.control.switch.SizeCase`
+    `auto_unpack.plugins.control.switch.SizeCase` 文件大小过滤器，用于筛选文件大小满足条件的文件。
 
 | 名称              | 类型                                      | 描述                          | 默认值   |
 | ----------------- | ----------------------------------------- | ----------------------------- | -------- |
@@ -48,7 +48,7 @@ icon: material/source-branch
 
 !!! info "GlobCase"
 
-    `auto_unpack.plugins.control.switch.GlobCase`
+    `auto_unpack.plugins.control.switch.GlobCase` 文件路径过滤器，用于筛选文件路径满足条件的文件。
 
 | 名称              | 类型            | 描述                            | 默认值     |
 | ----------------- | --------------- | ------------------------------- | ---------- |
@@ -56,6 +56,30 @@ icon: material/source-branch
 | `includes`        | List[str]       | 包含的文件路径列表，glob 表达式 | `['**/*']` |
 | `excludes`        | List[str]       | 排除的文件路径列表，glob 表达式 | `[]`       |
 | :star: `save_key` | str             | 分支上下文                      | 无         |
+
+### CTimeCase
+
+!!! info "CTimeCase"
+
+    `auto_unpack.plugins.control.filter.CTimeCase` 创建时间过滤器，用于筛选文件创建时间满足条件的文件。
+
+| 名称          | 类型                                      | 描述                                                   | 默认值    |
+| ------------- | ----------------------------------------- | ------------------------------------------------------ | --------- |
+| :star: `mode` | Literal['ctime']                          | 创建时间过滤，固定为 `'ctime'`                         | `'ctime'` |
+| :star: `time` | str                                       | 时间限制(格式: RFC3339)<br/>例如：2022-01-01T00:00:00Z | 无        |
+| `operator`    | Literal['<', '>', '<=', '>=', '==', '!='] | 大小比较运算符                                         | `>=`      |
+
+### MTimeCase
+
+!!! info "MTimeCase"
+
+    `auto_unpack.plugins.control.filter.MTimeCase` 修改时间过滤器，用于筛选文件修改时间满足条件的文件。
+
+| 名称          | 类型                                      | 描述                                                   | 默认值    |
+| ------------- | ----------------------------------------- | ------------------------------------------------------ | --------- |
+| :star: `mode` | Literal['mtime']                          | 修改时间过滤，固定为 `'mtime'`                         | `'mtime'` |
+| :star: `time` | str                                       | 时间限制(格式: RFC3339)<br/>例如：2022-01-01T00:00:00Z | 无        |
+| `operator`    | Literal['<', '>', '<=', '>=', '==', '!='] | 大小比较运算符                                         | `>=`      |
 
 ## :recycle: 示例
 

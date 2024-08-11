@@ -24,19 +24,19 @@ icon: material/filter-check-outline
 
     `auto_unpack.plugins.control.filter.FilterPluginConfig`
 
-| 名称                                                                    | 类型                                                              | 描述                            | 默认值     |
-| ----------------------------------------------------------------------- | ----------------------------------------------------------------- | ------------------------------- | ---------- |
-| :star: `name`                                                           | Literal['filter']                                                 | 插件名称，固定为 `'filter'`     | `'filter'` |
-| :construction: `includes` `废弃`<br>`请使用`[`GlobFilter`](#globfilter) | List[str]                                                         | 包含的文件路径列表，glob 表达式 | `['**/*']` |
-| :construction: `excludes` `废弃`<br>`请使用`[`GlobFilter`](#globfilter) | List[str]                                                         | 排除的文件路径列表，glob 表达式 | `[]`       |
-| `rules`                                                                 | List[Union[[SizeFilter](#sizefilter), [GlobFilter](#globfilter)]] | 筛选规则                        | `[]`       |
-| [`上下文字段见上文`](#_1)                                               |                                                                   |                                 |            |
+| 名称                                                                    | 类型                                                                                                                        | 描述                            | 默认值     |
+| ----------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------- | ------------------------------- | ---------- |
+| :star: `name`                                                           | Literal['filter']                                                                                                           | 插件名称，固定为 `'filter'`     | `'filter'` |
+| :construction: `includes` `废弃`<br>`请使用`[`GlobFilter`](#globfilter) | List[str]                                                                                                                   | 包含的文件路径列表，glob 表达式 | `['**/*']` |
+| :construction: `excludes` `废弃`<br>`请使用`[`GlobFilter`](#globfilter) | List[str]                                                                                                                   | 排除的文件路径列表，glob 表达式 | `[]`       |
+| `rules`                                                                 | List[Union[[SizeFilter](#sizefilter), [GlobFilter](#globfilter), [CTimeFilter](#ctimefilter), [MTimeFilter](#mtimefilter)]] | 筛选规则                        | `[]`       |
+| [`上下文字段见上文`](#_1)                                               |                                                                                                                             |                                 |            |
 
 ### SizeFilter
 
 !!! info "SizeFilter"
 
-    `auto_unpack.plugins.control.filter.SizeFilter`
+    `auto_unpack.plugins.control.filter.SizeFilter` 文件大小过滤器，用于筛选文件大小满足条件的文件。
 
 | 名称          | 类型                                      | 描述                          | 默认值   |
 | ------------- | ----------------------------------------- | ----------------------------- | -------- |
@@ -45,18 +45,41 @@ icon: material/filter-check-outline
 | `operator`    | Literal['<', '>', '<=', '>=', '==', '!='] | 大小比较运算符                | `>=`     |
 | `unit`        | Literal['b', 'kb', 'mb', 'gb', 'tb']      | 单位                          | `mb`     |
 
-
 ### GlobFilter
 
 !!! info "GlobFilter"
 
-    `auto_unpack.plugins.control.filter.GlobFilter`
+    `auto_unpack.plugins.control.filter.GlobFilter` 文件路径过滤器，用于筛选文件路径满足条件的文件。
 
 | 名称          | 类型            | 描述                            | 默认值     |
 | ------------- | --------------- | ------------------------------- | ---------- |
 | :star: `mode` | Literal['glob'] | 文件路径过滤，固定为 `'glob'`   | `'glob'`   |
 | `includes`    | List[str]       | 包含的文件路径列表，glob 表达式 | `['**/*']` |
 | `excludes`    | List[str]       | 排除的文件路径列表，glob 表达式 | `[]`       |
+
+### CTimeFilter
+
+!!! info "CTimeFilter"
+
+    `auto_unpack.plugins.control.filter.CTimeFilter` 创建时间过滤器，用于筛选文件创建时间满足条件的文件。
+
+| 名称          | 类型                                      | 描述                                                   | 默认值    |
+| ------------- | ----------------------------------------- | ------------------------------------------------------ | --------- |
+| :star: `mode` | Literal['ctime']                          | 创建时间过滤，固定为 `'ctime'`                         | `'ctime'` |
+| :star: `time` | str                                       | 时间限制(格式: RFC3339)<br/>例如：2022-01-01T00:00:00Z | 无        |
+| `operator`    | Literal['<', '>', '<=', '>=', '==', '!='] | 大小比较运算符                                         | `>=`      |
+
+### MTimeFilter
+
+!!! info "MTimeFilter"
+
+    `auto_unpack.plugins.control.filter.MTimeFilter` 修改时间过滤器，用于筛选文件修改时间满足条件的文件。
+
+| 名称          | 类型                                      | 描述                                                   | 默认值    |
+| ------------- | ----------------------------------------- | ------------------------------------------------------ | --------- |
+| :star: `mode` | Literal['mtime']                          | 修改时间过滤，固定为 `'mtime'`                         | `'mtime'` |
+| :star: `time` | str                                       | 时间限制(格式: RFC3339)<br/>例如：2022-01-01T00:00:00Z | 无        |
+| `operator`    | Literal['<', '>', '<=', '>=', '==', '!='] | 大小比较运算符                                         | `>=`      |
 
 ## :recycle: 示例
 
@@ -65,6 +88,8 @@ icon: material/filter-check-outline
 ```yaml
 flow:
   steps:
+    - name: scan
+      dir: archive
     - name: filter
       rules:
         - mode: glob
@@ -77,4 +102,19 @@ flow:
           size: 1.0
           operator: '>='
           unit: mb
-``` 
+```
+
+### 打印 文件创建时间 在 2022-01-01 之后的文件
+
+```yaml
+flow:
+  steps:
+    - name: scan
+      dir: archive
+    - name: filter
+      rules:
+        - mode: ctime
+          time: "2022-01-01T00:00:00Z"
+          operator: ">="
+    - name: log
+```

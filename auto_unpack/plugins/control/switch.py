@@ -4,7 +4,9 @@ from typing import List, Literal, Optional, Union
 from pydantic import Field
 
 from auto_unpack.plugin import OutputPluginConfig, Plugin
-from auto_unpack.plugins.control.filter import Filter, GlobFilter, SizeFilter
+from auto_unpack.plugins.control.filter import (CTimeFilter, Filter,
+                                                GlobFilter, MTimeFilter,
+                                                SizeFilter)
 from auto_unpack.store import Context
 
 logger = logging.getLogger(__name__)
@@ -34,7 +36,21 @@ class GlobCase(GlobFilter, Case):
     pass
 
 
-Case_Type = Union[SizeCase, GlobCase]
+class CTimeCase(CTimeFilter, Case):
+    """
+    创建时间分支条件
+    """
+    pass
+
+
+class MTimeCase(MTimeFilter, Case):
+    """
+    修改时间分支条件
+    """
+    pass
+
+
+Case_Type = Union[SizeCase, GlobCase, CTimeCase, MTimeCase]
 
 
 class SwitchPluginConfig(OutputPluginConfig):

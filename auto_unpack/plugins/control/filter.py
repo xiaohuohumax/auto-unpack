@@ -1,5 +1,7 @@
 import logging
 import operator
+import re
+from datetime import datetime
 from typing import Any, Callable, Dict, List, Literal, Optional, Union
 
 from pydantic import BaseModel, Field, field_validator
@@ -109,7 +111,64 @@ class GlobFilter(Filter):
             include_file_datas, self.excludes)
 
 
-Filter_Type = Union[SizeFilter, GlobFilter]
+class TimeFilter(Filter):
+    """
+    时间过滤
+    """
+    mode: Literal['ctime'] = Field(
+        default='ctime',
+        description="创建时间过滤"
+    )
+    time: datetime = Field(
+        description="时间限制(格式: RFC3339)\n例如：2022-01-01T00:00:00Z"
+    )
+    operator: Literal['<', '>', '<=', '>=', '==', '!='] = Field(
+        default='>=',
+        description="大小比较运算符(默认: >=)"
+    )
+
+    def filter(self, file_datas: List[FileData]) -> List[FileData]:
+        include_file_datas = []
+
+        operator_func = operator_map[self.operator]
+
+        for f in file_datas:
+            if operator_func(self.operator_left_time(f), self.time.timestamp()):
+                include_file_datas.append(f)
+
+        return include_file_datas
+
+    def operator_left_time(self, f: FileData) -> float:
+        raise NotImplementedError()
+
+
+class CTimeFilter(TimeFilter):
+    """
+    创建时间过滤
+    """
+    mode: Literal['ctime'] = Field(
+        default='ctime',
+        description="创建时间过滤"
+    )
+
+    def operator_left_time(self, f: FileData) -> float:
+        return f.path.stat().st_ctime
+
+
+class MTimeFilter(TimeFilter):
+    """
+    最后修改时间过滤
+    """
+    mode: Literal['mtime'] = Field(
+        default='mtime',
+        description="最后修改时间过滤"
+    )
+
+    def operator_left_time(self, f: FileData) -> float:
+        return f.path.stat().st_mtime
+
+
+Filter_Type = Union[SizeFilter, GlobFilter, CTimeFilter, MTimeFilter]
 
 
 class FilterPluginConfig(HandlePluginConfig):

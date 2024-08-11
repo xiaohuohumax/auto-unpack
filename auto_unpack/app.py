@@ -63,12 +63,17 @@ class App:
         """
         根据配置创建流程
         """
-        self.flows = []
+        if len(self.flows) != 0:
+            return
+
         logger.info("Creating flows...")
         flow_config = load_config_by_class(
-            ProjectFlowConfig, self.env.config_dir, self.env.mode)
-        steps = flow_config.flow.steps
-        for step in steps:
+            ProjectFlowConfig,
+            self.env.config_dir,
+            self.env.mode
+        )
+
+        for step in flow_config.flow.steps:
             plugin = pluginManager.create_plugin_instance(
                 step, self.store, self.plugin_global_config
             )
@@ -77,16 +82,20 @@ class App:
 
         logger.info(f"Flows created: {len(self.flows)}")
 
+    def _clear_info_dir(self):
+        """
+        清空 info 目录
+        """
+        if self.config.app.clear_info_dir:
+            info_dir = self.config.app.info_dir
+            logger.info("Clearing info dir...")
+            if info_dir.exists():
+                shutil.rmtree(info_dir, ignore_errors=True)
+
     def _execute_flows(self):
         """
         执行流程
         """
-        if self.config.app.clear_info_dir:
-            logger.info("Clearing info dir...")
-            shutil.rmtree(self.config.app.info_dir, ignore_errors=True)
-
-        self.config.app.info_dir.mkdir(parents=True, exist_ok=True)
-
         logger.info("Executing flows...")
         flows_count = len(self.flows)
         for i, flow in enumerate(self.flows):
@@ -139,16 +148,15 @@ class App:
         运行
         """
         try:
-            if len(self.flows) == 0:
-                # 创建流程
-                self._create_flows()
-
             logger.info("Running app...")
-
             logger.info(f"Configs: {self.config}")
             logger.info(f"Envs: {self.env}")
             logger.info(f"Args: {self.args}")
 
+            # 创建流程
+            self._create_flows()
+            # 清空 info 目录
+            self._clear_info_dir()
             # 执行流程
             self._execute_flows()
 

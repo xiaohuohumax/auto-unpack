@@ -18,6 +18,21 @@
         "tag:yaml.org,2002:python/name:material.extensions.emoji.twemoji",
         "tag:yaml.org,2002:python/name:pymdownx.superfences.fence_code_format"
     ],
+    "todo-tree.general.tags": [
+        "MAJOR_TODO",
+        "BUG",
+        "TODO",
+        "FIX",
+    ],
+    "todo-tree.highlights.backgroundColourScheme": [
+        "tomato",
+        "red",
+        "orange",
+        "violet",
+    ],
+    "todo-tree.highlights.foregroundColourScheme": [
+        "black",
+    ],
     "cSpell.words": [
         "apscheduler",
         "asctime",

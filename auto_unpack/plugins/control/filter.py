@@ -120,6 +120,7 @@ class FilterPluginConfig(HandlePluginConfig):
         default='filter',
         description="过滤插件"
     )
+    # major_todo: 3.x.x 移除 includes 和 excludes 字段
     includes: List[str] = Field(
         default=["**/*"],
         description="[已废弃]包含的文件路径列表(glob 表达式, 默认: [**/*])"

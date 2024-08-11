@@ -146,6 +146,8 @@ def main():
     elif args.sub_command == ArgsSubCommand.INIT:
         init(args)
 
+    # todo: 增加生成 schema 功能
+
 
 if __name__ == '__main__':
     main()

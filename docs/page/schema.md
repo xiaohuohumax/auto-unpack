@@ -72,62 +72,79 @@ https://raw.githubusercontent.com/xiaohuohumax/auto-unpack/main/schema/[version]
     默认的 JSON Schema 只包含内置插件的配置项，如果需要添加自定义插件的配置项，可以根据需要修改然后重新构建。
 
 
-```python
-import json
-import logging
-from pathlib import Path
-from typing import Literal
+=== "通过脚手架工具构建"
 
-from pydantic import Field
+    ```sh
+    # auto-unpack schema -h 查看帮助
 
-from auto_unpack.plugin import PluginConfig, Plugin, PluginManager
-from auto_unpack import constant, schema
-from auto_unpack.util import file
+    # 插件路径可以多个，路径可以是文件夹或文件
+    # 例如：auto-unpack schema plugins/ print.py
+    auto-unpack schema plugins
+
+    # 忽略内置插件，默认：False
+    auto-unpack schema plugins -i
+
+    # 输出到指定文件，默认：schema/auto-unpack=flow-schema.json
+    auto-unpack schema plugins -o schema.json
+    ```
+
+=== "通过编写代码构建"
+
+    ```python
+    import json
+    import logging
+    from pathlib import Path
+    from typing import Literal
+
+    from pydantic import Field
+
+    from auto_unpack.plugin import PluginConfig, Plugin, PluginManager
+    from auto_unpack import constant, schema
+    from auto_unpack.util import file
 
 
-class PrintPluginConfig(PluginConfig):
-    """
-    打印插件配置
-    """
-    name: Literal["print"] = Field(
-        default="print",
-        description="打印插件"
-    )
-    ...
+    class PrintPluginConfig(PluginConfig):
+        """
+        打印插件配置
+        """
+        name: Literal["print"] = Field(
+            default="print",
+            description="打印插件"
+        )
+        ...
 
 
-class PrintPlugin(Plugin[PrintPluginConfig]):
-    """
-    打印插件
-    """
-    name: str = "print"
-    ...
+    class PrintPlugin(Plugin[PrintPluginConfig]):
+        """
+        打印插件
+        """
+        name: str = "print"
+        ...
 
 
-if __name__ == '__main__':
-    # 插件管理
-    plugin_manager = PluginManager()
-    # 添加内置插件
-    plugin_manager.load_plugin(constant.BUILTIN_PLUGINS_DIR)
-    # 通过文件夹添加插件
-    # plugin_manager.load_plugin(Path('plugins'))
-    # 通过文件添加插件
-    # plugin_manager.load_plugin(Path('plugins/print.py'))
-    # 添加自己新插件
-    plugin_manager.load_plugin_by_class(PrintPluginConfig, PrintPlugin)
+    if __name__ == '__main__':
+        # 插件管理
+        plugin_manager = PluginManager()
+        # 添加内置插件
+        plugin_manager.load_plugin(constant.BUILTIN_PLUGINS_DIR)
+        # 通过文件夹添加插件
+        # plugin_manager.load_plugin(Path('plugins'))
+        # 通过文件添加插件
+        # plugin_manager.load_plugin(Path('plugins/print.py'))
+        # 添加自己新插件
+        plugin_manager.load_plugin_by_class(PrintPluginConfig, PrintPlugin)
 
-    # auto-unpack-flow-schema.json
-    flow_schema_dict = schema.generate_flow_schema(
-        plugin_manager=plugin_manager
-    )
+        # auto-unpack-flow-schema.json
+        flow_schema_dict = schema.generate_flow_schema(
+            plugin_manager=plugin_manager
+        )
 
-    flow_schema = json.dumps(flow_schema_dict, indent=4, ensure_ascii=False)
-    file.write_file(Path('auto-unpack-flow-schema.json'), flow_schema)
+        flow_schema = json.dumps(flow_schema_dict, indent=4, ensure_ascii=False)
+        file.write_file(Path('auto-unpack-flow-schema.json'), flow_schema)
 
-    # auto-unpack-schema.json
-    # flow_config_dict = schema.generate_config_schema()
+        # auto-unpack-schema.json
+        # flow_config_dict = schema.generate_config_schema()
 
-    # config_schema = json.dumps(flow_config_dict, indent=4, ensure_ascii=False)
-    # file.write_file(Path('auto-unpack-schema.json'), config_schema)
-
-```
+        # config_schema = json.dumps(flow_config_dict, indent=4, ensure_ascii=False)
+        # file.write_file(Path('auto-unpack-schema.json'), config_schema)
+    ```

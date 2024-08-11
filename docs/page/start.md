@@ -24,6 +24,7 @@ hide:
 利用脚手架工具 `auto-unpack` 初始化项目
 
 ``` sh
+# auto-unpack -h 查看帮助
 auto-unpack init [project_path]
 ```
 

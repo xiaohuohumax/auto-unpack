@@ -53,6 +53,7 @@ dev-dependencies = [
     "mkdocs-material>=9.5.29",
     "mkdocs>=1.6.0",
     "mkdocs-minify-plugin>=0.8.0",
+    "mkdocs-awesome-pages-plugin>=2.9.3",
 ]
 
 [tool.hatch.metadata]
@@ -81,5 +82,6 @@ exclude = ["__pycache__"]
 start = "python -m main"
 docs = "mkdocs serve"
 build-docs = "mkdocs build"
-schema = "python -m schema"
+schema = "python -m script.schema"
+examples = "python -m script.examples"
 cli = "python -m auto_unpack.cli"

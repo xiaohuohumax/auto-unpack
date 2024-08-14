@@ -31,15 +31,14 @@ nav:
       - transfer: plugins/builtin/transfer.md
   - 自定义插件: plugins/custom.md
   - 配置约束: schema.md
-  - 场景示例:
-      - 识别压缩包: examples/list-archive.md
-      - 解压嵌套压缩包: examples/loop-archive.md
+  - ... | examples/*.md
   - 关于: about.md
 
 plugins:
   - search:
       lang: zh
       separator: '[\s\u200b\-_,:!=\[\]()"`/]+|\.(?!\d)|&[lg]t;|(?!\b)(?=[A-Z][a-z])'
+  - awesome-pages
   - minify:
       minify_html: true
 

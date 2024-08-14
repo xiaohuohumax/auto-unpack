@@ -7,7 +7,9 @@ on:
   workflow_dispatch:
 
 jobs:
-  deploy:
+  build-page:
+    needs:
+      - update-examples
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -34,7 +36,35 @@ jobs:
             mkdocs-material-
 
       - name: Install Python dependencies
-        run: pip install mkdocs mkdocs-material mkdocs-minify-plugin
+        run: pip install -r requirements-dev.lock
 
       - name: Build documentation
         run: mkdocs gh-deploy --force
+
+  update-examples:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
+
+      - name: Install the latest version of rye
+        uses: eifinger/setup-rye@v3
+        with:
+          enable-cache: true
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          version: "latest"
+
+      - name: Install dependencies
+        run: rye sync --no-lock
+
+      - name: Build examples
+        run: rye run examples
+
+      - name: Commit and push examples changes
+        uses: stefanzweifel/git-auto-commit-action@v5
+        id: auto-commit-action
+        with:
+          commit_message: Update examples
+          file_pattern: examples

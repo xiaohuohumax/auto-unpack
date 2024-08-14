@@ -38,6 +38,7 @@ nav:
 
 plugins:
   - search:
+      lang: zh
       separator: '[\s\u200b\-_,:!=\[\]()"`/]+|\.(?!\d)|&[lg]t;|(?!\b)(?=[A-Z][a-z])'
   - minify:
       minify_html: true
@@ -64,6 +65,7 @@ watch:
 theme:
   name: material
   custom_dir: docs/material/overrides
+  language: zh
   font:
     code: Roboto Mono
   # icon:
@@ -101,18 +103,18 @@ theme:
     - media: "(prefers-color-scheme)"
       toggle:
         icon: material/brightness-auto
-        name: Switch to light mode
+        name: 切换到明亮主题
     - media: "(prefers-color-scheme: light)"
       scheme: default
       primary: indigo
       accent: indigo
       toggle:
         icon: material/brightness-7
-        name: Switch to dark mode
+        name: 切换到暗黑主题
     - media: "(prefers-color-scheme: dark)"
       scheme: slate
       primary: black
       accent: indigo
       toggle:
         icon: material/brightness-4
-        name: Switch to system preference
+        name: 切换到系统主题

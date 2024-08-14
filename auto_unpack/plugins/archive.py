@@ -8,8 +8,8 @@ from pathlib import Path
 from typing import Any, Dict, List, Literal, Optional
 from uuid import uuid4
 
-from pydantic import (BaseModel, Field, field_serializer, model_serializer,
-                      model_validator)
+from pydantic import (BaseModel, Field, field_serializer, field_validator,
+                      model_serializer, model_validator)
 from typing_extensions import Self
 
 from auto_unpack.plugin import HandlePluginConfig, Plugin
@@ -176,7 +176,10 @@ class ArchivePluginConfig(HandlePluginConfig):
     )
     thread_max: int = Field(
         default=10,
-        description="线程池最大线程数(默认: 10)"
+        description="线程池最大线程数(默认: 10)",
+        json_schema_extra={
+            "minimum": 1
+        }
     )
     result_processing_mode: Result_Processing_Mode = Field(
         default='strict',
@@ -198,6 +201,14 @@ class ArchivePluginConfig(HandlePluginConfig):
         if not password_path.exists():
             raise ValueError(f"Password file `{password_path}` does not exist")
         return self
+
+    @field_validator('thread_max')
+    @classmethod
+    def validate_thread_max(cls, v: int):
+        if v <= 0:
+            raise ValueError(
+                f"Thread max should be greater than 0, but got `{v}`")
+        return v
 
 
 Result_Level = Literal['success', 'warning', 'error']

@@ -23,7 +23,10 @@ class FlatPluginConfig(PluginConfig):
     )
     depth: Optional[int] = Field(
         default=None,
-        description="扁平化的深度(null: 不限制深度, 默认: null)"
+        description="扁平化的深度(null: 不限制深度, 默认: null)",
+        json_schema_extra={
+            "minimum": 1
+        }
     )
 
     @field_validator('depth')

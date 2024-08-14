@@ -51,7 +51,10 @@ class SizeFilter(Filter):
         description="文件大小过滤"
     )
     size: float = Field(
-        description="文件大小限制"
+        description="文件大小限制",
+        json_schema_extra={
+            "minimum": 0,
+        }
     )
     operator: Literal['<', '>', '<=', '>=', '==', '!='] = Field(
         default='>=',
@@ -70,8 +73,9 @@ class SizeFilter(Filter):
     @field_validator('size')
     @classmethod
     def validate_size(cls, v: Any):
-        if v <= 0:
-            raise ValueError(f"Size must be greater than 0, but got {v}.")
+        if v < 0:
+            raise ValueError(
+                f"Size must be greater than or equal to 0, but got {v}.")
         return v
 
     def filter(self, file_datas: List[FileData]) -> List[FileData]:

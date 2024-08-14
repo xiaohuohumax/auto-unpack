@@ -2,7 +2,7 @@ import logging
 import time
 from typing import Any, List, Literal
 
-from pydantic import Field
+from pydantic import Field, field_validator
 
 from auto_unpack.plugin import OutputPluginConfig, Plugin, pluginManager
 
@@ -29,6 +29,14 @@ class LoopPluginConfig(OutputPluginConfig):
         default=1,
         description="循环间隔时间(单位: 秒, 默认: 1)"
     )
+
+    @field_validator('loop_interval')
+    @classmethod
+    def validate_loop_interval(cls, v: Any):
+        if v <= 0:
+            raise ValueError(
+                f"Loop interval must be greater than 0, but got {v}")
+        return v
 
 
 class LoopPlugin(Plugin[LoopPluginConfig]):

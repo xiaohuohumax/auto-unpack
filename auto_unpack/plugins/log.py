@@ -23,9 +23,9 @@ class LogPluginConfig(OutputPluginConfig):
         default='log',
         description="日志文件名(默认: log)"
     )
-    print_stats: List[Literal['all', 'ctime', 'mtime']] = Field(
+    print_stats: List[Literal['all', 'ctime', 'mtime', 'size']] = Field(
         default=[],
-        description="打印文件信息(默认: [])\n'all'：所有信息\n'ctime'：创建时间\n'mtime'：修改时间"
+        description="打印文件信息(默认: [])\n'all'：所有信息\n'ctime'：创建时间\n'mtime'：修改时间\n'size'：文件大小"
     )
 
 
@@ -40,6 +40,10 @@ class LogFileStat(BaseModel):
     mtime: str = Field(
         default=None,
         description="修改时间"
+    )
+    size: int = Field(
+        default=None,
+        description="文件大小(单位: 字节)"
     )
 
 
@@ -86,6 +90,7 @@ class LogPlugin(Plugin[LogPluginConfig]):
         stat_map: Dict[str, Callable[[FileData], Any]] = {
             'ctime': lambda x: self._timestamp_to_str(x.path.stat().st_ctime),
             'mtime': lambda x: self._timestamp_to_str(x.path.stat().st_mtime),
+            'size': lambda x: x.path.stat().st_size
         }
 
         if 'all' in self.config.print_stats:

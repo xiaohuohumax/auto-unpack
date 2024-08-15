@@ -2,7 +2,7 @@
 
 !!! note "场景介绍"
 
-    扫描路径 archive/base 下所有压缩包，解压输出到目录 output，并将解压信息保存至 extract.json。
+    扫描路径 archive/base 下所有压缩包，解压输出到目录 output，并将解压信息保存至 info/extract.json。
     
 
 

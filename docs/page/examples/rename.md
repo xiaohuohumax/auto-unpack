@@ -1,13 +1,18 @@
+# 文件重命名
+
+!!! note "场景介绍"
+
+    部分分卷压缩的压缩包，文件名中会包含多余的文字，需要重命名才能正确解压。
+    
+!!! tip "例如"
+
+    `改名前`：icon-v.7z.001, icon-v.7z.002删除, icon-v.7z.003删除<br/>
+    `改名后`：icon-v.7z.001, icon-v.7z.002, icon-v.7z.003
+
+## 处理流程
+
+```yaml
 # 文件重命名流程
-
-example_doc: true
-title: 文件重命名
-description: 部分分卷压缩的压缩包，文件名中会包含多余的文字，需要重命名才能正确解压。
-docs: |-
-  !!! tip "例如"
-
-      `改名前`：icon-v.7z.001, icon-v.7z.002删除, icon-v.7z.003删除<br/>
-      `改名后`：icon-v.7z.001, icon-v.7z.002, icon-v.7z.003
 
 flow:
   steps:
@@ -35,3 +40,5 @@ flow:
       output_dir: output
       # 解压统计信息 info/extract.json
       stat_file_name: extract
+
+```

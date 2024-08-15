@@ -67,4 +67,4 @@ jobs:
         id: auto-commit-action
         with:
           commit_message: Update examples
-          file_pattern: examples
+          file_pattern: docs/page/examples

@@ -1,9 +1,9 @@
-# 循环解压嵌套压缩包流程
+# 解压嵌套压缩包流程
 # 注意: 循环流程请谨慎使用, 防止死循环
 
 example_doc: true
 title: 解压嵌套压缩包
-description: 扫描路径 archive/loop 下所有压缩包，解压输出到目录 output。
+description: 扫描路径 archive/loop 下所有嵌套压缩包，解压输出到目录 output。
 
 flow:
   steps:

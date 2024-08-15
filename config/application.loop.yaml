@@ -1,14 +1,12 @@
 # 循环解压嵌套压缩包流程
 # 注意: 循环流程请谨慎使用, 防止死循环
 
+example_doc: true
+title: 解压嵌套压缩包
+description: 扫描路径 archive/loop 下所有压缩包，解压输出到目录 output。
+
 flow:
   steps:
-    # 清理输出目录(测试用)
-    - name: scan
-      include_dir: true
-      dir: output
-    - name: remove
-
     # 将压缩包拷贝到output目录
     - name: scan
       dir: archive/loop

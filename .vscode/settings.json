@@ -9,6 +9,7 @@
         // local
         "schema/auto-unpack-schema.json": "config/application.yaml",
         "schema/auto-unpack-flow-schema.json": "config/application.*.yaml",
+        "schema/examples-schema.json": "config/application.*.yaml",
     },
     "yaml.customTags": [
         "!ENV scalar",

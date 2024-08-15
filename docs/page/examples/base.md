@@ -1,8 +1,15 @@
-# 解压普通压缩包流程
+# 解压普通压缩包
 
-example_doc: true
-title: 解压普通压缩包
-description: 扫描路径 archive/base 下所有压缩包，解压输出到目录 output，并将解压信息保存至 extract.json。
+!!! note "场景介绍"
+
+    扫描路径 archive/base 下所有压缩包，解压输出到目录 output，并将解压信息保存至 extract.json。
+    
+
+
+## 处理流程
+
+```yaml
+# 解压普通压缩包流程
 
 flow:
   steps:
@@ -19,3 +26,5 @@ flow:
       output_dir: output
       # 解压统计信息 info/extract.json
       stat_file_name: extract
+
+```

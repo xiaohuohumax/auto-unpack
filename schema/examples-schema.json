@@ -1,0 +1,31 @@
+{
+    "description": "配置文件元数据，用于生成示例文档",
+    "properties": {
+        "example_doc": {
+            "default": false,
+            "description": "是否生成示例文档",
+            "title": "Example Doc",
+            "type": "boolean"
+        },
+        "title": {
+            "default": "",
+            "description": "示例标题",
+            "title": "Title",
+            "type": "string"
+        },
+        "description": {
+            "default": "",
+            "description": "示例描述",
+            "title": "Description",
+            "type": "string"
+        },
+        "docs": {
+            "default": "",
+            "description": "示例补充文档",
+            "title": "Docs",
+            "type": "string"
+        }
+    },
+    "title": "ConfigMeta",
+    "type": "object"
+}

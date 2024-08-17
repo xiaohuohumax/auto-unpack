@@ -30,7 +30,6 @@ jobs:
 
       - name: Commit and push schema changes
         uses: stefanzweifel/git-auto-commit-action@v5
-        id: auto-commit-action
         with:
           commit_message: Update schema
           file_pattern: schema

@@ -9,6 +9,9 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
 
       - name: Install the latest version of rye
         uses: eifinger/setup-rye@v3
@@ -20,6 +23,9 @@ jobs:
       - name: Install dependencies
         run: rye sync --no-lock --no-dev
 
+      - name: Update template version
+        run: rye run template
+
       - name: Build package
         run: rye build
 
@@ -28,3 +34,9 @@ jobs:
 
       - name: Publish package
         run: rye publish --token ${{ secrets.PYPI_API_TOKEN }} --yes
+
+      - name: Commit and push template changes
+        uses: stefanzweifel/git-auto-commit-action@v5
+        with:
+          commit_message: Update template
+          file_pattern: auto_unpack/template

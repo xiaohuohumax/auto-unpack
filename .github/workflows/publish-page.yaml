@@ -64,7 +64,6 @@ jobs:
 
       - name: Commit and push examples changes
         uses: stefanzweifel/git-auto-commit-action@v5
-        id: auto-commit-action
         with:
           commit_message: Update examples
           file_pattern: docs/page/examples

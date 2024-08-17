@@ -7,9 +7,9 @@ from pydantic import BaseModel
 
 from . import constant
 from .args import Args, load_args
-from .config import ProjectConfig, load_config_by_class
-from .env import Env, load_env_by_mode
-from .plugin import Plugin, PluginGlobalConfig, pluginManager
+from .config import ProjectConfig, load_config
+from .env import Env, load_env
+from .plugin import Plugin, PluginGlobalConfig, PluginManager
 from .store import DataStore
 from .util.file import read_file
 from .util.logging import config_logging
@@ -45,6 +45,8 @@ class App:
     store: DataStore = DataStore()
     # 插件全局配置
     plugin_global_config: PluginGlobalConfig
+    # 插件管理器
+    plugin_manager: PluginManager
 
     def _print_banner(self):
         """
@@ -67,14 +69,14 @@ class App:
             return
 
         logger.info("Creating flows...")
-        flow_config = load_config_by_class(
+        flow_config = load_config(
             ProjectFlowConfig,
             self.env.config_dir,
             self.env.mode
         )
 
         for step in flow_config.flow.steps:
-            plugin = pluginManager.create_plugin_instance(
+            plugin = self.plugin_manager.create_plugin_instance(
                 step, self.store, self.plugin_global_config
             )
             logger.debug(f"Flow step `{step.get('name')}` created")
@@ -106,21 +108,25 @@ class App:
     def __init__(self):
         # 加载配置
         self.args = load_args()
-        self.env = load_env_by_mode(self.args.mode)
-        self.config = load_config_by_class(
-            ProjectConfig, self.env.config_dir, self.env.mode)
+        self.env = load_env(self.args)
+        self.config = load_config(
+            config_class=ProjectConfig,
+            config_dir=self.env.config_dir,
+            mode=self.env.mode
+        )
+        # 打印 banner
+        self._print_banner()
         # 配置日志
         config_logging(self.config.logging.config_path,
                        self.config.logging.level)
-        # 打印 banner
-        self._print_banner()
 
         logger.info("Initializing app...")
+        self.plugin_manager = PluginManager()
         # 加载内置插件
-        pluginManager.load_plugin(constant.BUILTIN_PLUGINS_DIR)
+        self.plugin_manager.load_plugin(constant.BUILTIN_PLUGINS_DIR)
         # 加载自定义插件
         if self.config.app.plugins_dir:
-            pluginManager.load_plugin(self.config.app.plugins_dir)
+            self.plugin_manager.load_plugin(self.config.app.plugins_dir)
 
         self.plugin_global_config = PluginGlobalConfig(
             info_dir=self.config.app.info_dir
@@ -132,7 +138,7 @@ class App:
 
         :param plugin_path: 插件目录/文件路径
         """
-        pluginManager.load_plugin(plugin_path)
+        self.plugin_manager.load_plugin(plugin_path)
 
     def load_plugin_by_class(self, config_class: Any, plugin_class: Any):
         """
@@ -141,7 +147,7 @@ class App:
         :param config_class: 插件配置类
         :param plugin_class: 插件类
         """
-        pluginManager.load_plugin_by_class(config_class, plugin_class)
+        self.plugin_manager.load_plugin_by_class(config_class, plugin_class)
 
     def run(self):
         """

@@ -1,10 +1,9 @@
 from pathlib import Path
-from typing import Optional
 
 from dotenv import load_dotenv
 from pydantic_settings import BaseSettings
 
-load_dotenv(override=True)
+from .args import Args
 
 
 class Env(BaseSettings, case_sensitive=False):
@@ -19,14 +18,19 @@ class Env(BaseSettings, case_sensitive=False):
     config_dir: Path = Path('config')
 
 
-def load_env_by_mode(mode: Optional[str] = None) -> Env:
+def load_env(args: Args) -> Env:
     """
-    根据模式加载环境变量
+    根据命令行参数加载环境变量
 
-    :param mode: 环境模式
+    :param args: 命令行参数
     :return: 环境变量
     """
+    load_dotenv(override=True)
+
     env = Env()
-    if mode is not None:
-        env.mode = mode
+    if args.mode is not None:
+        env.mode = args.mode
+    if args.config_dir is not None:
+        env.config_dir = args.config_dir
+
     return env

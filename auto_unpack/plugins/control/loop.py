@@ -4,7 +4,7 @@ from typing import Any, List, Literal
 
 from pydantic import Field, field_validator
 
-from auto_unpack.plugin import OutputPluginConfig, Plugin, pluginManager
+from auto_unpack.plugin import OutputPluginConfig, Plugin
 
 logger = logging.getLogger(__name__)
 
@@ -56,7 +56,7 @@ class LoopPlugin(Plugin[LoopPluginConfig]):
         logger.info("Creating loop flows...")
         steps = self.config.steps
         for step in steps:
-            plugin = pluginManager.create_plugin_instance(
+            plugin = self.plugin_manager.create_plugin_instance(
                 step, self.store, self.global_config
             )
             logger.debug(f"Flow step `{step.get('name')}` created")

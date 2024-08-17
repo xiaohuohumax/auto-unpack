@@ -12,6 +12,7 @@ from pydantic import BaseModel
 
 from . import __version__ as version
 from . import constant, schema
+from .args import CustomHelpFormatter
 from .plugin import PluginManager
 from .util import file
 
@@ -46,28 +47,6 @@ class Args(BaseModel):
     plugin_paths: List[str] = []
     # schema 输出文件路径
     schema_output: str = ''
-
-
-class CustomHelpFormatter(argparse.HelpFormatter):
-    """
-    自定义帮助信息格式
-    """
-
-    def __init__(self, *args, **kwargs):
-        super(CustomHelpFormatter, self).__init__(*args, **kwargs)
-        self._max_help_position = 60
-
-    def _format_action_invocation(self, action):
-        """
-        格式化命令行参数
-
-        :param action: 命令行参数
-        :return: 格式化后的命令行参数
-        """
-        if action.option_strings and action.help:
-            if '-h' in action.option_strings or '--help' in action.option_strings:
-                action.help = '显示此帮助信息并退出'
-        return super(CustomHelpFormatter, self)._format_action_invocation(action)
 
 
 class SubParser:

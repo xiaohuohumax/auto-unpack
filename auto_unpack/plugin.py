@@ -75,11 +75,14 @@ class Plugin(Generic[C]):
     store: DataStore
     # 插件全局配置
     global_config: PluginGlobalConfig
+    # 插件管理器
+    plugin_manager: 'PluginManager'
 
-    def __init__(self, config: C, store: DataStore, global_config: PluginGlobalConfig):
+    def __init__(self, config: C, store: DataStore, global_config: PluginGlobalConfig, plugin_manager: 'PluginManager'):
         self.config = config
         self.store = store
         self.global_config = global_config
+        self.plugin_manager = plugin_manager
         self.init()
 
     def init(self):
@@ -233,7 +236,8 @@ class PluginManager:
                     return plugin_class(
                         config=config_instance,
                         store=store,
-                        global_config=global_config
+                        global_config=global_config,
+                        plugin_manager=self
                     )
                 except Exception as e:
                     logger.error(
@@ -241,6 +245,3 @@ class PluginManager:
                     raise e
 
         raise ValueError(f"Plugin `{config.get('name')}` not found")
-
-
-pluginManager = PluginManager()

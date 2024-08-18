@@ -52,8 +52,15 @@ class Args(BaseModel):
 class SubParser:
 
     command: ArgsSubCommand
+    help: str
+    subparser: argparse.ArgumentParser
 
-    def __init__(self, subparser: argparse._SubParsersAction[argparse.ArgumentParser]):
+    def __init__(self, subparser: argparse._SubParsersAction):
+        self.subparser = subparser.add_parser(
+            self.command.value,
+            help=self.help,
+            formatter_class=CustomHelpFormatter
+        )
         pass
 
     def execute(self, args: Args):
@@ -68,6 +75,7 @@ class SubParser:
 class InitSubParser(SubParser):
 
     command: ArgsSubCommand = ArgsSubCommand.INIT
+    help = '初始化项目'
 
     # 定义模板目录
     TEMPLATES: Dict[str, Path] = {
@@ -81,15 +89,11 @@ class InitSubParser(SubParser):
         '_gitignore': '.gitignore',
     }
 
-    def __init__(self, subparser: argparse._SubParsersAction[argparse.ArgumentParser]):
-        self.init_parser = subparser.add_parser(
-            ArgsSubCommand.INIT.value,
-            help='初始化项目',
-            formatter_class=CustomHelpFormatter
-        )
-        self.init_parser.set_defaults(sub_command=ArgsSubCommand.INIT)
+    def __init__(self, subparser: argparse._SubParsersAction):
+        super(InitSubParser, self).__init__(subparser)
+        self.subparser.set_defaults(sub_command=ArgsSubCommand.INIT)
 
-        self.init_parser.add_argument(
+        self.subparser.add_argument(
             'dir', type=str, nargs='?',
             help='初始化项目目录', default=''
         )
@@ -147,30 +151,28 @@ class InitSubParser(SubParser):
 class SchemaSubParser(SubParser):
 
     command: ArgsSubCommand = ArgsSubCommand.SCHEMA
+    help = '生成JSON Schema'
 
-    def __init__(self, subparser: argparse._SubParsersAction[argparse.ArgumentParser]):
-        self.schema_parser = subparser.add_parser(
-            ArgsSubCommand.SCHEMA.value,
-            help='生成 schema',
-            formatter_class=CustomHelpFormatter
-        )
-        self.schema_parser.set_defaults(sub_command=ArgsSubCommand.SCHEMA)
+    def __init__(self, subparser: argparse._SubParsersAction):
+        super(SchemaSubParser, self).__init__(subparser)
 
-        self.schema_parser.add_argument(
+        self.subparser.set_defaults(sub_command=ArgsSubCommand.SCHEMA)
+
+        self.subparser.add_argument(
             "-i", '--ignore-builtin-plugins',
             action='store_true',
             help='是否忽略内置插件', default=False
         )
 
-        self.schema_parser.add_argument(
+        self.subparser.add_argument(
             'plugin_paths', type=str, nargs='*',
             help='自定义插件目录/文件'
         )
 
-        self.schema_parser.add_argument(
+        self.subparser.add_argument(
             "-o", '--schema-output', type=str,
             help='schema 输出文件路径',
-            default='schema/auto-unpack=flow-schema.json'
+            default='schema/auto-unpack-flow-schema.json'
         )
 
     def execute(self, args: Args):

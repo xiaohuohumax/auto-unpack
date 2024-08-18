@@ -5,7 +5,7 @@ description = "后台服务模板"
 authors = [{ name = "xiaohuohumax" }]
 readme = "README.md"
 requires-python = ">= 3.8"
-dependencies = ["auto-unpack~=2.9.0", "apscheduler>=3.10.4"]
+dependencies = ["auto-unpack~=2.10.1", "apscheduler>=3.10.4"]
 
 [build-system]
 requires = ["hatchling"]

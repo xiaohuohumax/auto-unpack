@@ -73,6 +73,7 @@ class SevenZipUtil:
     """
 
     # 7zip 可执行文件路径
+    # todo: 更改为动态下载库文件，并且添加自定义路径功能
     _lib_path: Path = load_sevenzip_lib()
 
     @classmethod

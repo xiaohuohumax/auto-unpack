@@ -1,5 +1,5 @@
+import argparse
 import json
-import sys
 import time
 from io import StringIO
 from pathlib import Path
@@ -11,6 +11,8 @@ from ruamel.yaml.comments import CommentedMap
 from watchdog.events import FileSystemEvent, FileSystemEventHandler
 from watchdog.observers import Observer
 
+from auto_unpack import __version__ as version
+from auto_unpack.args import CustomHelpFormatter
 from auto_unpack.util import file
 
 config_dir: Path = Path('config')
@@ -122,24 +124,48 @@ class FileWatcherHandler(FileSystemEventHandler):
         build_example_docs()
 
 
+class Args(BaseModel):
+    """
+    命令行参数
+    """
+    # 是否显示版本号
+    version: bool = False
+    # 是否启动文件监控模式
+    watch: bool = False
+    # 是否生成JSON Schema文件
+    generate_schema: bool = False
+
+
 def main():
     """
     主函数
     """
-    argv_len = len(sys.argv)
-    if argv_len > 1 and sys.argv[1] in ['-s', '--schema']:
+    parser = argparse.ArgumentParser(
+        description="auto-unpack 文档-场景示例生成工具",
+        formatter_class=CustomHelpFormatter
+    )
+
+    parser.add_argument('-v', '--version', action='store_true', help='是否显示版本号')
+    parser.add_argument(
+        '-w', '--watch', action='store_true', help='是否启动文件监控模式')
+    parser.add_argument(
+        '-g', '--generate-schema', action='store_true', help='是否生成JSON Schema文件')
+
+    args = Args.model_validate(vars(parser.parse_args()))
+
+    if args.version:
+        print(version)
+        return
+    elif args.generate_schema:
         print("Generate schema file.")
         schema = json.dumps(ConfigMeta.model_json_schema(),
                             ensure_ascii=False, indent=4)
         file.write_file(schema_path, schema)
         print(f"Schema file was generated: {schema_path}")
         return
-
-    watch = argv_len > 1 and sys.argv[1] in ['-w', '--watch']
-
     print("Start generate examples docs.")
     build_example_docs()
-    if watch:
+    if args.watch:
         file_watcher = FileWatcherHandler()
         observer = Observer()
         observer.schedule(file_watcher, str(config_dir), recursive=True)
@@ -156,4 +182,7 @@ def main():
 
 
 if __name__ == '__main__':
+    """
+    此脚本用于生成文档-场景示例
+    """
     main()

@@ -69,7 +69,10 @@ def write_schema_file(schema_dict: Dict[str, Any], file_path: Path):
     file.write_file(file_path, schema)
 
 
-if __name__ == '__main__':
+def main():
+    """
+    生成 auto-unpack schema 文件
+    """
     try:
         print("generating auto-unpack schema...")
         print(f"version: {version}")
@@ -108,3 +111,10 @@ if __name__ == '__main__':
         print("auto-unpack schema generated successfully.")
     except Exception as e:
         print(f"Failed to generate auto-unpack schema: {e}")
+
+
+if __name__ == '__main__':
+    """
+    此脚本用于生成 auto-unpack schema 文件
+    """
+    main()

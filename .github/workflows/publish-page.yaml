@@ -55,7 +55,7 @@ jobs:
           enable-cache: true
           github-token: ${{ secrets.GITHUB_TOKEN }}
           version: "latest"
-          cache-prefix: ".cache-update-examples"
+          cache-prefix: "cache-update-examples"
 
       - name: Install dependencies
         run: rye sync --no-lock

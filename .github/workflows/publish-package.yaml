@@ -21,7 +21,7 @@ jobs:
           enable-cache: true
           github-token: ${{ secrets.GITHUB_TOKEN }}
           version: "latest"
-          cache-prefix: ".cache-publish-package"
+          cache-prefix: "cache-publish-package"
 
       - name: Install dependencies
         run: rye sync --no-lock --no-dev

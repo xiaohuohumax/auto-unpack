@@ -18,10 +18,10 @@ jobs:
       - name: Install the latest version of rye
         uses: eifinger/setup-rye@v4
         with:
-          enable-cache: true
+          # enable-cache: true
           github-token: ${{ secrets.GITHUB_TOKEN }}
           version: "latest"
-          cache-prefix: ".cache-update-schema"
+          # cache-prefix: "cache-update-schema"
 
       - name: Install dependencies
         run: rye sync --no-lock

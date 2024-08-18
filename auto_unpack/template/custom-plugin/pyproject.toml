@@ -23,4 +23,4 @@ packages = ["app"]
 
 [tool.rye.scripts]
 start = "python -m app"
-schema = "python -m app.schema"
+schema = "auto-unpack schema plugins"

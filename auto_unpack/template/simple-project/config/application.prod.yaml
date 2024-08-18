@@ -1,11 +1,6 @@
 flow:
   steps:
     - name: scan
-      include_dir: true
-      dir: output
-    - name: remove
-
-    - name: scan
       dir: archive
       excludes:
         - "*.gitkeep"

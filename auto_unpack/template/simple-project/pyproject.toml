@@ -5,7 +5,7 @@ description = "简单项目模板"
 authors = [{ name = "xiaohuohumax" }]
 readme = "README.md"
 requires-python = ">= 3.8"
-dependencies = ["auto-unpack>=2.6.0"]
+dependencies = ["auto-unpack~=2.9.0"]
 
 [build-system]
 requires = ["hatchling"]

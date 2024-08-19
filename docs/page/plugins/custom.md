@@ -9,7 +9,7 @@ hide:
 
 !!! tip "提示"
 
-    下面将以编写一个打印插件为例，介绍如何编写一个自定义插件。也可以直接参考 [自定义插件模板项目](https://github.com/xiaohuohumax/auto-unpack/tree/main/auto_unpack/template/custom-plugin/){target=_blank}。
+    下面将以编写一个打印插件为例，介绍如何编写一个自定义插件。也可以直接参考 [自定义插件模板项目](https://github.com/xiaohuohumax/auto-unpack/tree/main/release/template/custom-plugin/){target=_blank}。
 
 ## 插件目录
 

@@ -1,0 +1,17 @@
+[
+    {
+        "name": "backend-service",
+        "description": "后台服务模板",
+        "asset_name": "template_backend_service.tar.gz"
+    },
+    {
+        "name": "custom-plugin",
+        "description": "自定义插件模板",
+        "asset_name": "template_custom_plugin.tar.gz"
+    },
+    {
+        "name": "simple-project",
+        "description": "简单项目模板",
+        "asset_name": "template_simple_project.tar.gz"
+    }
+]

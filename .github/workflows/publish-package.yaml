@@ -27,6 +27,9 @@ jobs:
       - name: Update template version
         run: rye run template
 
+      - name: Build release assets
+        run: rye run release
+
       - name: Build package
         run: rye build
 
@@ -40,4 +43,12 @@ jobs:
         uses: stefanzweifel/git-auto-commit-action@v5
         with:
           commit_message: Update template
-          file_pattern: auto_unpack/template
+          file_pattern: "release/template auto_unpack/template.json"
+          # disable_globbing: true
+
+      - name: Update release assets
+        uses: ncipollo/release-action@v1
+        with:
+          allowUpdates: true
+          omitBodyDuringUpdate: true
+          artifacts: "release/dist/*"

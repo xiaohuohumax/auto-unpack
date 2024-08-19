@@ -72,7 +72,7 @@ include = [
     "logo.png",
     "logo-dark.png",
 ]
-exclude = ["__pycache__"]
+exclude = ["__pycache__", ".cache"]
 
 # [[tool.poetry.source]]
 # name = "aliyun"
@@ -87,3 +87,4 @@ schema = "python -m script.schema"
 examples = "python -m script.examples"
 cli = "python -m auto_unpack.cli"
 template = "python -m script.template"
+release = "python -m script.release"

@@ -2,19 +2,40 @@ import argparse
 import json
 import os
 import shutil
+import sys
 from enum import Enum
 from pathlib import Path
 from typing import Dict, List, Optional
 
 import inquirer
 from inquirer.errors import ValidationError
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 
+from . import __owner__ as owner
+from . import __repo__ as repo
 from . import __version__ as version
 from . import constant, schema
 from .args import CustomHelpFormatter
 from .plugin import PluginManager
-from .util import file
+from .util import download, file
+
+template_json_name = 'template.json'
+cli_parent_dir = Path(__file__).parent
+
+
+class TemplateAsset(BaseModel):
+    """
+    模板资产
+    """
+    name: str = Field(
+        description="模板名称"
+    )
+    description: str = Field(
+        description="模板描述"
+    )
+    asset_name: str = Field(
+        description="模板release asset名称"
+    )
 
 
 class ArgsSubCommand(Enum):
@@ -76,18 +97,12 @@ class InitSubParser(SubParser):
 
     command: ArgsSubCommand = ArgsSubCommand.INIT
     help = '初始化项目'
-
-    # 定义模板目录
-    TEMPLATES: Dict[str, Path] = {
-        "简单项目模板": constant.INIT_TEMPLATE_DIR/'simple-project',
-        "自定义插件模板": constant.INIT_TEMPLATE_DIR/'custom-plugin',
-        "后台服务模板": constant.INIT_TEMPLATE_DIR/'backend-service'
-    }
-
     # 文件名映射
-    FILE_NAME_MAP: Dict[str, str] = {
+    file_name_map: Dict[str, str] = {
         '_gitignore': '.gitignore',
     }
+    # 缓存目录
+    cache_dir = Path(__file__).parent/'.cache/cli'
 
     def __init__(self, subparser: argparse._SubParsersAction):
         super(InitSubParser, self).__init__(subparser)
@@ -115,17 +130,41 @@ class InitSubParser(SubParser):
                 raise ValidationError("", reason="目录不为空，请重新输入")
         return True
 
+    def _download_release_asset(self, asset_name: str, save_file: Path):
+        """
+        下载 release 资产
+
+        :param asset_name: 资产名称
+        :param save_file: 保存文件路径
+        :return: None
+        """
+        asset_url = f"https://github.com/{owner}/{repo}/releases/download/v{version}/{asset_name}"
+        print(f"Downloading {asset_url} to {save_file}")
+        download.download_url(asset_url, save_file)
+
+    def _get_template_json_file(self) -> List[TemplateAsset]:
+        """
+        解析模板资产映射文件
+
+        :return: 模板资产列表
+        """
+        save_file = cli_parent_dir/template_json_name
+        json_context = file.read_file(save_file)
+        return [TemplateAsset(**t) for t in json.loads(json_context)]
+
     def execute(self, args: Args):
         """
         执行初始化
 
         :param args: 命令行参数
         """
+        template_assets = self._get_template_json_file()
+        # 下载模板资产映射
         questions = [
             inquirer.Text(
                 name='dir', message='请输入初始化项目目录', validate=self._dir_validation),
             inquirer.List(
-                name='template', message='请选择模板', choices=list(InitSubParser.TEMPLATES.keys()))
+                name='template', message='请选择模板', choices=[t.description for t in template_assets])
         ]
         answers = inquirer.prompt(questions, answers=vars(args))
         if answers is None:
@@ -133,12 +172,25 @@ class InitSubParser(SubParser):
 
         answers = Args(**answers)
 
-        # 复制模板目录到初始化目录
-        template_dir = InitSubParser.TEMPLATES[answers.template]
-        shutil.copytree(template_dir, answers.dir, dirs_exist_ok=True)
+        # 获取资源名称
+        asset_name = next(
+            (t.asset_name for t in template_assets if t.description == answers.template),
+            None
+        )
+
+        template_asset_file = self.cache_dir/asset_name
+        if not template_asset_file.exists():
+            try:
+                # 本地缓存不存在，下载模板
+                self._download_release_asset(asset_name, template_asset_file)
+            except Exception as e:
+                print(f"Download template {asset_name} failed: {e}")
+                sys.exit(1)
+
+        shutil.unpack_archive(template_asset_file, extract_dir=answers.dir)
 
         # 通过文件名映射重命名文件
-        for file_name, new_file_name in InitSubParser.FILE_NAME_MAP.items():
+        for file_name, new_file_name in InitSubParser.file_name_map.items():
             file_path = Path(answers.dir)/file_name
             if file_path.exists():
                 new_file_path = Path(answers.dir)/new_file_name

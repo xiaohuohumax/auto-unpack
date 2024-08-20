@@ -1,16 +1,15 @@
-import json
 import re
 import shutil
 from pathlib import Path
-from typing import List
 
-from auto_unpack.cli import TemplateAsset, cli_parent_dir, template_json_name
+from auto_unpack.cli import TemplateAsset, ReleaseAsset, cli_parent_dir, release_json_name
 from auto_unpack.util import file
 
 release_root_dir = Path('release')
 release_dist_dir = release_root_dir / 'dist'
 template_root_dir = release_root_dir / 'template'
-template_asset_map_file = cli_parent_dir / template_json_name
+template_pkg_json_file = cli_parent_dir / release_json_name
+template_release_json_file = release_dist_dir / release_json_name
 template_asset_prefix = 'template'
 
 
@@ -56,14 +55,15 @@ def build_template_release():
     构建模板的发布资源
     """
     print('Start building template release assets.')
-    template_assets: List[TemplateAsset] = []
+    release_assets: ReleaseAsset = ReleaseAsset()
+
     for template_dir in template_root_dir.iterdir():
         description = load_template_description(template_dir)
         print(f'Building release asset for template `{template_dir.name}`.')
         asset_file = build_template_release_asset(template_dir)
         print(
             f'Saving release asset for template `{template_dir.name}` to {asset_file}.')
-        template_assets.append(
+        release_assets.templates.append(
             TemplateAsset(
                 name=template_dir.name,
                 description=description,
@@ -71,10 +71,12 @@ def build_template_release():
             )
         )
 
-    template_dicts = [t.model_dump() for t in template_assets]
-    template_json = json.dumps(template_dicts, indent=4, ensure_ascii=False)
-    print(f'Writing template asset map file to {template_asset_map_file}.')
-    file.write_file(template_asset_map_file, template_json)
+    template_json = release_assets.model_dump_json(indent=4)
+    print(f'Writing template package json file to {template_pkg_json_file}.')
+    file.write_file(template_pkg_json_file, template_json)
+    print(
+        f'Writing template release json file to {template_release_json_file}.')
+    file.write_file(template_release_json_file, template_json)
     print('Building template release assets completed.')
 
 

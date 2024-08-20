@@ -5,21 +5,18 @@ import shutil
 import sys
 from enum import Enum
 from pathlib import Path
-from typing import Dict, List, Optional
+from typing import Dict, List, Optional, Tuple
 
 import inquirer
 from inquirer.errors import ValidationError
 from pydantic import BaseModel, Field
 
-from . import __owner__ as owner
-from . import __repo__ as repo
-from . import __version__ as version
-from . import constant, schema
+from . import __owner__, __repo__, __version__, constant, schema
 from .args import CustomHelpFormatter
 from .plugin import PluginManager
 from .util import download, file
 
-template_json_name = 'template.json'
+release_json_name = 'release.json'
 cli_parent_dir = Path(__file__).parent
 
 
@@ -34,7 +31,26 @@ class TemplateAsset(BaseModel):
         description="模板描述"
     )
     asset_name: str = Field(
-        description="模板release asset名称"
+        description="模板资产名称"
+    )
+
+
+class ReleaseAsset(BaseModel):
+    """
+    发布资产
+    """
+    version: str = Field(
+        # 资产版本号，版本号不同则表示不兼容
+        default='1',
+        description="版本号"
+    )
+    release_version: str = Field(
+        default='v'+__version__,
+        description="发布版本号"
+    )
+    templates: List[TemplateAsset] = Field(
+        default=[],
+        description="模板资产列表"
     )
 
 
@@ -60,6 +76,7 @@ class Args(BaseModel):
     # INIT 参数
     dir: str = ''
     template: str = ''
+    latest: bool = False
 
     # SCHEMA 参数
     # 是否忽略内置插件
@@ -112,6 +129,10 @@ class InitSubParser(SubParser):
             'dir', type=str, nargs='?',
             help='初始化项目目录', default=''
         )
+        self.subparser.add_argument(
+            '-l', '--latest', action='store_true',
+            help='是否使用最新模板', default=False
+        )
 
     def _dir_validation(self, _, current) -> True:
         """
@@ -130,27 +151,56 @@ class InitSubParser(SubParser):
                 raise ValidationError("", reason="目录不为空，请重新输入")
         return True
 
-    def _download_release_asset(self, asset_name: str, save_file: Path):
+    def _get_release_asset_url(self, version: str, asset_name: str) -> str:
         """
-        下载 release 资产
+        获取 release 资产下载地址
 
+        :param version: 版本号
         :param asset_name: 资产名称
-        :param save_file: 保存文件路径
-        :return: None
+        :return: 下载地址
         """
-        asset_url = f"https://github.com/{owner}/{repo}/releases/download/v{version}/{asset_name}"
-        print(f"Downloading {asset_url} to {save_file}")
-        download.download_url(asset_url, save_file)
+        __repo__ = 'test'
+        if version == 'latest':
+            return f"https://github.com/{__owner__}/{__repo__}/releases/latest/download/{asset_name}"
+        return f"https://github.com/{__owner__}/{__repo__}/releases/download/{version}/{asset_name}"
 
-    def _get_template_json_file(self) -> List[TemplateAsset]:
+    def _get_release_asset(self, args: Args) -> Tuple[str, List[TemplateAsset]]:
         """
-        解析模板资产映射文件
+        获取 release 资产
 
-        :return: 模板资产列表
+        :return: 版本号，模板资产列表
         """
-        save_file = cli_parent_dir/template_json_name
-        json_context = file.read_file(save_file)
-        return [TemplateAsset(**t) for t in json.loads(json_context)]
+        local_release = ReleaseAsset.model_validate_json(
+            file.read_file(cli_parent_dir/release_json_name)
+        )
+
+        release_version = local_release.release_version
+        templates = local_release.templates
+
+        if args.latest:
+            latest_release: Optional[ReleaseAsset] = None
+            latest_release_url = self._get_release_asset_url(
+                'latest', release_json_name)
+
+            latest_release_file = self.cache_dir/release_json_name
+            try:
+                print(f"Downloading latest release config...")
+                download.download_url(latest_release_url, latest_release_file)
+
+                latest_release = ReleaseAsset.model_validate_json(
+                    file.read_file(latest_release_file)
+                )
+            except:
+                print(
+                    f"Failed to download latest release config, use local release config...")
+
+            if latest_release is not None and local_release.version == latest_release.version:
+                release_version = latest_release.release_version
+                templates = latest_release.templates
+
+            print(f'Release version: {release_version}')
+
+        return release_version, templates
 
     def execute(self, args: Args):
         """
@@ -158,7 +208,7 @@ class InitSubParser(SubParser):
 
         :param args: 命令行参数
         """
-        template_assets = self._get_template_json_file()
+        release_version, template_assets = self._get_release_asset(args)
         # 下载模板资产映射
         questions = [
             inquirer.Text(
@@ -178,11 +228,16 @@ class InitSubParser(SubParser):
             None
         )
 
-        template_asset_file = self.cache_dir/asset_name
+        template_asset_file = self.cache_dir/release_version/asset_name
         if not template_asset_file.exists():
             try:
                 # 本地缓存不存在，下载模板
-                self._download_release_asset(asset_name, template_asset_file)
+                template_asset_url = self._get_release_asset_url(
+                    release_version, asset_name
+                )
+                print(
+                    f"Downloading {template_asset_url} to {template_asset_file}")
+                download.download_url(template_asset_url, template_asset_file)
             except Exception as e:
                 print(f"Download template {asset_name} failed: {e}")
                 sys.exit(1)

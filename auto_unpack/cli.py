@@ -119,7 +119,7 @@ class InitSubParser(SubParser):
         '_gitignore': '.gitignore',
     }
     # 缓存目录
-    cache_dir = Path(__file__).parent/'.cache/cli'
+    cache_dir = constant.PKG_CACHE_DIR/'cli'
 
     def __init__(self, subparser: argparse._SubParsersAction):
         super(InitSubParser, self).__init__(subparser)
@@ -159,7 +159,6 @@ class InitSubParser(SubParser):
         :param asset_name: 资产名称
         :return: 下载地址
         """
-        __repo__ = 'test'
         if version == 'latest':
             return f"https://github.com/{__owner__}/{__repo__}/releases/latest/download/{asset_name}"
         return f"https://github.com/{__owner__}/{__repo__}/releases/download/{version}/{asset_name}"
@@ -184,7 +183,7 @@ class InitSubParser(SubParser):
 
             latest_release_file = self.cache_dir/release_json_name
             try:
-                print(f"Downloading latest release config...")
+                print("Downloading latest release config...")
                 download.download_url(latest_release_url, latest_release_file)
 
                 latest_release = ReleaseAsset.model_validate_json(
@@ -192,7 +191,7 @@ class InitSubParser(SubParser):
                 )
             except:
                 print(
-                    f"Failed to download latest release config, use local release config...")
+                    "Failed to download latest release config, use local release config...")
 
             if latest_release is not None and local_release.version == latest_release.version:
                 release_version = latest_release.release_version
@@ -330,7 +329,7 @@ def main():
     args = Args.model_validate(vars(parser.parse_args()))
 
     if args.version:
-        print(version)
+        print(__version__)
     elif args.sub_command is None:
         parser.print_help()
     else:

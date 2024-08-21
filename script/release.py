@@ -2,7 +2,8 @@ import re
 import shutil
 from pathlib import Path
 
-from auto_unpack.cli import TemplateAsset, ReleaseAsset, cli_parent_dir, release_json_name
+from auto_unpack.cli import (ReleaseAsset, TemplateAsset, cli_parent_dir,
+                             release_json_name)
 from auto_unpack.util import file
 
 release_root_dir = Path('release')

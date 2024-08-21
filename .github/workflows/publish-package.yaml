@@ -52,3 +52,4 @@ jobs:
           allowUpdates: true
           omitBodyDuringUpdate: true
           artifacts: "release/dist/*"
+          name: "auto-unpack ${{ github.ref_name }}"

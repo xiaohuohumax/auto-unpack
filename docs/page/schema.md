@@ -14,34 +14,40 @@ hide:
 | auto-unpack-schema.json      | 项目配置约束（application.yaml）            |
 | auto-unpack-flow-schema.json | 验证流程配置约束（application.[mode].yaml） |
 
-### CDN JSON Schema
+!!! warning "注意事项"
 
-```txt
-<!-- 最新 -->
-https://cdn.jsdelivr.net/gh/xiaohuohumax/auto-unpack@main/schema/auto-unpack-schema.json
-<!-- 特定版本 -->
-https://cdn.jsdelivr.net/gh/xiaohuohumax/auto-unpack@main/schema/[version]/auto-unpack-schema.json
+    约束文件生成规则，有变化才会生成对应版本的约束文件。所以未发现与当前版本号相同的约束文件时，请使用小于或等于当前版本号的最接近的版本号。
 
-<!-- 最新 -->
-https://cdn.jsdelivr.net/gh/xiaohuohumax/auto-unpack@main/schema/auto-unpack-flow-schema.json
-<!-- 特定版本 -->
-https://cdn.jsdelivr.net/gh/xiaohuohumax/auto-unpack@main/schema/[version]/auto-unpack-flow-schema.json
-```
+    例如：当前版本：2.11.0，约束文件版本：【...，2.7.0，2.8.0，2.9.0，2.14.0】，则使用版本号 2.9.0 即可。
 
-### Github JSON Schema
+=== "jsDelivr"
 
-```txt
-<!-- 最新 -->
-https://raw.githubusercontent.com/xiaohuohumax/auto-unpack/main/schema/auto-unpack-schema.json
-<!-- 特定版本 -->
-https://raw.githubusercontent.com/xiaohuohumax/auto-unpack/main/schema/[version]/auto-unpack-schema.json
+    ```txt
+    <!-- 最新 -->
+    https://cdn.jsdelivr.net/gh/xiaohuohumax/auto-unpack@main/schema/auto-unpack-schema.json
+    <!-- 特定版本 -->
+    https://cdn.jsdelivr.net/gh/xiaohuohumax/auto-unpack@main/schema/[version]/auto-unpack-schema.json
 
-<!-- 最新 -->
-https://raw.githubusercontent.com/xiaohuohumax/auto-unpack/main/schema/auto-unpack-flow-schema.json
-<!-- 特定版本 -->
-https://raw.githubusercontent.com/xiaohuohumax/auto-unpack/main/schema/[version]/auto-unpack-flow-schema.json
+    <!-- 最新 -->
+    https://cdn.jsdelivr.net/gh/xiaohuohumax/auto-unpack@main/schema/auto-unpack-flow-schema.json
+    <!-- 特定版本 -->
+    https://cdn.jsdelivr.net/gh/xiaohuohumax/auto-unpack@main/schema/[version]/auto-unpack-flow-schema.json
+    ```
 
-```
+=== "Github"
+
+    ```txt
+    <!-- 最新 -->
+    https://raw.githubusercontent.com/xiaohuohumax/auto-unpack/main/schema/auto-unpack-schema.json
+    <!-- 特定版本 -->
+    https://raw.githubusercontent.com/xiaohuohumax/auto-unpack/main/schema/[version]/auto-unpack-schema.json
+
+    <!-- 最新 -->
+    https://raw.githubusercontent.com/xiaohuohumax/auto-unpack/main/schema/auto-unpack-flow-schema.json
+    <!-- 特定版本 -->
+    https://raw.githubusercontent.com/xiaohuohumax/auto-unpack/main/schema/[version]/auto-unpack-flow-schema.json
+
+    ```
 
 ## VSCode 中使用 Schema
 
@@ -84,7 +90,7 @@ https://raw.githubusercontent.com/xiaohuohumax/auto-unpack/main/schema/[version]
     # 忽略内置插件，默认：False
     auto-unpack schema plugins -i
 
-    # 输出到指定文件，默认：schema/auto-unpack=flow-schema.json
+    # 输出到指定文件，默认：schema/auto-unpack-flow-schema.json
     auto-unpack schema plugins -o schema.json
     ```
 

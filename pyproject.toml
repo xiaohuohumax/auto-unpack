@@ -76,7 +76,7 @@ exclude = ["__pycache__", ".cache"]
 
 # [[tool.poetry.source]]
 # name = "aliyun"
-# url = "http://mirrors.aliyun.com/pypi/simple"
+# url = "https://mirrors.aliyun.com/pypi/simple"
 # default = true
 
 [tool.rye.scripts]

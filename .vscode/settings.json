@@ -42,6 +42,7 @@
         "clib",
         "CPIO",
         "datefmt",
+        "Delivr",
         "dotenv",
         "eifinger",
         "extrahead",

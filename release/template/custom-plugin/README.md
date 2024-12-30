@@ -15,7 +15,7 @@
 ```bash
 rye run schema
 # 或者
-python -m app.schema
+auto-unpack schema plugins
 ```
 
 ## 🛠️ 安装依赖

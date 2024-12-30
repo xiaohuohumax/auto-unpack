@@ -6,23 +6,25 @@
 #   features: []
 #   all-features: false
 #   with-sources: false
+#   generate-hashes: false
+#   universal: false
 
 -e file:.
-annotated-types==0.6.0
+annotated-types==0.7.0
     # via pydantic
 ansicon==1.89.0
     # via jinxed
-babel==2.15.0
+babel==2.16.0
     # via mkdocs-material
 blessed==1.20.0
     # via inquirer
-bracex==2.5
+bracex==2.5.post1
     # via wcmatch
-certifi==2024.7.4
+certifi==2024.12.14
     # via requests
-charset-normalizer==3.3.2
+charset-normalizer==3.4.1
     # via requests
-click==8.1.7
+click==8.1.8
     # via mkdocs
 colorama==0.4.6
     # via click
@@ -36,22 +38,22 @@ ghp-import==2.1.0
     # via mkdocs
 htmlmin2==0.1.13
     # via mkdocs-minify-plugin
-idna==3.7
+idna==3.10
     # via requests
-importlib-metadata==8.0.0
+importlib-metadata==8.5.0
     # via markdown
     # via mkdocs
     # via mkdocs-get-deps
-inquirer==3.3.0
+inquirer==3.4.0
     # via auto-unpack
-jinja2==3.1.4
+jinja2==3.1.5
     # via mkdocs
     # via mkdocs-material
 jinxed==1.3.0
     # via blessed
 jsmin==3.0.1
     # via mkdocs-minify-plugin
-markdown==3.6
+markdown==3.7
     # via mkdocs
     # via mkdocs-material
     # via pymdown-extensions
@@ -61,54 +63,54 @@ markupsafe==2.1.5
 mergedeep==1.3.4
     # via mkdocs
     # via mkdocs-get-deps
-mkdocs==1.6.0
+mkdocs==1.6.1
     # via mkdocs-awesome-pages-plugin
     # via mkdocs-material
     # via mkdocs-minify-plugin
-mkdocs-awesome-pages-plugin==2.9.3
+mkdocs-awesome-pages-plugin==2.10.1
 mkdocs-get-deps==0.2.0
     # via mkdocs
-mkdocs-material==9.5.29
+mkdocs-material==9.5.49
 mkdocs-material-extensions==1.3.1
     # via mkdocs-material
 mkdocs-minify-plugin==0.8.0
 natsort==8.4.0
     # via mkdocs-awesome-pages-plugin
-packaging==24.1
+packaging==24.2
     # via mkdocs
-paginate==0.5.6
+paginate==0.5.7
     # via mkdocs-material
 pathspec==0.12.1
     # via mkdocs
-platformdirs==4.2.2
+platformdirs==4.3.6
     # via mkdocs-get-deps
-pydantic==2.7.1
+pydantic==2.10.4
     # via auto-unpack
     # via pydantic-settings
-pydantic-core==2.18.2
+pydantic-core==2.27.2
     # via pydantic
-pydantic-settings==2.2.1
+pydantic-settings==2.7.0
     # via auto-unpack
 pygments==2.18.0
     # via mkdocs-material
-pymdown-extensions==10.8.1
+pymdown-extensions==10.13
     # via mkdocs-material
 python-dateutil==2.9.0.post0
     # via ghp-import
 python-dotenv==1.0.1
     # via pydantic-settings
-pytz==2024.1
+pytz==2024.2
     # via babel
-pyyaml==6.0.1
+pyyaml==6.0.2
     # via mkdocs
     # via mkdocs-get-deps
     # via pymdown-extensions
     # via pyyaml-env-tag
 pyyaml-env-tag==0.1
     # via mkdocs
-readchar==4.1.0
+readchar==4.2.1
     # via inquirer
-regex==2024.5.15
+regex==2024.11.6
     # via mkdocs-material
 requests==2.32.3
     # via mkdocs-material
@@ -118,23 +120,23 @@ ruamel-yaml-clib==0.2.8
     # via ruamel-yaml
 runs==1.2.2
     # via editor
-six==1.16.0
+six==1.17.0
     # via blessed
     # via python-dateutil
-typing-extensions==4.11.0
+typing-extensions==4.12.2
     # via annotated-types
     # via pydantic
     # via pydantic-core
-urllib3==2.2.2
+urllib3==2.2.3
     # via requests
 watchdog==4.0.2
     # via mkdocs
-wcmatch==9.0
+wcmatch==10.0
     # via mkdocs-awesome-pages-plugin
 wcwidth==0.2.13
     # via blessed
 xmod==1.8.1
     # via editor
     # via runs
-zipp==3.19.2
+zipp==3.20.2
     # via importlib-metadata

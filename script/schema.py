@@ -32,20 +32,21 @@ def clear_same_schema():
         :return: 版本号
         """
         folder_items = folder.name.split(".")[::-1]
-        return sum([int(v) * (1000 ** i) for i, v in enumerate(folder_items)])
+        return sum([int(v) * (1000**i) for i, v in enumerate(folder_items)])
 
     version_folders = sorted(
-        version_folders, key=lambda v: get_version(v), reverse=True)
+        version_folders, key=lambda v: get_version(v), reverse=True
+    )
 
     before_folder = version_folders[0]
-    before_config = file.read_file(before_folder/config_schema_name)
-    before_flow = file.read_file(before_folder/config_schema_flow_name)
+    before_config = file.read_file(before_folder / config_schema_name)
+    before_flow = file.read_file(before_folder / config_schema_flow_name)
 
     remove_folders = []
 
     for version_folder in version_folders[1:]:
-        now_config = file.read_file(version_folder/config_schema_name)
-        now_flow = file.read_file(version_folder/config_schema_flow_name)
+        now_config = file.read_file(version_folder / config_schema_name)
+        now_flow = file.read_file(version_folder / config_schema_flow_name)
 
         if before_config == now_config and before_flow == now_flow:
             remove_folders.append(before_folder)
@@ -79,10 +80,9 @@ def main():
         # 配置文件 schema
         config_json_schema = schema.generate_config_schema()
 
-        write_schema_file(config_json_schema, schema_folder/config_schema_name)
+        write_schema_file(config_json_schema, schema_folder / config_schema_name)
         write_schema_file(
-            config_json_schema,
-            schema_folder/version/config_schema_name
+            config_json_schema, schema_folder / version / config_schema_name
         )
         print(f"config schema generated: {schema_folder/config_schema_name}")
 
@@ -90,30 +90,23 @@ def main():
         plugin_manager.load_plugin(constant.BUILTIN_PLUGINS_DIR)
 
         # 流程配置文件 schema
-        flow_json_schema = schema.generate_flow_schema(
-            plugin_manager=plugin_manager
-        )
+        flow_json_schema = schema.generate_flow_schema(plugin_manager=plugin_manager)
+        write_schema_file(flow_json_schema, schema_folder / config_schema_flow_name)
         write_schema_file(
-            flow_json_schema,
-            schema_folder/config_schema_flow_name
-        )
-        write_schema_file(
-            flow_json_schema,
-            schema_folder/version/config_schema_flow_name
+            flow_json_schema, schema_folder / version / config_schema_flow_name
         )
 
         # 清理相同 schema 文件
         clear_same_schema()
 
-        print(
-            f"flow schema generated: {schema_folder/config_schema_flow_name}")
+        print(f"flow schema generated: {schema_folder/config_schema_flow_name}")
 
         print("auto-unpack schema generated successfully.")
     except Exception as e:
         print(f"Failed to generate auto-unpack schema: {e}")
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     """
     此脚本用于生成 auto-unpack schema 文件
     """

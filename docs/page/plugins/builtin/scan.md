@@ -29,6 +29,7 @@ icon: material/magnify-scan
 | `includes`                | List[str]       | 包含的文件路径列表，glob 表达式 | `['**/*']` |
 | `excludes`                | List[str]       | 排除的文件路径列表，glob 表达式 | `[]`       |
 | `include_dir`             | bool            | 是否包含文件夹                  | `false`    |
+| `deep`                    | bool            | 是否递归扫描子目录              | `true`     |
 | [`上下文字段见上文`](#_1) |                 |                                 |            |
 
 ## :recycle: 示例

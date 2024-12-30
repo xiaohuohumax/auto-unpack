@@ -24,6 +24,7 @@ class ScanPluginConfig(InputPluginConfig):
         default=[], description="排除的文件路径列表(glob 语法, 默认: [])"
     )
     include_dir: bool = Field(default=False, description="是否包含文件夹(默认: false)")
+    deep: bool = Field(default=True, description="是否递归扫描子目录(默认: true)")
 
 
 class ScanPlugin(Plugin[ScanPluginConfig]):
@@ -38,8 +39,9 @@ class ScanPlugin(Plugin[ScanPluginConfig]):
     def execute(self):
         file_datas: List[FileData] = []
 
+        glob_func = self.config.dir.rglob if self.config.deep else self.config.dir.glob
         for include in self.config.includes:
-            for f in self.config.dir.rglob(include):
+            for f in glob_func(include):
                 if not self.config.include_dir and not f.is_file():
                     continue
                 file_data = FileData(path=f, search_path=self.config.dir)

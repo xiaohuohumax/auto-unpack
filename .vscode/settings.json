@@ -76,6 +76,7 @@
         "tzlocal",
         "UEFI",
         "winsw",
-        "zipx"
+        "zipx",
+        "datas"
     ]
 }

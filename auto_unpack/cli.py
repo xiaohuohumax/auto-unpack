@@ -16,7 +16,7 @@ from .args import CustomHelpFormatter
 from .plugin import PluginManager
 from .util import download, file
 
-release_json_name = 'release.json'
+release_json_name = "release.json"
 cli_parent_dir = Path(__file__).parent
 
 
@@ -24,58 +24,50 @@ class TemplateAsset(BaseModel):
     """
     模板资产
     """
-    name: str = Field(
-        description="模板名称"
-    )
-    description: str = Field(
-        description="模板描述"
-    )
-    asset_name: str = Field(
-        description="模板资产名称"
-    )
+
+    name: str = Field(description="模板名称")
+    description: str = Field(description="模板描述")
+    asset_name: str = Field(description="模板资产名称")
 
 
 class ReleaseAsset(BaseModel):
     """
     发布资产
     """
+
     version: str = Field(
         # 资产版本号，版本号不同则表示不兼容
-        default='1',
-        description="版本号"
+        default="1",
+        description="版本号",
     )
-    release_version: str = Field(
-        default='v'+__version__,
-        description="发布版本号"
-    )
-    templates: List[TemplateAsset] = Field(
-        default=[],
-        description="模板资产列表"
-    )
+    release_version: str = Field(default="v" + __version__, description="发布版本号")
+    templates: List[TemplateAsset] = Field(default=[], description="模板资产列表")
 
 
 class ArgsSubCommand(Enum):
     """
     子命令枚举
     """
+
     # 初始化项目
-    INIT = 'init'
+    INIT = "init"
     # 生成 schema
-    SCHEMA = 'schema'
+    SCHEMA = "schema"
 
 
 class Args(BaseModel):
     """
     命令行参数
     """
+
     # 是否显示版本号
     version: bool = False
     # 子命令
     sub_command: Optional[ArgsSubCommand] = None
 
     # INIT 参数
-    dir: str = ''
-    template: str = ''
+    dir: str = ""
+    template: str = ""
     latest: bool = False
 
     # SCHEMA 参数
@@ -84,20 +76,17 @@ class Args(BaseModel):
     # 自定义插件目录/文件
     plugin_paths: List[str] = []
     # schema 输出文件路径
-    schema_output: str = ''
+    schema_output: str = ""
 
 
 class SubParser:
-
     command: ArgsSubCommand
     help: str
     subparser: argparse.ArgumentParser
 
     def __init__(self, subparser: argparse._SubParsersAction):
         self.subparser = subparser.add_parser(
-            self.command.value,
-            help=self.help,
-            formatter_class=CustomHelpFormatter
+            self.command.value, help=self.help, formatter_class=CustomHelpFormatter
         )
         pass
 
@@ -111,27 +100,28 @@ class SubParser:
 
 
 class InitSubParser(SubParser):
-
     command: ArgsSubCommand = ArgsSubCommand.INIT
-    help = '初始化项目'
+    help = "初始化项目"
     # 文件名映射
     file_name_map: Dict[str, str] = {
-        '_gitignore': '.gitignore',
+        "_gitignore": ".gitignore",
     }
     # 缓存目录
-    cache_dir = constant.PKG_CACHE_DIR/'cli'
+    cache_dir = constant.PKG_CACHE_DIR / "cli"
 
     def __init__(self, subparser: argparse._SubParsersAction):
         super(InitSubParser, self).__init__(subparser)
         self.subparser.set_defaults(sub_command=ArgsSubCommand.INIT)
 
         self.subparser.add_argument(
-            'dir', type=str, nargs='?',
-            help='初始化项目目录', default=''
+            "dir", type=str, nargs="?", help="初始化项目目录", default=""
         )
         self.subparser.add_argument(
-            '-l', '--latest', action='store_true',
-            help='是否使用最新模板', default=False
+            "-l",
+            "--latest",
+            action="store_true",
+            help="是否使用最新模板",
+            default=False,
         )
 
     def _dir_validation(self, _, current) -> True:
@@ -143,7 +133,7 @@ class InitSubParser(SubParser):
         :raises ValidationError: 验证失败
         :return: True
         """
-        p = Path(os.getcwd())/current
+        p = Path(os.getcwd()) / current
         if p.exists():
             if p.is_file():
                 raise ValidationError("", reason="存在同名文件，请重新输入")
@@ -159,7 +149,7 @@ class InitSubParser(SubParser):
         :param asset_name: 资产名称
         :return: 下载地址
         """
-        if version == 'latest':
+        if version == "latest":
             return f"https://github.com/{__owner__}/{__repo__}/releases/latest/download/{asset_name}"
         return f"https://github.com/{__owner__}/{__repo__}/releases/download/{version}/{asset_name}"
 
@@ -170,7 +160,7 @@ class InitSubParser(SubParser):
         :return: 版本号，模板资产列表
         """
         local_release = ReleaseAsset.model_validate_json(
-            file.read_file(cli_parent_dir/release_json_name)
+            file.read_file(cli_parent_dir / release_json_name)
         )
 
         release_version = local_release.release_version
@@ -179,9 +169,10 @@ class InitSubParser(SubParser):
         if args.latest:
             latest_release: Optional[ReleaseAsset] = None
             latest_release_url = self._get_release_asset_url(
-                'latest', release_json_name)
+                "latest", release_json_name
+            )
 
-            latest_release_file = self.cache_dir/release_json_name
+            latest_release_file = self.cache_dir / release_json_name
             try:
                 print("Downloading latest release config...")
                 download.download_url(latest_release_url, latest_release_file)
@@ -191,13 +182,17 @@ class InitSubParser(SubParser):
                 )
             except:
                 print(
-                    "Failed to download latest release config, use local release config...")
+                    "Failed to download latest release config, use local release config..."
+                )
 
-            if latest_release is not None and local_release.version == latest_release.version:
+            if (
+                latest_release is not None
+                and local_release.version == latest_release.version
+            ):
                 release_version = latest_release.release_version
                 templates = latest_release.templates
 
-            print(f'Release version: {release_version}')
+            print(f"Release version: {release_version}")
 
         return release_version, templates
 
@@ -211,9 +206,15 @@ class InitSubParser(SubParser):
         # 下载模板资产映射
         questions = [
             inquirer.Text(
-                name='dir', message='请输入初始化项目目录', validate=self._dir_validation),
+                name="dir",
+                message="请输入初始化项目目录",
+                validate=self._dir_validation,
+            ),
             inquirer.List(
-                name='template', message='请选择模板', choices=[t.description for t in template_assets])
+                name="template",
+                message="请选择模板",
+                choices=[t.description for t in template_assets],
+            ),
         ]
         answers = inquirer.prompt(questions, answers=vars(args))
         if answers is None:
@@ -223,19 +224,22 @@ class InitSubParser(SubParser):
 
         # 获取资源名称
         asset_name = next(
-            (t.asset_name for t in template_assets if t.description == answers.template),
-            None
+            (
+                t.asset_name
+                for t in template_assets
+                if t.description == answers.template
+            ),
+            None,
         )
 
-        template_asset_file = self.cache_dir/release_version/asset_name
+        template_asset_file = self.cache_dir / release_version / asset_name
         if not template_asset_file.exists():
             try:
                 # 本地缓存不存在，下载模板
                 template_asset_url = self._get_release_asset_url(
                     release_version, asset_name
                 )
-                print(
-                    f"Downloading {template_asset_url} to {template_asset_file}")
+                print(f"Downloading {template_asset_url} to {template_asset_file}")
                 download.download_url(template_asset_url, template_asset_file)
             except Exception as e:
                 print(f"Download template {asset_name} failed: {e}")
@@ -245,19 +249,18 @@ class InitSubParser(SubParser):
 
         # 通过文件名映射重命名文件
         for file_name, new_file_name in InitSubParser.file_name_map.items():
-            file_path = Path(answers.dir)/file_name
+            file_path = Path(answers.dir) / file_name
             if file_path.exists():
-                new_file_path = Path(answers.dir)/new_file_name
+                new_file_path = Path(answers.dir) / new_file_name
                 file_path.rename(new_file_path)
 
-        print('Initialized finished!\n')
+        print("Initialized finished!\n")
         print(f"  cd {answers.dir}\n  rye sync")
 
 
 class SchemaSubParser(SubParser):
-
     command: ArgsSubCommand = ArgsSubCommand.SCHEMA
-    help = '生成JSON Schema'
+    help = "生成JSON Schema"
 
     def __init__(self, subparser: argparse._SubParsersAction):
         super(SchemaSubParser, self).__init__(subparser)
@@ -265,20 +268,23 @@ class SchemaSubParser(SubParser):
         self.subparser.set_defaults(sub_command=ArgsSubCommand.SCHEMA)
 
         self.subparser.add_argument(
-            "-i", '--ignore-builtin-plugins',
-            action='store_true',
-            help='是否忽略内置插件', default=False
+            "-i",
+            "--ignore-builtin-plugins",
+            action="store_true",
+            help="是否忽略内置插件",
+            default=False,
         )
 
         self.subparser.add_argument(
-            'plugin_paths', type=str, nargs='*',
-            help='自定义插件目录/文件'
+            "plugin_paths", type=str, nargs="*", help="自定义插件目录/文件"
         )
 
         self.subparser.add_argument(
-            "-o", '--schema-output', type=str,
-            help='schema 输出文件路径',
-            default='schema/auto-unpack-flow-schema.json'
+            "-o",
+            "--schema-output",
+            type=str,
+            help="schema 输出文件路径",
+            default="schema/auto-unpack-flow-schema.json",
         )
 
     def execute(self, args: Args):
@@ -295,17 +301,13 @@ class SchemaSubParser(SubParser):
         for plugin_path in args.plugin_paths:
             plugin_manager.load_plugin(Path(plugin_path))
 
-        flow_schema_dict = schema.generate_flow_schema(
-            plugin_manager=plugin_manager
-        )
+        flow_schema_dict = schema.generate_flow_schema(plugin_manager=plugin_manager)
 
         schema_output = Path(args.schema_output)
-        flow_schema = json.dumps(
-            flow_schema_dict, ensure_ascii=False, indent=4
-        )
+        flow_schema = json.dumps(flow_schema_dict, ensure_ascii=False, indent=4)
         file.write_file(schema_output, flow_schema)
 
-        print('Schema generated finished!')
+        print("Schema generated finished!")
         print(f"Schema output: {schema_output}")
 
 
@@ -315,15 +317,15 @@ def main():
     """
     parser = argparse.ArgumentParser(
         description="auto-unpack 脚手架工具，用于快速创建项目",
-        formatter_class=CustomHelpFormatter
+        formatter_class=CustomHelpFormatter,
     )
-    parser.add_argument('-v', '--version', action='store_true', help='显示版本号')
+    parser.add_argument("-v", "--version", action="store_true", help="显示版本号")
 
-    subparser = parser.add_subparsers(help='子命令', dest='sub_command')
+    subparser = parser.add_subparsers(help="子命令", dest="sub_command")
 
     sub_parsers: List[SubParser] = [
         InitSubParser(subparser),
-        SchemaSubParser(subparser)
+        SchemaSubParser(subparser),
     ]
 
     args = Args.model_validate(vars(parser.parse_args()))
@@ -339,5 +341,5 @@ def main():
                 break
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

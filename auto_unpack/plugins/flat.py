@@ -14,22 +14,16 @@ class FlatPluginConfig(PluginConfig):
     """
     扁平化文件夹插件配置
     """
-    name: Literal['flat'] = Field(
-        default='flat',
-        description="扁平化文件夹插件"
-    )
-    dir: Path = Field(
-        description="需要扁平化的文件夹"
-    )
+
+    name: Literal["flat"] = Field(default="flat", description="扁平化文件夹插件")
+    dir: Path = Field(description="需要扁平化的文件夹")
     depth: Optional[int] = Field(
         default=None,
         description="扁平化的深度(null: 不限制深度, 默认: null)",
-        json_schema_extra={
-            "minimum": 1
-        }
+        json_schema_extra={"minimum": 1},
     )
 
-    @field_validator('depth')
+    @field_validator("depth")
     @classmethod
     def validate_depth(cls, v: Any):
         if v is not None and v < 1:
@@ -59,6 +53,7 @@ class FlatPlugin(Plugin[FlatPluginConfig]):
         file2.txt
     ```
     """
+
     name: str = "flat"
 
     def _depth_filter(self, path: Path, now_depth: int = 0) -> List[Path]:
@@ -83,8 +78,7 @@ class FlatPlugin(Plugin[FlatPluginConfig]):
         files = self._depth_filter(self.config.dir)
 
         for file in files:
-            target_file = get_next_not_exist_path(
-                self.config.dir.joinpath(file.name))
+            target_file = get_next_not_exist_path(self.config.dir.joinpath(file.name))
             file.rename(target_file)
 
         logger.info(f"Flat success, {len(files)} files flattened")

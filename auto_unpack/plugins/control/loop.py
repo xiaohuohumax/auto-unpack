@@ -13,29 +13,19 @@ class LoopPluginConfig(OutputPluginConfig):
     """
     循环插件配置
     """
-    name: Literal['loop'] = Field(
-        default='loop',
-        description="循环插件"
-    )
-    steps: List[Any] = Field(
-        default=[],
-        description="需要循环执行的步骤(默认: [])"
-    )
-    max_loops: int = Field(
-        default=1024,
-        description="最大循环次数(-1: 不限制, 默认: 1024)"
-    )
-    loop_interval: int = Field(
-        default=1,
-        description="循环间隔时间(单位: 秒, 默认: 1)"
-    )
 
-    @field_validator('loop_interval')
+    name: Literal["loop"] = Field(default="loop", description="循环插件")
+    steps: List[Any] = Field(default=[], description="需要循环执行的步骤(默认: [])")
+    max_loops: int = Field(
+        default=1024, description="最大循环次数(-1: 不限制, 默认: 1024)"
+    )
+    loop_interval: int = Field(default=1, description="循环间隔时间(单位: 秒, 默认: 1)")
+
+    @field_validator("loop_interval")
     @classmethod
     def validate_loop_interval(cls, v: Any):
         if v <= 0:
-            raise ValueError(
-                f"Loop interval must be greater than 0, but got {v}")
+            raise ValueError(f"Loop interval must be greater than 0, but got {v}")
         return v
 
 
@@ -45,6 +35,7 @@ class LoopPlugin(Plugin[LoopPluginConfig]):
 
     作用：循环执行插件流程
     """
+
     name: str = "loop"
     flows: List[Plugin] = []
 
@@ -71,9 +62,8 @@ class LoopPlugin(Plugin[LoopPluginConfig]):
         logger.info("Executing loop flows...")
         flows_count = len(self.flows)
         for i, flow in enumerate(self.flows):
-            logger.info(
-                f"{i+1}/{flows_count} Executing flow `{flow.name}`")
-            logger.debug(f'Config: {flow.config.dict()}')
+            logger.info(f"{i+1}/{flows_count} Executing flow `{flow.name}`")
+            logger.debug(f"Config: {flow.config.dict()}")
             flow.execute()
 
     def init(self):
@@ -89,7 +79,8 @@ class LoopPlugin(Plugin[LoopPluginConfig]):
 
             if self.config.max_loops > 0 and loop_index >= self.config.max_loops:
                 raise RuntimeError(
-                    f"Loop plugin has reached the maximum number of loops: {self.config.max_loops}")
+                    f"Loop plugin has reached the maximum number of loops: {self.config.max_loops}"
+                )
 
             time.sleep(self.config.loop_interval)
             loop_index += 1

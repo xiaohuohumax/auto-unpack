@@ -14,13 +14,9 @@ class EmptyPluginConfig(PluginConfig):
     """
     空文件夹清理插件配置
     """
-    name: Literal['empty'] = Field(
-        default='empty',
-        description='空文件夹清理插件'
-    )
-    dir: Path = Field(
-        description='需要清理空文件夹的目录'
-    )
+
+    name: Literal["empty"] = Field(default="empty", description="空文件夹清理插件")
+    dir: Path = Field(description="需要清理空文件夹的目录")
 
 
 class EmptyPlugin(Plugin[EmptyPluginConfig]):
@@ -29,6 +25,7 @@ class EmptyPlugin(Plugin[EmptyPluginConfig]):
 
     作用: 清理文件夹下所有空文件夹
     """
+
     name: str = "empty"
 
     def execute(self):

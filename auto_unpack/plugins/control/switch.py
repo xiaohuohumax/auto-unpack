@@ -4,9 +4,13 @@ from typing import List, Literal, Optional, Union
 from pydantic import Field
 
 from auto_unpack.plugin import OutputPluginConfig, Plugin
-from auto_unpack.plugins.control.filter import (CTimeFilter, Filter,
-                                                GlobFilter, MTimeFilter,
-                                                SizeFilter)
+from auto_unpack.plugins.control.filter import (
+    CTimeFilter,
+    Filter,
+    GlobFilter,
+    MTimeFilter,
+    SizeFilter,
+)
 from auto_unpack.store import Context
 
 logger = logging.getLogger(__name__)
@@ -16,16 +20,16 @@ class Case(Filter):
     """
     数据分支条件
     """
+
     # 分支上下文
-    save_key: str = Field(
-        description="分支上下文"
-    )
+    save_key: str = Field(description="分支上下文")
 
 
 class SizeCase(SizeFilter, Case):
     """
     大小分支条件
     """
+
     pass
 
 
@@ -33,6 +37,7 @@ class GlobCase(GlobFilter, Case):
     """
     文件 glob 表达式分支条件
     """
+
     pass
 
 
@@ -40,6 +45,7 @@ class CTimeCase(CTimeFilter, Case):
     """
     创建时间分支条件
     """
+
     pass
 
 
@@ -47,6 +53,7 @@ class MTimeCase(MTimeFilter, Case):
     """
     修改时间分支条件
     """
+
     pass
 
 
@@ -57,17 +64,11 @@ class SwitchPluginConfig(OutputPluginConfig):
     """
     条件分支上下文插件配置
     """
-    name: Literal["switch"] = Field(
-        default="switch",
-        description="条件分支上下文插件"
-    )
-    cases: List[Case_Type] = Field(
-        default=[],
-        description="分支条件(默认: [])"
-    )
+
+    name: Literal["switch"] = Field(default="switch", description="条件分支上下文插件")
+    cases: List[Case_Type] = Field(default=[], description="分支条件(默认: [])")
     default_key: Optional[str] = Field(
-        default=None,
-        description="未匹配到分支条件时上下文 key(默认: null)"
+        default=None, description="未匹配到分支条件时上下文 key(默认: null)"
     )
 
 
@@ -77,6 +78,7 @@ class SwitchPlugin(Plugin[SwitchPluginConfig]):
 
     作用: 依据条件对当前上下文数据分组, 并保存到新上下文
     """
+
     name: str = "switch"
 
     def execute(self):
@@ -94,5 +96,4 @@ class SwitchPlugin(Plugin[SwitchPluginConfig]):
 
         if self.config.default_key is not None:
             # 未匹配到分支条件的数据
-            self.save_context(Context(file_datas=file_datas),
-                              self.config.default_key)
+            self.save_context(Context(file_datas=file_datas), self.config.default_key)

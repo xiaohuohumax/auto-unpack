@@ -21,6 +21,7 @@ class FlowConfig(BaseModel):
     """
     流程配置
     """
+
     steps: List[Any] = []
 
 
@@ -28,6 +29,7 @@ class ProjectFlowConfig(BaseModel):
     """
     项目流程配置
     """
+
     # 流程配置
     flow: FlowConfig = FlowConfig()
 
@@ -59,7 +61,7 @@ class App:
             return
 
         print(read_file(self.config.banner.file_path))
-        print(self.config.banner.welcome + '\n')
+        print(self.config.banner.welcome + "\n")
 
     def _create_flows(self):
         """
@@ -69,11 +71,7 @@ class App:
             return
 
         logger.info("Creating flows...")
-        flow_config = load_config(
-            ProjectFlowConfig,
-            self.env.config_dir,
-            self.env.mode
-        )
+        flow_config = load_config(ProjectFlowConfig, self.env.config_dir, self.env.mode)
 
         for step in flow_config.flow.steps:
             plugin = self.plugin_manager.create_plugin_instance(
@@ -102,7 +100,7 @@ class App:
         flows_count = len(self.flows)
         for i, flow in enumerate(self.flows):
             logger.info(f"{i+1}/{flows_count} Executing flow `{flow.name}`")
-            logger.debug(f'Config: {flow.config.dict()}')
+            logger.debug(f"Config: {flow.config.dict()}")
             flow.execute()
 
     def __init__(self):
@@ -112,13 +110,12 @@ class App:
         self.config = load_config(
             config_class=ProjectConfig,
             config_dir=self.env.config_dir,
-            mode=self.env.mode
+            mode=self.env.mode,
         )
         # 打印 banner
         self._print_banner()
         # 配置日志
-        config_logging(self.config.logging.config_path,
-                       self.config.logging.level)
+        config_logging(self.config.logging.config_path, self.config.logging.level)
 
         logger.info("Initializing app...")
         self.plugin_manager = PluginManager()

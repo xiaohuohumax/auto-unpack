@@ -12,10 +12,10 @@ class Env(BaseSettings, case_sensitive=False):
     """
 
     # 环境模式
-    mode: str = 'dev'
+    mode: str = "dev"
 
     # 配置文件存放目录
-    config_dir: Path = Path('config')
+    config_dir: Path = Path("config")
 
 
 def load_env(args: Args) -> Env:

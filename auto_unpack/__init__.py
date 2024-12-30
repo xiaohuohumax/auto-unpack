@@ -7,6 +7,6 @@ try:
 except PackageNotFoundError:
     __version__ = "unknown"
 
-__all__ = ['App']
+__all__ = ["App"]
 __owner__ = "xiaohuohumax"
 __repo__ = "auto-unpack"

@@ -20,17 +20,17 @@ class ResultCode(Enum):
     255 User stopped the process
     """
 
-    NO_ERROR = (0, '成功')
-    WARNING = (1, '警告(非致命错误)')
-    FATAL_ERROR = (2, '致命错误')
-    COMMAND_LINE_ERROR = (7, '命令行错误')
-    NOT_ENOUGH_MEMORY_ERROR = (8, '没有足够的内存进行操作')
-    USER_STOPPED = (255, '用户停止进程')
+    NO_ERROR = (0, "成功")
+    WARNING = (1, "警告(非致命错误)")
+    FATAL_ERROR = (2, "致命错误")
+    COMMAND_LINE_ERROR = (7, "命令行错误")
+    NOT_ENOUGH_MEMORY_ERROR = (8, "没有足够的内存进行操作")
+    USER_STOPPED = (255, "用户停止进程")
 
     # 扩展状态码
-    UNKNOWN = (-1, '未知')
+    UNKNOWN = (-1, "未知")
     # Headers Error in encrypted archive.
-    HEADERS_ERROR = (-2, '加密压缩包头部错误')
+    HEADERS_ERROR = (-2, "加密压缩包头部错误")
 
     @property
     def tip(self):
@@ -57,9 +57,10 @@ class Attr(BaseModel):
     """
     压缩包属性
     """
-    model_config = ConfigDict(extra='allow')
 
-    type: str = ''
+    model_config = ConfigDict(extra="allow")
+
+    type: str = ""
     volumes: Optional[int] = None
     multivolume: Optional[bool] = None
     volume_index: Optional[int] = None
@@ -100,22 +101,22 @@ class Result(BaseModel):
         """
         format_value: any = value
 
-        if key == 'type':
-            if value.lower() == 'split':
+        if key == "type":
+            if value.lower() == "split":
                 self.is_volume = True
                 return
 
-        elif key == 'multivolume':
-            format_value = value == '+'
+        elif key == "multivolume":
+            format_value = value == "+"
             if format_value:
                 self.is_volume = True
 
-        elif key == 'volumes':
+        elif key == "volumes":
             format_value = int(value)
             if format_value > 1:
                 self.is_volume = True
 
-        elif key == 'volume_index':
+        elif key == "volume_index":
             format_value = int(value)
             self.is_volume = True
 
@@ -125,16 +126,17 @@ class Result(BaseModel):
         """
         解析压缩包信息
         """
-        pattern = r'^([a-zA-Z ]+)\s+=\s+(.+)'
+        pattern = r"^([a-zA-Z ]+)\s+=\s+(.+)"
         groups: List[Tuple[str, str]] = re.findall(pattern, self.message, re.M)
         for key, value in groups:
-            self._update_info(key.replace(' ', '_').lower(), value.strip())
+            self._update_info(key.replace(" ", "_").lower(), value.strip())
 
 
 class ExtractResult(Result):
     """
     7zip 解压结果
     """
+
     pass
 
 
@@ -145,7 +147,7 @@ class FileInfo(BaseModel):
 
     date_time: Optional[str] = None
     #  D:文件夹 R:只读文件 H:隐藏文件 S:系统文件 A:普通文件
-    attr: Literal['D', 'R', 'H', 'S', 'A', '']
+    attr: Literal["D", "R", "H", "S", "A", ""]
     size: Optional[int] = None
     compressed: Optional[int] = None
     path: Path
@@ -155,11 +157,10 @@ class FileInfo(BaseModel):
         """
         是否是文件夹
         """
-        return self.attr == 'D'
+        return self.attr == "D"
 
 
 class ListResult(Result):
-
     # 文件列表
     files: List[FileInfo] = []
 
@@ -196,7 +197,7 @@ class ListResult(Result):
             paths: List[Path] = []
             index = 1
             while True:
-                volume_path = parent/name_callback(index)
+                volume_path = parent / name_callback(index)
                 if not volume_path.exists():
                     break
                 paths.append(volume_path)
@@ -206,25 +207,23 @@ class ListResult(Result):
         volume_paths: List[Path] = []
 
         # 处理 .001 .01 之类为后缀的分卷
-        if re.match(r'\.0+[1-9]\d*$', suffix):
+        if re.match(r"\.0+[1-9]\d*$", suffix):
             suffix_len = len(suffix) - 1
-            volume_paths += loop_search(
-                lambda i: f'{stem}.{str(i).zfill(suffix_len)}')
+            volume_paths += loop_search(lambda i: f"{stem}.{str(i).zfill(suffix_len)}")
 
         # 处理 zip 相关的压缩包
         # 处理 .zip .z01 之类为后缀的压缩包
-        elif archive_type == 'zip':
-            volume_paths.append(parent / f'{stem}.zip')
-            volume_paths += loop_search(lambda i: f'{stem}.z{str(i).zfill(2)}')
+        elif archive_type == "zip":
+            volume_paths.append(parent / f"{stem}.zip")
+            volume_paths += loop_search(lambda i: f"{stem}.z{str(i).zfill(2)}")
 
         # 处理 rar 相关的压缩包
-        elif 'rar' in archive_type:
+        elif "rar" in archive_type:
             # 处理 .part1.rar 之类为后缀的压缩包
-            part_pattern = r'(.+)\.part\d+\.rar$'
+            part_pattern = r"(.+)\.part\d+\.rar$"
             if re.match(part_pattern, name):
-                base_name = re.sub(part_pattern, r'\1', name)
-                volume_paths += loop_search(
-                    lambda i: f'{base_name}.part{i}.rar')
+                base_name = re.sub(part_pattern, r"\1", name)
+                volume_paths += loop_search(lambda i: f"{base_name}.part{i}.rar")
 
         # todo: 处理其他分卷压缩包类型
 
@@ -252,7 +251,7 @@ class ListResult(Result):
         ------------------- ----- ------------ ------------  ------------------------
         ```
         """
-        pattern = r'((?:(?:-+\s+){4})+(?:-+))([\s\S]+?)(?:(?:-+\s+){5})+'
+        pattern = r"((?:(?:-+\s+){4})+(?:-+))([\s\S]+?)(?:(?:-+\s+){5})+"
         groups: List[Tuple[str, str]] = re.findall(pattern, self.message, re.M)
 
         if len(groups) == 0:
@@ -261,8 +260,7 @@ class ListResult(Result):
         # 获取列开始位置
         # 0                   20    26           39            53
         # ------------------- ----- ------------ ------------  ------------------------
-        col_index = [s.start()
-                     for s in re.finditer(r'-{4,}', groups[0][0], re.M)]
+        col_index = [s.start() for s in re.finditer(r"-{4,}", groups[0][0], re.M)]
 
         lines: List[str] = groups[0][1].split(os.linesep)
 
@@ -271,25 +269,30 @@ class ListResult(Result):
                 continue
 
             # 时间
-            d = line[col_index[0]:col_index[1]].strip()
-            date_time = None if d == '' else d
+            d = line[col_index[0] : col_index[1]].strip()
+            date_time = None if d == "" else d
 
             # 文件属性 D.... => D
-            attr = line[col_index[1]:col_index[2]].strip().replace('.', '')
+            attr = line[col_index[1] : col_index[2]].strip().replace(".", "")
 
             # 大小
-            s = line[col_index[2]:col_index[3]].strip()
-            size = None if s == '' else int(s)
+            s = line[col_index[2] : col_index[3]].strip()
+            size = None if s == "" else int(s)
 
             # 压缩大小
-            c = line[col_index[3]:col_index[4]].strip()
-            compressed = None if c == '' else int(c)
+            c = line[col_index[3] : col_index[4]].strip()
+            compressed = None if c == "" else int(c)
 
             # 文件名
-            name = line[col_index[4]:].strip()
+            name = line[col_index[4] :].strip()
 
-            file = FileInfo(date_time=date_time, attr=attr,
-                            size=size, compressed=compressed, path=Path(name))
+            file = FileInfo(
+                date_time=date_time,
+                attr=attr,
+                size=size,
+                compressed=compressed,
+                path=Path(name),
+            )
             self.files.append(file)
 
 
@@ -297,4 +300,5 @@ class TestResult(Result):
     """
     测试结果
     """
+
     pass

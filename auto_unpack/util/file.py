@@ -13,7 +13,7 @@ def read_file(file_path: Path) -> str:
     :param encoding: 编码格式默认utf8
     :return: 文件内容
     """
-    with open(file_path, encoding='utf8') as f:
+    with open(file_path, encoding="utf8") as f:
         return f.read()
 
 
@@ -26,7 +26,7 @@ def write_file(file_path: Path, content: str):
     :return: None
     """
     file_path.parent.mkdir(parents=True, exist_ok=True)
-    with open(file_path, 'w', encoding='utf8') as f:
+    with open(file_path, "w", encoding="utf8") as f:
         f.write(content)
 
 
@@ -48,7 +48,7 @@ def read_yaml_file(file_path: Path) -> Any:
     :param encoding: 编码格式默认utf8
     :return: yaml文件内容
     """
-    return YAML(typ='safe').load(read_file(file_path))
+    return YAML(typ="safe").load(read_file(file_path))
 
 
 def get_next_not_exist_path(path: Path) -> Path:

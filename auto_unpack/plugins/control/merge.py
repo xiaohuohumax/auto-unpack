@@ -13,13 +13,10 @@ class MergePluginConfig(InputPluginConfig):
     """
     合并上下文插件配置
     """
-    name: Literal['merge'] = Field(
-        default='merge',
-        description='合并上下文插件'
-    )
+
+    name: Literal["merge"] = Field(default="merge", description="合并上下文插件")
     context_keys: List[str] = Field(
-        default=[],
-        description='需要合并的上下文 key 集合(默认: [])'
+        default=[], description="需要合并的上下文 key 集合(默认: [])"
     )
 
 
@@ -29,6 +26,7 @@ class MergePlugin(Plugin[MergePluginConfig]):
 
     作用：将多个上下文数据合并到一个上下文数据中
     """
+
     name: str = "merge"
 
     def execute(self):

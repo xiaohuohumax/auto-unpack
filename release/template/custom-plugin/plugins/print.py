@@ -12,20 +12,16 @@ class PrintPluginConfig(PluginConfig):
     """
     打印插件配置
     """
-    name: Literal["print"] = Field(
-        default="print",
-        description="打印插件"
-    )
-    message: str = Field(
-        default="Hello, world!",
-        description="打印的消息"
-    )
+
+    name: Literal["print"] = Field(default="print", description="打印插件")
+    message: str = Field(default="Hello, world!", description="打印的消息")
 
 
 class PrintPlugin(Plugin[PrintPluginConfig]):
     """
     打印插件
     """
+
     name: str = "print"
 
     def init(self):

@@ -17,20 +17,21 @@ class PluginConfig(BaseModel):
     """
     插件配置基类
     """
+
     # 忽略多余参数
-    model_config = ConfigDict(extra='ignore')
+    model_config = ConfigDict(extra="ignore")
     # 插件名称
-    name: str = ''
+    name: str = ""
 
 
 class InputPluginConfig(PluginConfig):
     """
     入口类型插件配置，用作加载数据
     """
+
     # 上下文保存 key
     save_key: str = Field(
-        default=constant.CONTEXT_DEFAULT_KEY,
-        description='上下文保存 key'
+        default=constant.CONTEXT_DEFAULT_KEY, description="上下文保存 key"
     )
 
 
@@ -38,27 +39,27 @@ class OutputPluginConfig(PluginConfig):
     """
     出口类型插件配置，用作数据最终处理
     """
+
     # 上下文加载 key
-    load_key: str = Field(
-        constant.CONTEXT_DEFAULT_KEY,
-        description='上下文加载 key'
-    )
+    load_key: str = Field(constant.CONTEXT_DEFAULT_KEY, description="上下文加载 key")
 
 
 class HandlePluginConfig(InputPluginConfig, OutputPluginConfig):
     """
     处理类型插件配置，用作数据中间加工
     """
+
     pass
 
 
-C = TypeVar('C', bound=PluginConfig)
+C = TypeVar("C", bound=PluginConfig)
 
 
 class PluginGlobalConfig(BaseModel):
     """
     插件全局配置元类
     """
+
     # 信息输出目录
     info_dir: Path
 
@@ -67,8 +68,9 @@ class Plugin(Generic[C]):
     """
     插件基类
     """
+
     # 插件名称(唯一标识)
-    name: str = ''
+    name: str = ""
     # 插件配置
     config: C
     # 数据仓库
@@ -76,9 +78,15 @@ class Plugin(Generic[C]):
     # 插件全局配置
     global_config: PluginGlobalConfig
     # 插件管理器
-    plugin_manager: 'PluginManager'
+    plugin_manager: "PluginManager"
 
-    def __init__(self, config: C, store: DataStore, global_config: PluginGlobalConfig, plugin_manager: 'PluginManager'):
+    def __init__(
+        self,
+        config: C,
+        store: DataStore,
+        global_config: PluginGlobalConfig,
+        plugin_manager: "PluginManager",
+    ):
         self.config = config
         self.store = store
         self.global_config = global_config
@@ -124,6 +132,7 @@ class PluginManager:
     """
     插件管理器
     """
+
     # 插件列表
     plugins: List[Tuple[PluginConfig, Plugin]] = []
 
@@ -134,28 +143,29 @@ class PluginManager:
         :param config: 插件配置
         :param plugin: 插件
         """
-        index = next((i for i, (_, p) in enumerate(
-            self.plugins) if p.name == plugin.name), -1)
+        index = next(
+            (i for i, (_, p) in enumerate(self.plugins) if p.name == plugin.name), -1
+        )
         if index != -1:
             logger.warning(f"Plugin `{plugin.name}` already exists, replaced")
             self.plugins[index] = (config, plugin)
         else:
             self.plugins.append((config, plugin))
 
-    def _load_plugin_by_file(self, file_path: Path) -> Optional[Tuple[PluginConfig, Plugin]]:
+    def _load_plugin_by_file(
+        self, file_path: Path
+    ) -> Optional[Tuple[PluginConfig, Plugin]]:
         """
         通过文件加载插件
 
         :param file_path: 插件文件路径
         """
         suffix = file_path.suffix
-        if suffix != '.py':
+        if suffix != ".py":
             return None
 
         plugin_name = file_path.stem
-        spec = importlib.util.spec_from_file_location(
-            plugin_name, file_path
-        )
+        spec = importlib.util.spec_from_file_location(plugin_name, file_path)
         module = importlib.util.module_from_spec(spec)
         spec.loader.exec_module(module)
 
@@ -175,8 +185,7 @@ class PluginManager:
             logger.debug(f"Plugin `{plugin_class.name}` loaded")
             self._save_plugin(config_class, plugin_class)
         else:
-            logger.warning(
-                f"Plugin file {plugin_name} has no config or plugin class")
+            logger.warning(f"Plugin file {plugin_name} has no config or plugin class")
 
     def load_plugin(self, plugin_path: Path):
         """
@@ -196,9 +205,9 @@ class PluginManager:
         logger.debug(f"Loading plugins from {plugin_path}")
         for root, _, files in os.walk(plugin_path):
             for file in files:
-                if file.startswith('__') or not file.endswith('.py'):
+                if file.startswith("__") or not file.endswith(".py"):
                     continue
-                self._load_plugin_by_file(Path(root)/file)
+                self._load_plugin_by_file(Path(root) / file)
 
     def load_plugin_by_class(self, config_class: Any, plugin_class: Any):
         """
@@ -211,17 +220,21 @@ class PluginManager:
 
         if not issubclass(plugin_class, Plugin):
             logger.warning(
-                f"Plugin class `{plugin_class}` is not a subclass of `Plugin`")
+                f"Plugin class `{plugin_class}` is not a subclass of `Plugin`"
+            )
             return
         elif not issubclass(config_class, PluginConfig):
             logger.warning(
-                f"Plugin config class `{config_class}` is not a subclass of `PluginConfig`")
+                f"Plugin config class `{config_class}` is not a subclass of `PluginConfig`"
+            )
             return
 
         logger.debug(f"Plugin `{plugin_class.name}` loaded")
         self._save_plugin(config_class, plugin_class)
 
-    def create_plugin_instance(self, config: Any, store: DataStore, global_config: PluginGlobalConfig) -> Plugin:
+    def create_plugin_instance(
+        self, config: Any, store: DataStore, global_config: PluginGlobalConfig
+    ) -> Plugin:
         """
         根据配置创建插件实例
 
@@ -230,18 +243,19 @@ class PluginManager:
         :return: 插件实例
         """
         for config_class, plugin_class in self.plugins:
-            if plugin_class.name == dict(config).get('name', None):
+            if plugin_class.name == dict(config).get("name", None):
                 try:
                     config_instance = config_class(**config)
                     return plugin_class(
                         config=config_instance,
                         store=store,
                         global_config=global_config,
-                        plugin_manager=self
+                        plugin_manager=self,
                     )
                 except Exception as e:
                     logger.error(
-                        f"Creating flow step `{config.get('name')}` failed: {e}")
+                        f"Creating flow step `{config.get('name')}` failed: {e}"
+                    )
                     raise e
 
         raise ValueError(f"Plugin `{config.get('name')}` not found")

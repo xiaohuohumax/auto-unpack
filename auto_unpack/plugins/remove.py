@@ -14,10 +14,8 @@ class RemovePluginConfig(OutputPluginConfig):
     """
     删除文件插件配置
     """
-    name: Literal['remove'] = Field(
-        default='remove',
-        description='删除文件插件'
-    )
+
+    name: Literal["remove"] = Field(default="remove", description="删除文件插件")
 
 
 class RemovePlugin(Plugin[RemovePluginConfig]):
@@ -26,6 +24,7 @@ class RemovePlugin(Plugin[RemovePluginConfig]):
 
     作用: 删除数据仓库中的指定文件
     """
+
     name: str = "remove"
 
     def execute(self):

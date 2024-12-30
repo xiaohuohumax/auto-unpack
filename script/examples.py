@@ -15,9 +15,9 @@ from auto_unpack import __version__ as version
 from auto_unpack.args import CustomHelpFormatter
 from auto_unpack.util import file
 
-config_dir: Path = Path('config')
-examples_dir: Path = Path('docs/page/examples')
-schema_path: Path = Path('schema/examples-schema.json')
+config_dir: Path = Path("config")
+examples_dir: Path = Path("docs/page/examples")
+schema_path: Path = Path("schema/examples-schema.json")
 
 example_template = """# {title}
 
@@ -39,22 +39,11 @@ class ConfigMeta(BaseModel):
     """
     配置文件元数据，用于生成示例文档
     """
-    example_doc: bool = Field(
-        default=False,
-        description="是否生成示例文档"
-    )
-    title: str = Field(
-        default="",
-        description="示例标题"
-    )
-    description: str = Field(
-        default="",
-        description="示例描述"
-    )
-    docs: str = Field(
-        default="",
-        description="示例补充文档"
-    )
+
+    example_doc: bool = Field(default=False, description="是否生成示例文档")
+    title: str = Field(default="", description="示例标题")
+    description: str = Field(default="", description="示例描述")
+    docs: str = Field(default="", description="示例补充文档")
 
 
 def build_example_docs():
@@ -62,11 +51,11 @@ def build_example_docs():
     构建示例文档
     """
     # 清理旧文档
-    for f in examples_dir.glob('*.md'):
+    for f in examples_dir.glob("*.md"):
         f.unlink()
 
     # 获取配置文档
-    flow_files: List[Path] = list(config_dir.glob('application.*.yaml'))
+    flow_files: List[Path] = list(config_dir.glob("application.*.yaml"))
 
     yaml = YAML()
     yaml.indent(mapping=2, sequence=4, offset=2)
@@ -96,7 +85,7 @@ def build_example_docs():
                 yaml=flow_file_content,
             )
 
-            name = flow_file.stem.replace('application.', '')
+            name = flow_file.stem.replace("application.", "")
             example_file = examples_dir / f"{name}.md"
 
             file.write_file(example_file, example_context)
@@ -128,6 +117,7 @@ class Args(BaseModel):
     """
     命令行参数
     """
+
     # 是否显示版本号
     version: bool = False
     # 是否启动文件监控模式
@@ -142,14 +132,16 @@ def main():
     """
     parser = argparse.ArgumentParser(
         description="auto-unpack 文档-场景示例生成工具",
-        formatter_class=CustomHelpFormatter
+        formatter_class=CustomHelpFormatter,
     )
 
-    parser.add_argument('-v', '--version', action='store_true', help='是否显示版本号')
+    parser.add_argument("-v", "--version", action="store_true", help="是否显示版本号")
     parser.add_argument(
-        '-w', '--watch', action='store_true', help='是否启动文件监控模式')
+        "-w", "--watch", action="store_true", help="是否启动文件监控模式"
+    )
     parser.add_argument(
-        '-g', '--generate-schema', action='store_true', help='是否生成JSON Schema文件')
+        "-g", "--generate-schema", action="store_true", help="是否生成JSON Schema文件"
+    )
 
     args = Args.model_validate(vars(parser.parse_args()))
 
@@ -158,8 +150,9 @@ def main():
         return
     elif args.generate_schema:
         print("Generate schema file.")
-        schema = json.dumps(ConfigMeta.model_json_schema(),
-                            ensure_ascii=False, indent=4)
+        schema = json.dumps(
+            ConfigMeta.model_json_schema(), ensure_ascii=False, indent=4
+        )
         file.write_file(schema_path, schema)
         print(f"Schema file was generated: {schema_path}")
         return
@@ -181,7 +174,7 @@ def main():
     print("Generate examples docs done.")
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     """
     此脚本用于生成文档-场景示例
     """

@@ -8,17 +8,32 @@ from pathlib import Path
 from typing import Any, Dict, List, Literal, Optional
 from uuid import uuid4
 
-from pydantic import (BaseModel, Field, field_serializer, field_validator,
-                      model_serializer, model_validator)
+from pydantic import (
+    BaseModel,
+    Field,
+    field_serializer,
+    field_validator,
+    model_serializer,
+    model_validator,
+)
 from typing_extensions import Self
 
 from auto_unpack.plugin import HandlePluginConfig, Plugin
 from auto_unpack.store import Context, FileData
-from auto_unpack.util.file import (get_next_not_exist_path,
-                                   is_path_in_includes, path_equal,
-                                   read_file_lines, write_file)
-from auto_unpack.util.sevenzip import (ExtractResult, ListResult, Result,
-                                       ResultCode, SevenZipUtil)
+from auto_unpack.util.file import (
+    get_next_not_exist_path,
+    is_path_in_includes,
+    path_equal,
+    read_file_lines,
+    write_file,
+)
+from auto_unpack.util.sevenzip import (
+    ExtractResult,
+    ListResult,
+    Result,
+    ResultCode,
+    SevenZipUtil,
+)
 from auto_unpack.util.sevenzip.result import Attr
 
 logger = logging.getLogger(__name__)
@@ -28,22 +43,23 @@ class ArchiveInfoStatus(Enum):
     """
     文件信息枚举
     """
+
     # 未初始化
-    INIT = (-1, 'Init')
+    INIT = (-1, "Init")
     # 识别失败
-    LIST_FAIL = (0, 'List Fail')
+    LIST_FAIL = (0, "List Fail")
     # 识别为分卷
-    LIST_VOLUME = (1, 'List Volume')
+    LIST_VOLUME = (1, "List Volume")
     # 识别成功
-    LIST_SUCCESS = (2, 'List Success')
+    LIST_SUCCESS = (2, "List Success")
     # 测试失败
-    TEST_FAIL = (3, 'Test Fail')
+    TEST_FAIL = (3, "Test Fail")
     # 测试成功
-    TEST_SUCCESS = (4, 'Test Success')
+    TEST_SUCCESS = (4, "Test Success")
     # 解压失败
-    EXTRACT_FAIL = (5, 'Extract Fail')
+    EXTRACT_FAIL = (5, "Extract Fail")
     # 解压成功
-    EXTRACT_SUCCESS = (6, 'Extract Success')
+    EXTRACT_SUCCESS = (6, "Extract Success")
 
     @property
     def tip(self):
@@ -57,6 +73,7 @@ class ArchiveInfo(BaseModel):
     """
     压缩包信息
     """
+
     # 是否分卷
     is_volume: bool
     # 密码
@@ -68,14 +85,14 @@ class ArchiveInfo(BaseModel):
     # 入口文件路径
     main_path: Path = Field(exclude=True)
 
-    @model_serializer(when_used='json')
+    @model_serializer(when_used="json")
     def serialize_v1(self) -> Dict[str, Any]:
         r = self.model_dump(exclude_none=True)
-        if not r['is_volume']:
-            del r['volumes']
+        if not r["is_volume"]:
+            del r["volumes"]
 
-        if 'path' in r['attr']:
-            del r['attr']['path']
+        if "path" in r["attr"]:
+            del r["attr"]["path"]
         return r
 
 
@@ -83,6 +100,7 @@ class ArchiveError(BaseModel):
     """
     异常信息
     """
+
     # 命令行输出
     message: str
     # 命令行错误代码
@@ -93,6 +111,7 @@ class ArchiveFile(BaseModel):
     """
     压缩包文件
     """
+
     # 状态
     status: ArchiveInfoStatus = Field(exclude=True)
     # 路径
@@ -114,24 +133,26 @@ class ArchiveStatGroup(BaseModel):
     """
     压缩包统计信息分组
     """
+
     # 状态
     status: ArchiveInfoStatus
     # 统计信息
     archives: List[ArchiveFile] = []
 
-    @field_serializer('status', when_used='json')
+    @field_serializer("status", when_used="json")
     def serialize_status(self, status: ArchiveInfoStatus) -> str:
         return status.tip
 
 
 # 结果处理模式
-Result_Processing_Mode = Literal['strict', 'greedy']
+Result_Processing_Mode = Literal["strict", "greedy"]
 
 
 class ArchiveStat(BaseModel):
     """
     压缩包统计信息
     """
+
     # 文件数
     count: int = 0
 
@@ -144,7 +165,7 @@ class ArchiveStat(BaseModel):
     extract_success: Optional[int] = None
     extract_fail: Optional[int] = None
     # 结果处理模式
-    result_processing_mode: Result_Processing_Mode = 'strict'
+    result_processing_mode: Result_Processing_Mode = "strict"
 
     # 详细信息
     groups: List[ArchiveStatGroup] = []
@@ -154,64 +175,56 @@ class ArchivePluginConfig(HandlePluginConfig):
     """
     压缩包处理插件配置
     """
-    name: Literal['archive'] = Field(
-        default='archive',
-        description="压缩包处理插件"
-    )
+
+    name: Literal["archive"] = Field(default="archive", description="压缩包处理插件")
     # 压缩包处理模式
-    mode: Literal['list', 'extract', 'test'] = Field(
+    mode: Literal["list", "extract", "test"] = Field(
         description="压缩包处理模式\nlist: 列出压缩包内文件信息\nextract: 解压压缩包\ntest: 测试压缩包完整性"
     )
     password_path: Path = Field(
-        default_factory=lambda: Path('passwords.txt'),
-        description="密码表文件路径(默认: passwords.txt)"
+        default_factory=lambda: Path("passwords.txt"),
+        description="密码表文件路径(默认: passwords.txt)",
     )
     fail_key: Optional[str] = Field(
-        default=None,
-        description="失败上下文 key(默认: null)"
+        default=None, description="失败上下文 key(默认: null)"
     )
     stat_file_name: Optional[str] = Field(
-        default=None,
-        description="统计信息文件名，不同模式对应不同统计信息(默认: null)"
+        default=None, description="统计信息文件名，不同模式对应不同统计信息(默认: null)"
     )
     thread_max: int = Field(
         default=10,
         description="线程池最大线程数(默认: 10)",
-        json_schema_extra={
-            "minimum": 1
-        }
+        json_schema_extra={"minimum": 1},
     )
     result_processing_mode: Result_Processing_Mode = Field(
-        default='strict',
-        description="结果处理模式(默认: strict)\nstrict: 严格模式[结果绝对依靠 7-zip 命令行输出]\ngreedy: 贪婪模式[7-zip 返回某些错误码时, 也会尝试识别/测试/解压]"
+        default="strict",
+        description="结果处理模式(默认: strict)\nstrict: 严格模式[结果绝对依靠 7-zip 命令行输出]\ngreedy: 贪婪模式[7-zip 返回某些错误码时, 也会尝试识别/测试/解压]",
     )
     # mode: extract 可用选项
     output_dir: Path = Field(
-        default_factory=lambda: Path('output'),
-        description="压缩包存放目录(默认: output)"
+        default_factory=lambda: Path("output"),
+        description="压缩包存放目录(默认: output)",
     )
     keep_dir: bool = Field(
-        default=True,
-        description="是否保持解压后的文件夹结构(默认: true)"
+        default=True, description="是否保持解压后的文件夹结构(默认: true)"
     )
 
-    @model_validator(mode='after')
+    @model_validator(mode="after")
     def validator(self) -> Self:
         password_path = self.password_path
         if not password_path.exists():
             raise ValueError(f"Password file `{password_path}` does not exist")
         return self
 
-    @field_validator('thread_max')
+    @field_validator("thread_max")
     @classmethod
     def validate_thread_max(cls, v: int):
         if v <= 0:
-            raise ValueError(
-                f"Thread max should be greater than 0, but got `{v}`")
+            raise ValueError(f"Thread max should be greater than 0, but got `{v}`")
         return v
 
 
-Result_Level = Literal['success', 'warning', 'error']
+Result_Level = Literal["success", "warning", "error"]
 
 
 class ArchivePlugin(Plugin[ArchivePluginConfig]):
@@ -220,12 +233,13 @@ class ArchivePlugin(Plugin[ArchivePluginConfig]):
 
     作用: 识别压缩包，测试压缩包完整性，解压压缩包
     """
+
     name: str = "archive"
     passwords: List[str] = []
 
     archive_files: List[ArchiveFile] = []
 
-    cache_dir: Path = Path('.cache')
+    cache_dir: Path = Path(".cache")
     cache_dirs: List[Path] = []
     file_lock = threading.Lock()
 
@@ -239,16 +253,17 @@ class ArchivePlugin(Plugin[ArchivePluginConfig]):
         # 计算密码表起始位置
         start_index = 0
         for i, line in enumerate(lines):
-            if all(char == '-' for char in line) and len(line) > 0:
+            if all(char == "-" for char in line) and len(line) > 0:
                 start_index = i + 1
                 break
 
         # 添加空密码到第一位
         passwords = [p for p in lines[start_index:] if len(p) > 0]
-        self.passwords = [''] + passwords
+        self.passwords = [""] + passwords
 
         logger.info(
-            f"Loaded {len(passwords)} passwords from `{self.config.password_path}`")
+            f"Loaded {len(passwords)} passwords from `{self.config.password_path}`"
+        )
 
     def _get_result_level(self, result: Result) -> Result_Level:
         """
@@ -263,7 +278,7 @@ class ArchivePlugin(Plugin[ArchivePluginConfig]):
         :param result: 结果
         :return: 级别
         """
-        if self.config.result_processing_mode == 'greedy':
+        if self.config.result_processing_mode == "greedy":
             # 贪婪模式
 
             # 关于 p7zip 解压缩较大的RAR格式文件 BUG ISSUE #2
@@ -271,14 +286,14 @@ class ArchivePlugin(Plugin[ArchivePluginConfig]):
             # Type = Rar
             # Code = HEADERS_ERROR => Headers Error in encrypted archive.
             # Characteristics = Recovery
-            if result.code == ResultCode.HEADERS_ERROR \
-                and result.attr.type == 'Rar' \
-                    and 'Recovery' in result.attr.characteristics:
-                return 'warning'
+            if (
+                result.code == ResultCode.HEADERS_ERROR
+                and result.attr.type == "Rar"
+                and "Recovery" in result.attr.characteristics
+            ):
+                return "warning"
 
-        return 'success' \
-            if result.code == ResultCode.NO_ERROR \
-            else 'error'
+        return "success" if result.code == ResultCode.NO_ERROR else "error"
 
     def _list_archives_item(self, archive_files: List[ArchiveFile]):
         """
@@ -290,7 +305,6 @@ class ArchivePlugin(Plugin[ArchivePluginConfig]):
         success_archive_files: List[ArchiveFile] = []
 
         for archive_file in archive_files:
-
             # 跳过文件夹
             if archive_file.path.is_dir():
                 error_message = f"Skipping directory `{archive_file.path}`"
@@ -301,19 +315,24 @@ class ArchivePlugin(Plugin[ArchivePluginConfig]):
                 continue
 
             # 跳过已被识别的分卷
-            is_included = any((c for c in success_archive_files
-                               if is_path_in_includes(archive_file.path, c.info.volumes)))
+            is_included = any(
+                (
+                    c
+                    for c in success_archive_files
+                    if is_path_in_includes(archive_file.path, c.info.volumes)
+                )
+            )
             if is_included:
                 continue
 
-            if self.config.mode == 'list':
+            if self.config.mode == "list":
                 logger.info(f"Listing archive `{archive_file.path}`")
 
             for password in self.passwords:
                 list_result = SevenZipUtil.list(archive_file.path, password)
 
                 level = self._get_result_level(list_result)
-                if level == 'error':
+                if level == "error":
                     continue
 
                 archive_file.status = ArchiveInfoStatus.LIST_SUCCESS
@@ -322,10 +341,10 @@ class ArchivePlugin(Plugin[ArchivePluginConfig]):
                     attr=list_result.attr,
                     is_volume=list_result.is_volume,
                     volumes=list_result.volume_paths,
-                    password=password if password != '' else None,
+                    password=password if password != "" else None,
                     main_path=list_result.volume_main_path,
                 )
-                if level == 'warning':
+                if level == "warning":
                     archive_file.error = ArchiveError(
                         message=list_result.message,
                         code=list_result.code,
@@ -375,14 +394,18 @@ class ArchivePlugin(Plugin[ArchivePluginConfig]):
                 continue
 
             # 不是分卷
-            if not path_equal(archive_file.info.main_path, archive_file.path) \
-                    or len(archive_file.info.volumes) < 2:
+            if (
+                not path_equal(archive_file.info.main_path, archive_file.path)
+                or len(archive_file.info.volumes) < 2
+            ):
                 continue
 
             for archive_file_item in self.archive_files:
                 if archive_file_item == archive_file:
                     continue
-                if not is_path_in_includes(archive_file_item.path, archive_file.info.volumes):
+                if not is_path_in_includes(
+                    archive_file_item.path, archive_file.info.volumes
+                ):
                     continue
 
                 archive_file_item.status = ArchiveInfoStatus.LIST_VOLUME
@@ -403,13 +426,12 @@ class ArchivePlugin(Plugin[ArchivePluginConfig]):
 
         logger.info(f"Testing archive `{archive_file.path}`")
 
-        test_result = SevenZipUtil.test(
-            info_result.file_path, info_result.password)
+        test_result = SevenZipUtil.test(info_result.file_path, info_result.password)
         level = self._get_result_level(test_result)
 
-        if level in ['success', 'warning']:
+        if level in ["success", "warning"]:
             archive_file.status = ArchiveInfoStatus.TEST_SUCCESS
-            if level == 'warning':
+            if level == "warning":
                 archive_file.error = ArchiveError(
                     message=test_result.message,
                     code=test_result.code,
@@ -420,9 +442,9 @@ class ArchivePlugin(Plugin[ArchivePluginConfig]):
             test_result = SevenZipUtil.test(info_result.file_path, password)
             level = self._get_result_level(test_result)
 
-            if level in ['success', 'warning']:
+            if level in ["success", "warning"]:
                 archive_file.status = ArchiveInfoStatus.TEST_SUCCESS
-                if level == 'warning':
+                if level == "warning":
                     archive_file.error = ArchiveError(
                         message=test_result.message,
                         code=test_result.code,
@@ -441,7 +463,7 @@ class ArchivePlugin(Plugin[ArchivePluginConfig]):
         """
         测试压缩包完整性
         """
-        if self.config.mode != 'test':
+        if self.config.mode != "test":
             return
 
         pool = ThreadPool(self.config.thread_max)
@@ -487,11 +509,10 @@ class ArchivePlugin(Plugin[ArchivePluginConfig]):
                     self.config.output_dir / archive_file.path.stem
                 )
                 shutil.move(output_cache_dir, output)
-            logger.debug(
-                f"Extracted archive `{output_cache_dir}` to `{output}`")
+            logger.debug(f"Extracted archive `{output_cache_dir}` to `{output}`")
             archive_file.status = ArchiveInfoStatus.EXTRACT_SUCCESS
 
-            if level == 'warning':
+            if level == "warning":
                 archive_file.error = ArchiveError(
                     message=result.message,
                     code=result.code,
@@ -502,28 +523,27 @@ class ArchivePlugin(Plugin[ArchivePluginConfig]):
             file_path=info_result.file_path,
             password=info_result.password,
             output_dir=output_cache_dir,
-            overwrite='u',
+            overwrite="u",
             keep_dir=self.config.keep_dir,
         )
         level = self._get_result_level(extract_result)
 
-        if level in ['success', 'warning']:
+        if level in ["success", "warning"]:
             extract_success(extract_result, level)
             return
 
         for password in self.passwords:
-
             extract_result = SevenZipUtil.extract(
                 file_path=info_result.file_path,
                 password=password,
                 output_dir=output_cache_dir,
-                overwrite='u',
+                overwrite="u",
                 keep_dir=self.config.keep_dir,
             )
 
             level = self._get_result_level(extract_result)
 
-            if level in ['success', 'warning']:
+            if level in ["success", "warning"]:
                 archive_file.info.password = password
                 extract_success(extract_result, level)
                 break
@@ -541,7 +561,7 @@ class ArchivePlugin(Plugin[ArchivePluginConfig]):
         """
         解压压缩包
         """
-        if self.config.mode != 'extract':
+        if self.config.mode != "extract":
             return
 
         if not self.config.output_dir.exists():
@@ -600,13 +620,13 @@ class ArchivePlugin(Plugin[ArchivePluginConfig]):
 
         # 各阶段数量统计
         count_map = {
-            ArchiveInfoStatus.LIST_SUCCESS: [0, 'list_success'],
-            ArchiveInfoStatus.LIST_VOLUME: [0, 'list_volume'],
-            ArchiveInfoStatus.LIST_FAIL: [0, 'list_fail'],
-            ArchiveInfoStatus.TEST_SUCCESS: [0, 'test_success'],
-            ArchiveInfoStatus.TEST_FAIL: [0, 'test_fail'],
-            ArchiveInfoStatus.EXTRACT_SUCCESS: [0, 'extract_success'],
-            ArchiveInfoStatus.EXTRACT_FAIL: [0, 'extract_fail'],
+            ArchiveInfoStatus.LIST_SUCCESS: [0, "list_success"],
+            ArchiveInfoStatus.LIST_VOLUME: [0, "list_volume"],
+            ArchiveInfoStatus.LIST_FAIL: [0, "list_fail"],
+            ArchiveInfoStatus.TEST_SUCCESS: [0, "test_success"],
+            ArchiveInfoStatus.TEST_FAIL: [0, "test_fail"],
+            ArchiveInfoStatus.EXTRACT_SUCCESS: [0, "extract_success"],
+            ArchiveInfoStatus.EXTRACT_FAIL: [0, "extract_fail"],
         }
 
         archive_status = ArchiveStat(groups=[])
@@ -640,7 +660,7 @@ class ArchivePlugin(Plugin[ArchivePluginConfig]):
         )
 
         stat_path = get_next_not_exist_path(
-            self.global_config.info_dir / f'{self.config.stat_file_name}.json'
+            self.global_config.info_dir / f"{self.config.stat_file_name}.json"
         )
 
         write_file(stat_path, stat_json)

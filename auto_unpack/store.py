@@ -14,6 +14,7 @@ class FileData(BaseModel):
     """
     文件数据类
     """
+
     # 文件路径
     path: Path
     # 搜索路径
@@ -30,9 +31,11 @@ class FileData(BaseModel):
         return hash((str(self.path), str(self.search_path)))
 
     def __eq__(self, other):
-        return isinstance(other, FileData) \
-            and self.path == other.path \
+        return (
+            isinstance(other, FileData)
+            and self.path == other.path
             and self.search_path == other.search_path
+        )
 
 
 def path_glob_match(path: Path, pattern: str) -> bool:
@@ -44,9 +47,9 @@ def path_glob_match(path: Path, pattern: str) -> bool:
     :return: 是否匹配
     """
     try:
-        path_str = str(path).replace('\\', '/')
-        if not path_str.endswith('/') and path.is_dir():
-            path_str += '/'
+        path_str = str(path).replace("\\", "/")
+        if not path_str.endswith("/") and path.is_dir():
+            path_str += "/"
         return fnmatch.fnmatchcase(path_str, pattern)
     except Exception:
         # 当文件不存在时，回退至使用 match 方法
@@ -55,7 +58,8 @@ def path_glob_match(path: Path, pattern: str) -> bool:
         # Path('a').match('*/') => True
         # Path('a/').match('*/') => True
         logger.warning(
-            f"Failed to use fnmatch.fnmatchcase to match path `{path}` with pattern `{pattern}`")
+            f"Failed to use fnmatch.fnmatchcase to match path `{path}` with pattern `{pattern}`"
+        )
         return path.match(pattern)
 
 
@@ -101,6 +105,7 @@ class Context(BaseModel):
     """
     上下文类
     """
+
     # 文件数据列表
     file_datas: List[FileData] = []
 
@@ -109,6 +114,7 @@ class DataStore:
     """
     数据存储类
     """
+
     contexts: Dict[str, Context] = {}
 
     def __init__(self):
@@ -120,8 +126,7 @@ class DataStore:
         加载上下文
         """
         if context_key not in self.contexts:
-            raise KeyError(
-                f"Context key `{context_key}` not found in data store")
+            raise KeyError(f"Context key `{context_key}` not found in data store")
         return self.contexts[context_key]
 
     def save_context(self, context_key, context: Context):

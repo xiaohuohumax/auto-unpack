@@ -17,7 +17,7 @@ scheduler = BackgroundScheduler()
 
 
 def signal_handler(_sig, _frame):
-    logger.info('Received signal, shutting down scheduler...')
+    logger.info("Received signal, shutting down scheduler...")
     scheduler.shutdown(wait=False)
     sys.exit(0)
 
@@ -30,13 +30,13 @@ app = App()
 
 scheduler.add_job(
     app.run,
-    trigger='interval',
+    trigger="interval",
     seconds=job_interval_seconds,
-    next_run_time=datetime.now()
+    next_run_time=datetime.now(),
 )
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     scheduler.start()
     while True:
         time.sleep(60 * 5)

@@ -44,7 +44,9 @@ Tracker = "https://github.com/xiaohuohumax/auto-unpack/issues"
 auto-unpack = "auto_unpack.cli:main"
 
 [build-system]
-requires = ["hatchling"]
+# 新版 Hatch 与 rye 的 twine 不兼容 Metadata-Version 异常，暂时使用旧版
+# 参考：https://github.com/astral-sh/rye/issues/1446
+requires = ["hatchling==1.26.3"]
 build-backend = "hatchling.build"
 
 [tool.rye]
